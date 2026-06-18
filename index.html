@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body { font-family: 'Sarabun', sans-serif; }
     </style>
@@ -399,14 +400,24 @@
             renderDropdowns();
         }
 
-        function handleLogout() {
-            currentRecorder = null;
-            document.getElementById('userStatus').innerHTML = `<i class="fa-solid fa-user-clock text-indigo-300"></i> <span>ยังไม่ได้เข้าสู่ระบบ</span>`;
-            document.getElementById('logoutBtn').classList.add('hidden');
-            document.getElementById('loginSection').classList.remove('hidden');
-            document.getElementById('attendanceFormSection').classList.add('hidden');
-            alert("ออกจากระบบเรียบร้อยแล้วค่ะ");
-        }
+       function handleLogout() {
+    currentRecorder = null;
+    document.getElementById('userStatus').innerHTML = `<i class="fa-solid fa-user-clock text-indigo-300"></i> <span>ยังไม่ได้เข้าสู่ระบบ</span>`;
+    document.getElementById('logoutBtn').classList.add('hidden');
+    document.getElementById('loginSection').classList.remove('hidden');
+    document.getElementById('attendanceFormSection').classList.add('hidden');
+    
+    // ปรับการแจ้งเตือน "ออกจากระบบเรียบร้อยแล้วค่ะ" ให้สวยงามด้วย SweetAlert2
+    Swal.fire({
+        title: 'ออกจากระบบสำเร็จ!',
+        text: 'ออกจากระบบเรียบร้อยแล้วค่ะ',
+        icon: 'success',
+        confirmButtonText: 'ตกลง',
+        confirmButtonColor: '#312e81', // สี Indigo เข้ากับธีมโรงเรียน
+        timer: 2000, // ปิดอัตโนมัติภายใน 2 วินาที
+        timerProgressBar: true
+    });
+}
 
         // ==================== [TAB 1] Dashboard ====================
         function loadDailySummary() {
