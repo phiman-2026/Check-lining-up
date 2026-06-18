@@ -21,9 +21,9 @@
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzy3H3uljjyxiC1GSKM7PIYCs8sOR27LjaNdQiSKW3PvUTcxS5ptFsArMpjwHgNP9v7/exec";
         
         let classList = [];
-        let checkedLevels = []; // ระดับชั้นที่บันทึกของวันนี้ไปแล้ว
+        let checkedLevels = []; 
         let currentRecorder = null;
-        let isEditMode = false; // ตรวจสอบว่าเปิดโหมดแก้ไขอยู่หรือไม่
+        let isEditMode = false; 
     </script>
 
     <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-40">
@@ -119,7 +119,7 @@
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
                                 <th class="p-3 text-center w-24">ห้องเรียน</th>
-                                <th class="p-3">ชื่อครูที่ปรึกษา</th>
+                                <th class="p-3">ชื่อครูที่ปรึกษา (ร่วม)</th>
                                 <th class="p-3 text-center w-36">สถานะวันนี้</th>
                                 <th class="p-3">เหตุผลกรณีไม่ลงแถว</th>
                                 <th class="p-3 text-center w-24">เวลาบันทึก</th>
@@ -183,7 +183,7 @@
                             <thead>
                                 <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
                                     <th class="p-3 text-center w-24">ห้องเรียน</th>
-                                    <th class="p-3">ชื่อครูที่ปรึกษา</th>
+                                    <th class="p-3">ชื่อครูที่ปรึกษา (ร่วม)</th>
                                     <th class="p-3 text-center w-64">สถานะการลงแถว</th>
                                     <th class="p-3">ระบุสาเหตุ (กรณีไม่ลงแถว)</th>
                                 </tr>
@@ -229,7 +229,7 @@
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold text-center">
                                 <th class="p-3 text-center w-20">ห้อง</th>
-                                <th class="p-3 text-left">ชื่อครูที่ปรึกษา</th>
+                                <th class="p-3 text-left">ชื่อครูที่ปรึกษา (ร่วม)</th>
                                 <th class="p-3 text-emerald-700 bg-emerald-50/40 w-24">มาปฏิบัติงาน</th>
                                 <th class="p-3 text-rose-700 bg-rose-50/40 w-20">ขาดแถวรวม</th>
                                 <th class="p-3 text-slate-600 w-16">ป่วย</th>
@@ -239,8 +239,7 @@
                                 <th class="p-3 bg-slate-100 w-24">รวม (ครั้ง)</th>
                             </tr>
                         </thead>
-                        <tbody id="statsTableBody" class="divide-y divide-slate-100">
-                            </tbody>
+                        <tbody id="statsTableBody" class="divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
@@ -331,7 +330,6 @@
             document.getElementById('successModal').classList.add('hidden');
         }
 
-        // ดึงรายชื่อชั้นเรียน และตรวจสอบข้อมูลกรองประวัติการเช็คชื่อวันนี้
         function fetchInitialConfig() {
             showLoading(true);
             fetch(`${WEB_APP_URL}?action=getInitialData`)
@@ -339,14 +337,12 @@
                 .then(data => {
                     classList = data.classList || [];
                     checkedLevels = data.checkedLevels || [];
-                    
                     renderDropdowns();
                 })
                 .catch(err => alert("โหลดโครงสร้างชั้นล้มเหลว: " + err))
                 .finally(() => showLoading(false));
         }
 
-        // จัดแจงเนื้อหาใน Dropdown ต่างๆ ตามสิทธิ์และสถานะการลงแถว
         function renderDropdowns() {
             const dbSelect = document.getElementById('dbClassSelect');
             const checkSelect = document.getElementById('checkClassSelect');
@@ -363,9 +359,8 @@
                 statsSelect.appendChild(createOptionElement(cls, cls));
                 reportSelect.appendChild(createOptionElement(cls, cls));
 
-                // 💡 เงื่อนไขสำคัญ: ในโหมดปกติ (ไม่ใช่โหมดแก้ไข) หากระดับชั้นนี้เช็คไปแล้ว จะซ่อนออกจากตัวเลือกตรวจประจำวัน
                 if (!isEditMode && checkedLevels.includes(cls)) {
-                    // ไม่แอดลงตารางตรวจเพื่อป้องกันการเช็คชื่อซ้ำ
+                    // ซ่อนรายการที่เช็คแล้วออกเพื่อป้องกันการตรวจซ้ำซ้อน
                 } else {
                     checkSelect.appendChild(createOptionElement(cls, cls));
                 }
@@ -378,48 +373,46 @@
             return opt;
         }
 
-        // สลับโหมดบันทึกข้อมูลใหม่ / แก้ไขข้อมูลที่บันทึกไปแล้ว
+        // ปรับปรุงฟังก์ชันสลับโหมด: นำกล่องข้อความแจ้งเตือน (Alert) ขัดจังหวะออกเรียบร้อยแล้วตามสั่ง
         function toggleEditMode() {
-    isEditMode = !isEditMode;
-    const btn = document.getElementById('toggleModeBtn');
-    const text = document.getElementById('modeText');
-    const tbody = document.getElementById('attendanceTableBody');
+            isEditMode = !isEditMode;
+            const btn = document.getElementById('toggleModeBtn');
+            const text = document.getElementById('modeText');
+            const tbody = document.getElementById('attendanceTableBody');
 
-    if (isEditMode) {
-        btn.className = "bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-100 transition flex items-center gap-1.5 cursor-pointer";
-        text.innerText = "เปลี่ยนเป็นโหมดเช็คปกติ (ซ่อนรายการเช็คแล้ว)";
-        // นำบรรทัด alert(...) หรือ แจ้งเตือนเดิมออกเรียบร้อยแล้ว ระบบจะทำงานทันทีโดยไม่มีป๊อปอัปขัดจังหวะ
-    } else {
-        btn.className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
-        text.innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
-    }
-    
-    document.getElementById('checkClassSelect').value = "";
-    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
-    document.getElementById('submitBtnArea').classList.add('hidden');
-    renderDropdowns();
-}
+            if (isEditMode) {
+                btn.className = "bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-100 transition flex items-center gap-1.5 cursor-pointer";
+                text.innerText = "เปลี่ยนเป็นโหมดเช็คปกติ (ซ่อนรายการเช็คแล้ว)";
+            } else {
+                btn.className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
+                text.innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
+            }
+            
+            document.getElementById('checkClassSelect').value = "";
+            tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
+            document.getElementById('submitBtnArea').classList.add('hidden');
+            renderDropdowns();
+        }
 
-      function handleLogout() {
-    currentRecorder = null;
-    document.getElementById('userStatus').innerHTML = `<i class="fa-solid fa-user-clock text-indigo-300"></i> <span>ยังไม่ได้เข้าสู่ระบบ</span>`;
-    document.getElementById('logoutBtn').classList.add('hidden');
-    document.getElementById('loginSection').classList.remove('hidden');
-    document.getElementById('attendanceFormSection').classList.add('hidden');
-    
-    // ปรับการแจ้งเตือน "ออกจากระบบเรียบร้อยแล้วค่ะ" ให้สวยงามและทันสมัย
-    Swal.fire({
-        title: 'ออกจากระบบสำเร็จ',
-        text: 'ออกจากระบบเรียบร้อยแล้วค่ะ',
-        icon: 'success',
-        confirmButtonText: 'ตกลง',
-        confirmButtonColor: '#1e1b4b', // สี Indigo-950 เข้ากับธีมบาร์บน
-        timer: 2000,
-        timerProgressBar: true
-    });
-}
+        // ปรับปรุงฟังก์ชันออกจากระบบ: แจ้งเตือนสวยงามด้วย SweetAlert2 
+        function handleLogout() {
+            currentRecorder = null;
+            document.getElementById('userStatus').innerHTML = `<i class="fa-solid fa-user-clock text-indigo-300"></i> <span>ยังไม่ได้เข้าสู่ระบบ</span>`;
+            document.getElementById('logoutBtn').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('attendanceFormSection').classList.add('hidden');
+            
+            Swal.fire({
+                title: 'ออกจากระบบสำเร็จ',
+                text: 'ออกจากระบบเรียบร้อยแล้วค่ะ',
+                icon: 'success',
+                confirmButtonText: 'ตกลง',
+                confirmButtonColor: '#1e1b4b', 
+                timer: 2000,
+                timerProgressBar: true
+            });
+        }
 
-        // ==================== [TAB 1] Dashboard ====================
         function loadDailySummary() {
             const selectedClass = document.getElementById('dbClassSelect').value;
             const tbody = document.getElementById('dashboardTableBody');
@@ -457,7 +450,6 @@
                 .finally(() => showLoading(false));
         }
 
-        // ==================== [TAB 2] Check-in & Login ====================
         function handleLogin() {
             const pin = document.getElementById('pinInput').value;
             if (!pin) { alert("กรุณาใส่รหัส PIN ก่อนค่ะ"); return; }
@@ -517,7 +509,7 @@
                                         <input type="radio" name="status_${index}" value="ปฏิบัติหน้าที่" ${!isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, false)"> ปฏิบัติหน้าที่
                                     </label>
                                     <label class="flex items-center gap-1.5 cursor-pointer text-rose-700 font-medium">
-                                        <input type="radio" name="status_${index}" value="ไม่ลงแถว" ${isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, true)"> ไม่ลงแถว
+                                        <input type="radio" name="status_${index}" value="ไม่ลงแถว" ${isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, true)"> 不ลงแถว
                                     </label>
                                 </div>
                             </td>
@@ -581,14 +573,13 @@
                     tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
                     document.getElementById('submitBtnArea').classList.add('hidden');
                     
-                    fetchInitialConfig(); // อัปเดตรายชื่อชั้นเรียนที่เช็คแล้วใหม่
+                    fetchInitialConfig(); 
                     switchTab('dashboard-tab');
                 } else { alert("เกิดข้อผิดพลาด: " + res.msg); }
             })
             .finally(() => showLoading(false));
         }
 
-        // ==================== [TAB 3] สถิติรายเดือน ====================
         function loadMonthlyStats() {
             const levelFilter = document.getElementById('statsClassSelect').value;
             const tbody = document.getElementById('statsTableBody');
@@ -622,7 +613,6 @@
                 .catch(err => tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`);
         }
 
-        // ==================== [TAB 4] ออกรายงาน ====================
         function toggleReportDateInput() {
             const type = document.querySelector('input[name="reportType"]:checked').value;
             const label = document.getElementById('dateLabel');
@@ -653,7 +643,6 @@
             .then(res => res.json())
             .then(res => {
                 if (res.success && res.viewUrl) {
-                    // 💡 แก้ไขบั๊ก Pop-up Blocked: แทนที่จะบังคับเปิดลิงก์อัตโนมัติ ให้เปิดกล่องแจ้งเตือน Modal ที่สวยงามเพื่อให้คลิกเปิดดูเองอย่างปลอดภัย
                     const modal = document.getElementById('successModal');
                     const link = document.getElementById('modalDownloadLink');
                     link.href = res.viewUrl;
