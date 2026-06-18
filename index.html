@@ -16,28 +16,33 @@
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
     <script>
-        // ⚠️ สำคัญมาก: คุณอัฟฟานนำลิงก์ Web App URL ที่คัดลอกมาจาก GAS มาวางในเครื่องหมายคำพูดด้านล่างนี้ครับ
+        // ⚠️ นำลิงก์ Web App URL ใหม่มาวางตรงนี้ครับ
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzy3H3uljjyxiC1GSKM7PIYCs8sOR27LjaNdQiSKW3PvUTcxS5ptFsArMpjwHgNP9v7/exec";
         
         let classList = [];
+        let checkedLevels = []; // ระดับชั้นที่บันทึกของวันนี้ไปแล้ว
         let currentRecorder = null;
+        let isEditMode = false; // ตรวจสอบว่าเปิดโหมดแก้ไขอยู่หรือไม่
     </script>
 
-    <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-50">
+    <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center gap-3 text-center sm:text-left">
-                <div class="bg-white p-2 rounded-full text-indigo-900 w-10 h-10 flex items-center justify-center font-bold text-xl shadow-inner">
-                    พ.พ.
-                </div>
+                <div class="bg-white p-2 rounded-full text-indigo-900 w-10 h-10 flex items-center justify-center font-bold text-xl shadow-inner">พ.พ.</div>
                 <div>
                     <h1 class="text-lg font-bold tracking-wide">ระบบเช็คการปฏิบัติงานลงแถวของครูที่ปรึกษา</h1>
                     <p class="text-xs text-indigo-200">งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
                 </div>
             </div>
             
-            <div id="userStatus" class="text-sm bg-indigo-800/60 px-4 py-2 rounded-lg border border-indigo-700 flex items-center gap-2">
-                <i class="fa-solid fa-user-clock text-indigo-300"></i>
-                <span>ยังไม่ได้เข้าสู่ระบบ (สำหรับผู้ตรวจ)</span>
+            <div class="flex items-center gap-2">
+                <div id="userStatus" class="text-sm bg-indigo-800/60 px-4 py-2 rounded-lg border border-indigo-700 flex items-center gap-2">
+                    <i class="fa-solid fa-user-clock text-indigo-300"></i>
+                    <span>ยังไม่ได้เข้าสู่ระบบ</span>
+                </div>
+                <button id="logoutBtn" onclick="handleLogout()" class="hidden bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-xs transition cursor-pointer">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> ออกจากระบบ
+                </button>
             </div>
         </div>
 
@@ -68,6 +73,26 @@
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 <span class="text-sm font-medium text-slate-700">กำลังประมวลผลข้อมูล...</span>
+            </div>
+        </div>
+
+        <div id="successModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl scale-95 transition-all space-y-4 border border-slate-100">
+                <div class="bg-emerald-50 text-emerald-600 w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto shadow-inner animate-bounce">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="space-y-1">
+                    <h3 class="text-lg font-bold text-slate-900">สร้างรายงานทางราชการสำเร็จ</h3>
+                    <p class="text-sm text-slate-500">ระบบได้บันทึกเอกสาร PDF เข้าสู่ Google Drive เรียบร้อยแล้วค่ะ</p>
+                </div>
+                <div class="pt-2 flex flex-col gap-2">
+                    <a id="modalDownloadLink" href="#" target="_blank" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm cursor-pointer">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> คลิกเปิดดูรายงาน PDF ตรงนี้
+                    </a>
+                    <button onclick="closeModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2 rounded-xl transition text-sm cursor-pointer">
+                        ปิดหน้าต่างนี้
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -103,8 +128,7 @@
                         <tbody id="dashboardTableBody" class="divide-y divide-slate-100">
                             <tr>
                                 <td colspan="6" class="p-8 text-center text-slate-400">
-                                    <i class="fa-solid fa-arrow-pointer-separator block text-2xl mb-2"></i>
-                                    กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล
+                                    <i class="fa-solid fa-arrow-pointer-separator block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล
                                 </td>
                             </tr>
                         </tbody>
@@ -116,18 +140,13 @@
         <section id="check-tab" class="tab-content hidden space-y-6">
             <div id="loginSection" class="max-w-md mx-auto bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
                 <div class="text-center space-y-1">
-                    <div class="bg-indigo-50 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner">
-                        <i class="fa-solid fa-lock"></i>
-                    </div>
+                    <div class="bg-indigo-50 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner"><i class="fa-solid fa-lock"></i></div>
                     <h3 class="text-lg font-bold text-slate-900">ยืนยันตัวตนผู้บันทึกข้อมูล</h3>
                     <p class="text-xs text-slate-500">กรุณากรอกรหัส PIN ประจำตัวเพื่อเข้าสู่หน้าเช็คชื่อ</p>
                 </div>
                 <div class="space-y-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">รหัสผ่าน PIN</label>
-                        <input type="password" id="pinInput" placeholder="••••" maxlength="6" class="w-full text-center tracking-widest bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 font-bold text-lg focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden transition">
-                    </div>
-                    <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg shadow-xs transition duration-150 flex items-center justify-center gap-2 cursor-pointer">
+                    <input type="password" id="pinInput" placeholder="••••" maxlength="6" class="w-full text-center tracking-widest bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 font-bold text-lg focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden transition">
+                    <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg shadow-xs transition flex items-center justify-center gap-2 cursor-pointer">
                         <i class="fa-solid fa-key text-xs"></i> ตรวจสอบรหัสผ่าน
                     </button>
                 </div>
@@ -136,20 +155,24 @@
             <div id="attendanceFormSection" class="hidden bg-white rounded-xl shadow-xs border border-slate-200 p-4 sm:p-6 space-y-4">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                     <div class="flex items-center gap-3">
-                        <div class="bg-emerald-50 text-emerald-700 w-10 h-10 rounded-lg flex items-center justify-center text-lg shadow-xs">
-                            <i class="fa-solid fa-clipboard-user"></i>
-                        </div>
+                        <div class="bg-emerald-50 text-emerald-700 w-10 h-10 rounded-lg flex items-center justify-center text-lg shadow-xs"><i class="fa-solid fa-clipboard-user"></i></div>
                         <div>
-                            <h3 class="text-lg font-bold text-slate-950">ฟอร์มบันทึกการปฏิบัติงานลงแถว</h3>
-                            <p class="text-xs text-slate-500">เลือกกลุ่มระดับชั้นเพื่อลงเวลาให้คุณครู</p>
+                            <h3 class="text-lg font-bold text-slate-950">บันทึกเวลาปฏิบัติหน้าที่ลงแถว</h3>
+                            <p class="text-xs text-slate-500">ระบบจะซ่อนชั้นที่เช็คเสร็จแล้ว หากต้องการปรับข้อมูลให้กด "โหมดแก้ไข"</p>
                         </div>
                     </div>
                     
-                    <div class="flex items-center gap-2">
-                        <label for="checkClassSelect" class="text-sm font-medium text-slate-700 shrink-0">เลือกระดับชั้น:</label>
-                        <select id="checkClassSelect" onchange="loadAttendanceForm()" class="w-full md:w-48 bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-medium shadow-2xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden">
-                            <option value="">-- เลือกระดับชั้น --</option>
-                        </select>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button type="button" id="toggleModeBtn" onclick="toggleEditMode()" class="bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-pen-to-square"></i> <span id="modeText">เปิดโหมดแก้ไขข้อมูลเดิม</span>
+                        </button>
+                        
+                        <div class="flex items-center gap-2">
+                            <label for="checkClassSelect" class="text-sm font-medium text-slate-700 shrink-0">ระดับชั้น:</label>
+                            <select id="checkClassSelect" onchange="loadAttendanceForm()" class="w-full md:w-36 bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-medium shadow-2xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden">
+                                <option value="">-- เลือกระดับชั้น --</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -167,8 +190,7 @@
                             <tbody id="attendanceTableBody" class="divide-y divide-slate-100">
                                 <tr>
                                     <td colspan="4" class="p-8 text-center text-slate-400">
-                                        <i class="fa-solid fa-layer-group block text-2xl mb-2"></i>
-                                        กรุณาเลือกระดับชั้น เพื่อเปิดหน้าลงคะแนน
+                                        <i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ
                                     </td>
                                 </tr>
                             </tbody>
@@ -176,8 +198,8 @@
                     </div>
                     
                     <div id="submitBtnArea" class="flex justify-end pt-2 hidden">
-                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-2.5 rounded-lg shadow-xs transition duration-150 flex items-center gap-2 cursor-pointer">
-                            <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูลทั้งหมดของระดับชั้นนี้
+                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-2.5 rounded-lg shadow-xs transition flex items-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-floppy-disk"></i> บันทึกและบันทึกการส่ง
                         </button>
                     </div>
                 </form>
@@ -186,22 +208,34 @@
 
         <section id="stats-tab" class="tab-content hidden space-y-6">
             <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-4 sm:p-6">
-                <div class="border-b border-slate-100 pb-4 mb-4">
-                    <h2 class="text-xl font-bold text-slate-950 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-column text-indigo-600"></i> สถิติสะสมภาพรวมประจำเดือนนี้
-                    </h2>
-                    <p class="text-xs text-slate-500 mt-0.5">สรุปจำนวนครั้งในการปฏิบัติหน้าที่ของครูที่ปรึกษาแต่ละห้องประจำเดือนปัจจุบัน</p>
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-950 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-column text-indigo-600"></i> สถิติสะสมภาพรวมประจำเดือนนี้
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-0.5">รวมประวัติการบันทึกแบบแจกแจงสาเหตุรายห้องของเดือนปัจจุบัน</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="statsClassSelect" class="text-sm font-medium text-slate-700 shrink-0">ระดับชั้น:</label>
+                        <select id="statsClassSelect" onchange="loadMonthlyStats()" class="w-full md:w-48 bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-medium shadow-2xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden">
+                            <option value="">แสดงทุกระดับชั้น</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="overflow-x-auto rounded-lg border border-slate-200">
                     <table class="w-full text-left border-collapse text-sm">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
-                                <th class="p-3 text-center w-24">ห้องเรียน</th>
-                                <th class="p-3">ชื่อครูที่ปรึกษา</th>
-                                <th class="p-3 text-center w-32 text-emerald-700 bg-emerald-50/50">ปฏิบัติหน้าที่ (ครั้ง)</th>
-                                <th class="p-3 text-center w-32 text-rose-700 bg-rose-50/50">ไม่ลงแถว (ครั้ง)</th>
-                                <th class="p-3 text-center w-36 bg-slate-100/60">รวมลงเวลาทั้งหมด</th>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold text-center">
+                                <th class="p-3 text-center w-20">ห้อง</th>
+                                <th class="p-3 text-left">ชื่อครูที่ปรึกษา</th>
+                                <th class="p-3 text-emerald-700 bg-emerald-50/40 w-24">มาปฏิบัติงาน</th>
+                                <th class="p-3 text-rose-700 bg-rose-50/40 w-20">ขาดแถวรวม</th>
+                                <th class="p-3 text-slate-600 w-16">ป่วย</th>
+                                <th class="p-3 text-slate-600 w-16">กิจ</th>
+                                <th class="p-3 text-slate-600 w-16">สาย</th>
+                                <th class="p-3 text-slate-600 w-20">ไปราชการ</th>
+                                <th class="p-3 bg-slate-100 w-24">รวม (ครั้ง)</th>
                             </tr>
                         </thead>
                         <tbody id="statsTableBody" class="divide-y divide-slate-100">
@@ -214,11 +248,9 @@
         <section id="report-tab" class="tab-content hidden max-w-xl mx-auto space-y-6">
             <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-5">
                 <div class="text-center border-b border-slate-100 pb-4">
-                    <div class="bg-rose-50 text-rose-600 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner">
-                        <i class="fa-solid fa-file-invoice"></i>
-                    </div>
+                    <div class="bg-rose-50 text-rose-600 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner"><i class="fa-solid fa-file-invoice"></i></div>
                     <h3 class="text-lg font-bold text-slate-900">พิมพ์เอกสารรายงานทางราชการ</h3>
-                    <p class="text-xs text-slate-500">ส่งออกรายงานสรุปผลการปฏิบัติงานในรูปแบบไฟล์ PDF ไปเก็บไว้ใน Google Drive</p>
+                    <p class="text-xs text-slate-500">พิมพ์รายงานสรุปเป็น PDF ดึงลิงก์และเซฟลง Google Drive ได้ทันที</p>
                 </div>
 
                 <div class="space-y-4 text-sm">
@@ -226,28 +258,25 @@
                         <label class="block font-semibold text-slate-700 mb-1">1. ประเภทรายงาน</label>
                         <div class="grid grid-cols-2 gap-3">
                             <label class="flex items-center justify-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-100 font-medium transition">
-                                <input type="radio" name="reportType" value="daily" checked onchange="toggleReportDateInput()" class="text-indigo-600 focus:ring-indigo-500">
-                                รายงานสรุปรายวัน
+                                <input type="radio" name="reportType" value="daily" checked onchange="toggleReportDateInput()"> รายงานสรุปรายวัน
                             </label>
                             <label class="flex items-center justify-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-100 font-medium transition">
-                                <input type="radio" name="reportType" value="monthly" onchange="toggleReportDateInput()" class="text-indigo-600 focus:ring-indigo-500">
-                                รายงานสรุปรายเดือน
+                                <input type="radio" name="reportType" value="monthly" onchange="toggleReportDateInput()"> รายงานสรุปรายเดือน
                             </label>
                         </div>
                     </div>
 
                     <div>
                         <label for="reportClassSelect" class="block font-semibold text-slate-700 mb-1">2. เลือกระดับชั้นเรียน</label>
-                        <select id="reportClassSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden">
-                            </select>
+                        <select id="reportClassSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 outline-hidden focus:bg-white focus:border-indigo-500"></select>
                     </div>
 
                     <div id="reportDateWrapper">
                         <label id="dateLabel" class="block font-semibold text-slate-700 mb-1">3. เลือกวันที่ต้องการออกรายงาน</label>
-                        <input type="date" id="reportDateInput" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden font-medium">
+                        <input type="date" id="reportDateInput" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 font-medium focus:bg-white outline-hidden">
                     </div>
 
-                    <button onclick="handleGeneratePDF()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-lg shadow-xs transition duration-150 flex items-center justify-center gap-2 cursor-pointer mt-2 text-base">
+                    <button onclick="handleGeneratePDF()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-lg shadow-xs transition flex items-center justify-center gap-2 text-base cursor-pointer mt-2">
                         <i class="fa-solid fa-file-pdf"></i> สร้างรายงาน PDF และดึงลิงก์
                     </button>
                 </div>
@@ -259,21 +288,17 @@
     <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-4 mt-8">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs space-y-1">
             <p>© 2026 งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
-            <p>ระบบบริหารจัดการและจัดทำสถิติข้อมูลด้วย Google Apps Script & GitHub Pages</p>
         </div>
     </footer>
 
     <script>
-        // เปิดหน้าเว็บมาปุ๊บ ให้ดึงข้อมูลระดับชั้นเริ่มต้นทันที
         window.addEventListener('DOMContentLoaded', () => {
             setTodayDateInput();
             fetchInitialConfig();
         });
 
         function showLoading(show) {
-            const overlay = document.getElementById('loadingOverlay');
-            if (show) overlay.classList.remove('hidden');
-            else overlay.classList.add('hidden');
+            document.getElementById('loadingOverlay').classList[show ? 'remove' : 'add']('hidden');
         }
 
         function setTodayDateInput() {
@@ -284,7 +309,6 @@
             document.getElementById('reportDateInput').value = `${yyyy}-${mm}-${dd}`;
         }
 
-        // แท็บควบคุมหน้าเว็บ
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
@@ -298,55 +322,98 @@
             activeBtn.classList.remove('text-indigo-300', 'border-transparent');
             activeBtn.classList.add('text-white', 'border-b-2', 'border-indigo-400', 'bg-indigo-900/50');
 
-            if (tabId === 'stats-tab') {
-                loadMonthlyStats();
-            }
+            if (tabId === 'stats-tab') loadMonthlyStats();
         }
 
-        // ดึงการตั้งค่าข้อมูล Dropdown ระดับชั้นเรียนจากชีทหลังบ้าน
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('flex');
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        // ดึงรายชื่อชั้นเรียน และตรวจสอบข้อมูลกรองประวัติการเช็คชื่อวันนี้
         function fetchInitialConfig() {
             showLoading(true);
             fetch(`${WEB_APP_URL}?action=getInitialData`)
                 .then(res => res.json())
                 .then(data => {
                     classList = data.classList || [];
+                    checkedLevels = data.checkedLevels || [];
                     
-                    const dbSelect = document.getElementById('dbClassSelect');
-                    const checkSelect = document.getElementById('checkClassSelect');
-                    const reportSelect = document.getElementById('reportClassSelect');
-
-                    // เคลียร์ค่าเดิม
-                    dbSelect.innerHTML = '<option value="">-- เลือกระดับชั้น --</option>';
-                    checkSelect.innerHTML = '<option value="">-- เลือกระดับชั้น --</option>';
-                    reportSelect.innerHTML = '';
-
-                    classList.forEach(cls => {
-                        const opt1 = new AppOption(cls, cls);
-                        const opt2 = new AppOption(cls, cls);
-                        const opt3 = new AppOption(cls, cls);
-                        dbSelect.appendChild(opt1);
-                        checkSelect.appendChild(opt2);
-                        reportSelect.appendChild(opt3);
-                    });
+                    renderDropdowns();
                 })
-                .catch(err => alert("เกิดข้อผิดพลาดในการโหลดข้อมูลโครงสร้างชั้นเรียน: " + err))
+                .catch(err => alert("โหลดโครงสร้างชั้นล้มเหลว: " + err))
                 .finally(() => showLoading(false));
         }
 
-        function AppOption(text, value) {
-            const el = document.createElement('option');
-            el.text = text;
-            el.value = value;
-            return el;
+        // จัดแจงเนื้อหาใน Dropdown ต่างๆ ตามสิทธิ์และสถานะการลงแถว
+        function renderDropdowns() {
+            const dbSelect = document.getElementById('dbClassSelect');
+            const checkSelect = document.getElementById('checkClassSelect');
+            const statsSelect = document.getElementById('statsClassSelect');
+            const reportSelect = document.getElementById('reportClassSelect');
+
+            dbSelect.innerHTML = '<option value="">-- เลือกระดับชั้น --</option>';
+            checkSelect.innerHTML = '<option value="">-- เลือกระดับชั้น --</option>';
+            statsSelect.innerHTML = '<option value="">แสดงทุกระดับชั้น</option>';
+            reportSelect.innerHTML = '';
+
+            classList.forEach(cls => {
+                dbSelect.appendChild(createOptionElement(cls, cls));
+                statsSelect.appendChild(createOptionElement(cls, cls));
+                reportSelect.appendChild(createOptionElement(cls, cls));
+
+                // 💡 เงื่อนไขสำคัญ: ในโหมดปกติ (ไม่ใช่โหมดแก้ไข) หากระดับชั้นนี้เช็คไปแล้ว จะซ่อนออกจากตัวเลือกตรวจประจำวัน
+                if (!isEditMode && checkedLevels.includes(cls)) {
+                    // ไม่แอดลงตารางตรวจเพื่อป้องกันการเช็คชื่อซ้ำ
+                } else {
+                    checkSelect.appendChild(createOptionElement(cls, cls));
+                }
+            });
         }
 
-        // ==================== [TAB 1] Dashboard วันนี้รายชั้น ====================
+        function createOptionElement(text, value) {
+            const opt = document.createElement('option');
+            opt.text = text; opt.value = value;
+            return opt;
+        }
+
+        // สลับโหมดบันทึกข้อมูลใหม่ / แก้ไขข้อมูลที่บันทึกไปแล้ว
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const btn = document.getElementById('toggleModeBtn');
+            const text = document.getElementById('modeText');
+            const tbody = document.getElementById('attendanceTableBody');
+
+            if (isEditMode) {
+                btn.className = "bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-100 transition flex items-center gap-1.5 cursor-pointer";
+                text.innerText = "เปลี่ยนเป็นโหมดเช็คปกติ (ซ่อนรายการเช็คแล้ว)";
+                alert("เปิดโหมดแก้ไขแล้วค่ะ! ระบบจะแสดงทุกระดับชั้น รวมถึงชั้นที่คุณเช็คเวลาของวันนี้ไปแล้ว เพื่อให้เข้าไปติ๊กส่งซ้ำเขียนทับตัวเก่าได้ค่ะ");
+            } else {
+                btn.className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
+                text.innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
+            }
+            
+            document.getElementById('checkClassSelect').value = "";
+            tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
+            document.getElementById('submitBtnArea').classList.add('hidden');
+            renderDropdowns();
+        }
+
+        function handleLogout() {
+            currentRecorder = null;
+            document.getElementById('userStatus').innerHTML = `<i class="fa-solid fa-user-clock text-indigo-300"></i> <span>ยังไม่ได้เข้าสู่ระบบ</span>`;
+            document.getElementById('logoutBtn').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('attendanceFormSection').classList.add('hidden');
+            alert("ออกจากระบบเรียบร้อยแล้วค่ะ");
+        }
+
+        // ==================== [TAB 1] Dashboard ====================
         function loadDailySummary() {
             const selectedClass = document.getElementById('dbClassSelect').value;
             const tbody = document.getElementById('dashboardTableBody');
-            
             if (!selectedClass) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400"><i class="fa-solid fa-arrow-pointer-separator block text-2xl mb-2"></i>กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400"><i class="fa-solid fa-arrow-pointer-separator block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</td></tr>`;
                 return;
             }
 
@@ -356,37 +423,33 @@
                 .then(data => {
                     tbody.innerHTML = '';
                     if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">ไม่พบตารางข้อมูลห้องเรียนในระบบหลังบ้าน</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">ไม่พบตารางรายห้องเรียน</td></tr>`;
                         return;
                     }
-                    
                     data.forEach(item => {
                         let statusColor = "text-slate-500 bg-slate-100";
-                        if (item.status === "ปฏิบัติหน้าที่") statusColor = "text-emerald-700 bg-emerald-50 border border-emerald-200 font-semibold";
-                        else if (item.status === "ไม่ลงแถว") statusColor = "text-rose-700 bg-rose-50 border border-rose-200 font-semibold";
+                        if (item.status === "ปฏิบัติหน้าที่") statusColor = "text-emerald-700 bg-emerald-50 border border-emerald-200";
+                        else if (item.status === "ไม่ลงแถว") statusColor = "text-rose-700 bg-rose-50 border border-rose-200";
 
                         const tr = document.createElement('tr');
-                        tr.className = "hover:bg-slate-50/80 transition-colors";
                         tr.innerHTML = `
                             <td class="p-3 text-center font-bold text-slate-900">${item.className}</td>
                             <td class="p-3 font-medium text-slate-700">${item.teacherName}</td>
-                            <td class="p-3 text-center"><span class="px-2.5 py-1 rounded-md text-xs ${statusColor}">${item.status}</span></td>
-                            <td class="p-3 text-slate-600">${item.reason || '-'}</td>
+                            <td class="p-3 text-center"><span class="px-2.5 py-1 rounded-md text-xs font-semibold ${statusColor}">${item.status}</span></td>
+                            <td class="p-3 text-slate-600">${item.reason}</td>
                             <td class="p-3 text-center text-xs font-mono text-slate-500">${item.time}</td>
                             <td class="p-3 text-slate-600 text-xs">${item.recorder}</td>
                         `;
                         tbody.appendChild(tr);
                     });
                 })
-                .catch(err => alert("เกิดข้อผิดพลาดในการดึงข้อมูลสรุป: " + err))
                 .finally(() => showLoading(false));
         }
 
-        // ==================== [TAB 2] ระบบเช็คชื่อและล็อกอิน ====================
+        // ==================== [TAB 2] Check-in & Login ====================
         function handleLogin() {
             const pin = document.getElementById('pinInput').value;
-            if (!pin) { alert("กรุณากรอกรหัส PIN ก่อนครับ"); return; }
-
+            if (!pin) { alert("กรุณาใส่รหัส PIN ก่อนค่ะ"); return; }
             showLoading(true);
             fetch(WEB_APP_URL, {
                 method: 'POST',
@@ -397,13 +460,11 @@
                 if (res.success) {
                     currentRecorder = res.fullName;
                     document.getElementById('userStatus').innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="font-medium">ผู้ตรวจ: ${currentRecorder}</span>`;
+                    document.getElementById('logoutBtn').classList.remove('hidden');
                     document.getElementById('loginSection').classList.add('hidden');
                     document.getElementById('attendanceFormSection').classList.remove('hidden');
-                } else {
-                    alert(res.msg);
-                }
+                } else { alert(res.msg); }
             })
-            .catch(err => alert("ล็อกอินผิดพลาด: " + err))
             .finally(() => showLoading(false));
         }
 
@@ -413,7 +474,7 @@
             const submitArea = document.getElementById('submitBtnArea');
 
             if (!selectedClass) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i>กรุณาเลือกระดับชั้น เพื่อเปิดหน้าลงคะแนน</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
                 submitArea.classList.add('hidden');
                 return;
             }
@@ -424,12 +485,13 @@
                 .then(data => {
                     tbody.innerHTML = '';
                     if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">ไม่พบรายชื่อในระดับชั้นนี้</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">ไม่พบข้อมูลรายชื่อค่ะ</td></tr>`;
                         submitArea.classList.add('hidden');
                         return;
                     }
 
                     data.forEach((item, index) => {
+                        const isAbsent = item.existingStatus === "ไม่ลงแถว";
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                             <td class="p-3 text-center font-bold text-slate-900">
@@ -441,20 +503,19 @@
                             <td class="p-3">
                                 <div class="flex items-center gap-4 justify-center">
                                     <label class="flex items-center gap-1.5 cursor-pointer text-emerald-700 font-medium">
-                                        <input type="radio" name="status_${index}" value="ปฏิบัติหน้าที่" checked onchange="toggleReasonField(${index}, false)" class="text-emerald-600 focus:ring-emerald-500"> ปฏิบัติหน้าที่
+                                        <input type="radio" name="status_${index}" value="ปฏิบัติหน้าที่" ${!isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, false)"> ปฏิบัติหน้าที่
                                     </label>
                                     <label class="flex items-center gap-1.5 cursor-pointer text-rose-700 font-medium">
-                                        <input type="radio" name="status_${index}" value="ไม่ลงแถว" onchange="toggleReasonField(${index}, true)" class="text-rose-600 focus:ring-rose-500"> ไม่ลงแถว
+                                        <input type="radio" name="status_${index}" value="ไม่ลงแถว" ${isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, true)"> ไม่ลงแถว
                                     </label>
                                 </div>
                             </td>
                             <td class="p-3">
-                                <select id="reason_${index}" disabled class="w-full bg-slate-100 border border-slate-200 rounded-md px-2 py-1 text-xs opacity-50 focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden">
-                                    <option value="-">-- ปกติ (ลงแถว) --</option>
-                                    <option value="ลาป่วย">ลาป่วย</option>
-                                    <option value="ลากิจ">ลากิจ</option>
-                                    <option value="สาย">มาสาย</option>
-                                    <option value="ไปราชการ">ไปราชการ</option>
+                                <select id="reason_${index}" ${!isAbsent ? 'disabled' : ''} class="w-full ${!isAbsent ? 'bg-slate-100 opacity-50' : 'bg-white'} border border-slate-300 rounded-md px-2 py-1 text-xs focus:bg-white outline-hidden">
+                                    <option value="ลาป่วย" ${item.existingReason === 'ลาป่วย' ? 'selected' : ''}>ลาป่วย</option>
+                                    <option value="ลากิจ" ${item.existingReason === 'ลากิจ' ? 'selected' : ''}>ลากิจ</option>
+                                    <option value="สาย" ${item.existingReason === 'สาย' ? 'selected' : ''}>มาสาย</option>
+                                    <option value="ไปราชการ" ${item.existingReason === 'ไปราชการ' ? 'selected' : ''}>ไปราชการ</option>
                                 </select>
                             </td>
                         `;
@@ -462,7 +523,6 @@
                     });
                     submitArea.classList.remove('hidden');
                 })
-                .catch(err => alert("เกิดปัญหาในการดึงฟอร์มลงเวลา: " + err))
                 .finally(() => showLoading(false));
         }
 
@@ -470,21 +530,15 @@
             const select = document.getElementById(`reason_${index}`);
             if (show) {
                 select.removeAttribute('disabled');
-                select.classList.remove('bg-slate-100', 'opacity-50', 'border-slate-200');
-                select.classList.add('bg-white', 'border-slate-300');
-                select.value = "ลาป่วย"; // ค่าเริ่มต้นกรณีไม่มา
+                select.className = "w-full bg-white border border-slate-300 rounded-md px-2 py-1 text-xs outline-hidden";
             } else {
                 select.setAttribute('disabled', 'true');
-                select.classList.add('bg-slate-100', 'opacity-50', 'border-slate-200');
-                select.classList.remove('bg-white', 'border-slate-300');
-                select.value = "-";
+                select.className = "w-full bg-slate-100 border border-slate-300 rounded-md px-2 py-1 text-xs opacity-50 outline-hidden";
             }
         }
 
         function submitAttendance(e) {
             e.preventDefault();
-            if (!currentRecorder) { alert("ชื่อผู้บันทึกไม่ถูกต้อง กรุณาล็อกอินใหม่ครับ"); return; }
-
             const tbody = document.getElementById('attendanceTableBody');
             const rowsCount = tbody.querySelectorAll('tr').length;
             const attendanceData = [];
@@ -502,78 +556,71 @@
             showLoading(true);
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                body: JSON.stringify({
-                    action: 'saveAttendance',
-                    attendanceData: attendanceData,
-                    recorderName: currentRecorder
-                })
+                body: JSON.stringify({ action: 'saveAttendance', attendanceData: attendanceData, recorderName: currentRecorder })
             })
             .then(res => res.json())
             .then(res => {
                 if (res.success) {
                     alert(res.msg);
-                    // รีเซ็ตหน้าและพากลับไปหน้าแรกเพื่อแสดงตารางอัปเดต
+                    isEditMode = false;
+                    document.getElementById('toggleModeBtn').className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
+                    document.getElementById('modeText').innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
+                    
                     document.getElementById('checkClassSelect').value = "";
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i>กรุณาเลือกระดับชั้น เพื่อเปิดหน้าลงคะแนน</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
                     document.getElementById('submitBtnArea').classList.add('hidden');
                     
-                    // ปรับหน้า Dashboard แท็บแรกให้ตรงกับระดับที่พึ่งเช็คไป
-                    document.getElementById('dbClassSelect').value = document.getElementById('checkClassSelect').value;
+                    fetchInitialConfig(); // อัปเดตรายชื่อชั้นเรียนที่เช็คแล้วใหม่
                     switchTab('dashboard-tab');
-                    loadDailySummary();
-                } else {
-                    alert("บันทึกไม่สำเร็จ: " + res.msg);
-                }
+                } else { alert("เกิดข้อผิดพลาด: " + res.msg); }
             })
-            .catch(err => alert("ส่งข้อมูลขัดข้อง: " + err))
             .finally(() => showLoading(false));
         }
 
-        // ==================== [TAB 3] สถิติสะสมประจำเดือน ====================
+        // ==================== [TAB 3] สถิติรายเดือน ====================
         function loadMonthlyStats() {
+            const levelFilter = document.getElementById('statsClassSelect').value;
             const tbody = document.getElementById('statsTableBody');
-            tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังรวบรวมสถิติประจำเดือนจากระบบ...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-500"><i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังสรุปสถิติตามสาเหตุ...</td></tr>`;
 
-            fetch(`${WEB_APP_URL}?action=getMonthlyStats`)
+            fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}`)
                 .then(res => res.json())
                 .then(data => {
                     tbody.innerHTML = '';
                     if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">ยังไม่มีฐานข้อมูลประวัติในเดือนนี้เลยค่ะ</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-400">ยังไม่มีข้อมูลในระบบสะสมค่ะ</td></tr>`;
                         return;
                     }
-
                     data.forEach(item => {
                         const tr = document.createElement('tr');
-                        tr.className = "hover:bg-slate-50/80 transition-colors";
+                        tr.className = "hover:bg-slate-50 text-center";
                         tr.innerHTML = `
-                            <td class="p-3 text-center font-bold text-slate-900">${item.className}</td>
-                            <td class="p-3 font-medium text-slate-700">${item.teacherName}</td>
-                            <td class="p-3 text-center text-emerald-700 bg-emerald-50/20 font-semibold">${item.present}</td>
-                            <td class="p-3 text-center text-rose-700 bg-rose-50/20 font-semibold">${item.absent}</td>
-                            <td class="p-3 text-center bg-slate-50/50 font-mono font-medium">${item.total}</td>
+                            <td class="p-3 font-bold text-slate-900">${item.className}</td>
+                            <td class="p-3 text-left font-medium text-slate-700">${item.teacherName}</td>
+                            <td class="p-3 text-emerald-700 bg-emerald-50/20 font-semibold">${item.present}</td>
+                            <td class="p-3 text-rose-700 bg-rose-50/20 font-semibold">${item.absent}</td>
+                            <td class="p-3 text-slate-600">${item.sick}</td>
+                            <td class="p-3 text-slate-600">${item.personal}</td>
+                            <td class="p-3 text-slate-600">${item.late}</td>
+                            <td class="p-3 text-slate-600">${item.mission}</td>
+                            <td class="p-3 bg-slate-100/80 font-mono font-bold text-slate-800">${item.total}</td>
                         `;
                         tbody.appendChild(tr);
                     });
                 })
-                .catch(err => {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`;
-                });
+                .catch(err => tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`);
         }
 
-        // ==================== [TAB 4] ออกรายงาน PDF ====================
+        // ==================== [TAB 4] ออกรายงาน ====================
         function toggleReportDateInput() {
             const type = document.querySelector('input[name="reportType"]:checked').value;
             const label = document.getElementById('dateLabel');
             const input = document.getElementById('reportDateInput');
 
             if (type === 'daily') {
-                label.innerText = "3. เลือกวันที่ต้องการออกรายงาน";
-                input.type = "date";
-                setTodayDateInput();
+                label.innerText = "3. เลือกวันที่ต้องการออกรายงาน"; input.type = "date"; setTodayDateInput();
             } else {
-                label.innerText = "3. เลือกเดือน/ปี ที่ต้องการออกรายงาน";
-                input.type = "month";
+                label.innerText = "3. เลือกเดือน/ปี ที่ต้องการออกรายงาน"; input.type = "month";
                 const today = new Date();
                 input.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
             }
@@ -584,34 +631,27 @@
             const className = document.getElementById('reportClassSelect').value;
             const timeValue = document.getElementById('reportDateInput').value;
 
-            if (!className) { alert("กรุณาเลือกระดับชั้นก่อนพิมพ์รายงานครับ"); return; }
-            if (!timeValue) { alert("กรุณาระบุวันหรือเดือนที่ต้องการออกรายงานครับ"); return; }
+            if (!className) { alert("กรุณาเลือกระดับชั้นก่อนค่ะ"); return; }
+            if (!timeValue) { alert("กรุณาระบุวัน/เดือนก่อนค่ะ"); return; }
 
             showLoading(true);
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                body: JSON.stringify({
-                    action: 'generatePDF',
-                    type: type,
-                    className: className,
-                    timeValue: timeValue
-                })
+                body: JSON.stringify({ action: 'generatePDF', type: type, className: className, timeValue: timeValue })
             })
             .then(res => res.json())
             .then(res => {
                 if (res.success && res.viewUrl) {
-                    // เปิดไฟล์ PDF ในแท็บใหม่ทันทีเมื่อทำงานเสร็จ
-                    const targetWin = window.open(res.viewUrl, '_blank');
-                    if(targetWin) {
-                        targetWin.focus();
-                    } else {
-                        alert("สร้าง PDF เรียบร้อยแล้วค่ะ! แต่อุปกรณ์บล็อกการเปิดหน้าต่างใหม่ (Pop-up)\nคุณสามารถเข้าลิงก์ตรงนี้ได้เลยค่ะ: \n" + res.viewUrl);
-                    }
-                } else {
-                    alert("ล้มเหลว: " + res.msg);
-                }
+                    // 💡 แก้ไขบั๊ก Pop-up Blocked: แทนที่จะบังคับเปิดลิงก์อัตโนมัติ ให้เปิดกล่องแจ้งเตือน Modal ที่สวยงามเพื่อให้คลิกเปิดดูเองอย่างปลอดภัย
+                    const modal = document.getElementById('successModal');
+                    const link = document.getElementById('modalDownloadLink');
+                    link.href = res.viewUrl;
+                    
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                } else { alert("ล้มเหลว: " + res.msg); }
             })
-            .catch(err => alert("เกิดปัญหาในขั้นตอนส่งออก PDF: " + err))
+            .catch(err => alert("เกิดปัญหาขัดข้อง: " + err))
             .finally(() => showLoading(false));
         }
     </script>
