@@ -297,6 +297,15 @@
     </footer>
 
   <script>
+        // ⚠️ ลิงก์ Web App URL เดิมที่คุณอัฟฟานกำหนดไว้
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzy3H3uljjyxiC1GSKM7PIYCs8sOR27LjaNdQiSKW3PvUTcxS5ptFsArMpjwHgNP9v7/exec";
+        
+        let classList = [];
+        let checkedLevels = []; 
+        let currentRecorder = null;
+        let isEditMode = false; 
+        let currentStatsRangeType = 'weekly'; // ตัวแปรคุมสถานะการเลือกสถิติเริ่มต้นที่ รายสัปดาห์
+
         window.addEventListener('DOMContentLoaded', () => {
             setTodayDateInput();
             fetchInitialConfig();
@@ -311,7 +320,9 @@
             const yyyy = today.getFullYear();
             const mm = String(today.getMonth() + 1).padStart(2, '0');
             const dd = String(today.getDate()).padStart(2, '0');
-            document.getElementById('reportDateInput').value = `${yyyy}-${mm}-${dd}`;
+            if (document.getElementById('reportDateInput')) {
+                document.getElementById('reportDateInput').value = `${yyyy}-${mm}-${dd}`;
+            }
         }
 
         function switchTab(tabId) {
@@ -324,8 +335,10 @@
             });
 
             const activeBtn = document.getElementById(`btn-${tabId}`);
-            activeBtn.classList.remove('text-indigo-300', 'border-transparent');
-            activeBtn.classList.add('text-white', 'border-b-2', 'border-indigo-400', 'bg-indigo-900/50');
+            if (activeBtn) {
+                activeBtn.classList.remove('text-indigo-300', 'border-transparent');
+                activeBtn.classList.add('text-white', 'border-b-2', 'border-indigo-400', 'bg-indigo-900/50');
+            }
 
             if (tabId === 'stats-tab') loadMonthlyStats();
         }
@@ -411,6 +424,7 @@
             document.getElementById('logoutBtn').classList.add('hidden');
             document.getElementById('loginSection').classList.remove('hidden');
             document.getElementById('attendanceFormSection').classList.add('hidden');
+            document.getElementById('pinInput').value = '';
             
             Swal.fire({
                 title: 'ออกจากระบบสำเร็จ',
@@ -427,7 +441,7 @@
             const selectedClass = document.getElementById('dbClassSelect').value;
             const tbody = document.getElementById('dashboardTableBody');
             if (!selectedClass) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400"><i class="fa-solid fa-arrow-pointer-separator block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400"><i class="fa-solid fa-arrow-pointer block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</td></tr>`;
                 return;
             }
 
@@ -436,7 +450,7 @@
                 .then(res => res.json())
                 .then(data => {
                     tbody.innerHTML = '';
-                    if (data.length === 0) {
+                    if (!data || data.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">ไม่พบตารางรายห้องเรียน</td></tr>`;
                         return;
                     }
@@ -450,12 +464,15 @@
                             <td class="p-3 text-center font-bold text-slate-900">${item.className}</td>
                             <td class="p-3 font-medium text-slate-700">${item.teacherName}</td>
                             <td class="p-3 text-center"><span class="px-2.5 py-1 rounded-md text-xs font-semibold ${statusColor}">${item.status}</span></td>
-                            <td class="p-3 text-slate-600">${item.reason}</td>
-                            <td class="p-3 text-center text-xs font-mono text-slate-500">${item.time}</td>
-                            <td class="p-3 text-slate-600 text-xs">${item.recorder}</td>
+                            <td class="p-3 text-slate-600">${item.reason || '-'}</td>
+                            <td class="p-3 text-center text-xs font-mono text-slate-500">${item.time || '-'}</td>
+                            <td class="p-3 text-slate-600 text-xs">${item.recorder || '-'}</td>
                         `;
                         tbody.appendChild(tr);
                     });
+                })
+                .catch(err => {
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`;
                 })
                 .finally(() => showLoading(false));
         }
@@ -493,6 +510,14 @@
                     });
                 }
             })
+            .catch(err => {
+                Swal.fire({
+                    title: 'เกิดข้อผิดพลาดระบบ',
+                    text: 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้: ' + err,
+                    icon: 'error',
+                    confirmButtonColor: '#1e1b4b'
+                });
+            })
             .finally(() => showLoading(false));
         }
 
@@ -512,7 +537,7 @@
                 .then(res => res.json())
                 .then(data => {
                     tbody.innerHTML = '';
-                    if (data.length === 0) {
+                    if (!data || data.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">ไม่พบข้อมูลรายชื่อค่ะ</td></tr>`;
                         submitArea.classList.add('hidden');
                         return;
@@ -580,13 +605,19 @@
             const attendanceData = [];
 
             for (let i = 0; i < rowsCount; i++) {
-                const className = document.querySelector(`input[name="class_${i}"]`).value;
-                const teacherName = document.querySelector(`input[name="teacher_${i}"]`).value;
-                const status = document.querySelector(`input[name="status_${i}"]:checked`).value;
-                const reasonSelect = document.getElementById(`reason_${i}`);
-                const reason = status === "ไม่ลงแถว" ? reasonSelect.value : "-";
+                const classInput = document.querySelector(`input[name="class_${i}"]`);
+                const teacherInput = document.querySelector(`input[name="teacher_${i}"]`);
+                const statusInput = document.querySelector(`input[name="status_${i}"]:checked`);
+                
+                if (classInput && teacherInput && statusInput) {
+                    const className = classInput.value;
+                    const teacherName = teacherInput.value;
+                    const status = statusInput.value;
+                    const reasonSelect = document.getElementById(`reason_${i}`);
+                    const reason = status === "ไม่ลงแถว" ? reasonSelect.value : "-";
 
-                attendanceData.push({ className, teacherName, status, reason });
+                    attendanceData.push({ className, teacherName, status, reason });
+                }
             }
 
             showLoading(true);
@@ -634,61 +665,67 @@
             .finally(() => showLoading(false));
         }
 
-       function loadMonthlyStats() {
-    const levelFilter = document.getElementById('statsClassSelect').value;
-    
-    // 🌟 1. ดึงค่าปุ่มตริ๊กตัวเลือก (สมมติว่าไอดีปุ่มหรือสวิตช์เลือกสัปดาห์/เดือน มีการเก็บค่านะค่ะ)
-    // หรือถ้ายังไม่ได้ทำตัวแปรสลับ ให้เปลี่ยนตรงนี้เป็นคำว่า 'monthly' หรือ 'weekly' ดูก่อนได้ค่ะ
-    // ตัวอย่างเช่นดึงค่าจาก radio หรือปุ่มที่กดเลือกสัปดาห์/เดือน:
-    const rangeType = document.querySelector('input[name="statsRange"]:checked')?.value || 'monthly'; 
+        // 🌟 ฟังก์ชันสลับช่วงสถิติและสลับ CSS ปุ่มตามที่คุณอัฟฟานออกแบบไว้ในส่วนเนื้อหา
+        function changeStatsRange(type) {
+            currentStatsRangeType = type;
+            const weeklyBtn = document.getElementById('rangeWeeklyBtn');
+            const monthlyBtn = document.getElementById('rangeMonthlyBtn');
 
-    const tbody = document.getElementById('statsTableBody');
-    tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังสรุปสถิติ...</td></tr>`;
-
-    // 🌟 2. เพิ่ม &rangeType=${rangeType} ต่อท้าย URL ไปด้วยค่ะ
-    fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}&rangeType=${rangeType}`)
-        .then(res => res.json())
-        .then(data => {
-            tbody.innerHTML = '';
-            
-            // 🌟 3. ป้องกัน TypeError ดักจับกรณีหลังบ้านส่งตัวหนังสือ Error มา
-            if (!data || !Array.isArray(data)) {
-                console.error("หลังบ้านส่งค่าผิดพลาด:", data);
-                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-rose-500">❌ เกิดข้อผิดพลาดจากระบบหลังบ้าน: ${data.msg || 'รูปแบบข้อมูลไม่ถูกต้อง'}</td></tr>`;
-                return;
+            if (type === 'weekly') {
+                weeklyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-3xs transition cursor-pointer";
+                monthlyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer";
+            } else {
+                monthlyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-3xs transition cursor-pointer";
+                weeklyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer";
             }
+            loadMonthlyStats();
+        }
 
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">ยังไม่มีข้อมูลในระบบสะสมค่ะ</td></tr>`;
-                return;
-            }
-            
-            data.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 text-center";
-                
-                // 🌟 4. ในฟังก์ชัน getDynamicStatsByClass คอลัมน์สุดท้ายส่งชื่อว่า "reasonText" นะค่ะ 
-                // (จากเดิมคุณอัฟฟานเขียน item.absent ดิบๆ สลับคอลัมน์กันอยู่เล็กน้อย ลองปรับตามนี้ให้ตรงตารางสรุปในรูปภาพค่ะ)
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-slate-900">${item.className}</td>
-                    <td class="p-3 text-left font-medium text-slate-700">${item.teacherName}</td>
-                    <td class="p-3 bg-slate-100/80 font-mono font-bold text-slate-800">${item.total}</td>
-                    <td class="p-3 text-emerald-700 bg-emerald-50/20 font-semibold">${item.present}</td>
-                    <td class="p-3 text-rose-700 bg-rose-50/20 font-semibold">${item.absent}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        })
-        .catch(err => tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`);
-}
+        function loadMonthlyStats() {
+            const levelFilter = document.getElementById('statsClassSelect').value;
+            const tbody = document.getElementById('statsTableBody');
+            tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังสรุปสถิติ...</td></tr>`;
 
-        // 🛠 ปรับปรุงส่วนการสลับประเภทข้อมูลเพื่อรองรับ "รายสัปดาห์ (weekly)"
+            // 🌟 เปลี่ยนมาดึงช่วงเวลาจากตัวแปรสากล currentStatsRangeType เพื่อรองรับประเภทสัปดาห์/เดือนอย่างสมบูรณ์
+            fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}&rangeType=${currentStatsRangeType}`)
+                .then(res => res.json())
+                .then(data => {
+                    tbody.innerHTML = '';
+                    
+                    if (!data || !Array.isArray(data)) {
+                        console.error("หลังบ้านส่งค่าผิดพลาด:", data);
+                        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-rose-500">❌ เกิดข้อผิดพลาดจากระบบหลังบ้าน: ${data?.msg || 'รูปแบบข้อมูลไม่ถูกต้อง'}</td></tr>`;
+                        return;
+                    }
+
+                    if (data.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">ยังไม่มีข้อมูลในระบบสะสมค่ะ</td></tr>`;
+                        return;
+                    }
+                    
+                    data.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-50 text-center";
+                        tr.innerHTML = `
+                            <td class="p-3 font-bold text-slate-900">${item.className}</td>
+                            <td class="p-3 text-left font-medium text-slate-700">${item.teacherName}</td>
+                            <td class="p-3 bg-slate-100/80 font-mono font-bold text-slate-800">${item.total}</td>
+                            <td class="p-3 text-emerald-700 bg-emerald-50/20 font-semibold">${item.present}</td>
+                            <td class="p-3 text-rose-700 bg-rose-50/20 font-semibold">${item.absent}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(err => {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`;
+                });
+        }
+
         function toggleReportDateInput() {
             const type = document.querySelector('input[name="reportType"]:checked').value;
             const label = document.getElementById('dateLabel');
             const inputContainer = document.getElementById('reportDateInput').parentElement;
 
-            // เคลียร์กล่อง Input เก่าออกก่อนเพื่อสลับรูปแบบ
             inputContainer.innerHTML = '';
 
             if (type === 'daily') {
@@ -713,7 +750,6 @@
             }
         }
 
-        // 🛠 ปรับปรุงส่วนการส่งข้อมูลพิมพ์ PDF ไปหลังบ้านให้เข้าใจคำว่า "วันเริ่ม_วันสิ้นสุด"
         function handleGeneratePDF() {
             const type = document.querySelector('input[name="reportType"]:checked').value;
             const className = document.getElementById('reportClassSelect').value;
@@ -726,7 +762,7 @@
                     Swal.fire({ title: 'แจ้งเตือน', text: 'กรุณาระบุวันเริ่มต้นและสิ้นสุดสัปดาห์ให้ครบถ้วนค่ะ', icon: 'warning', confirmButtonColor: '#1e1b4b' });
                     return;
                 }
-                timeValue = `${start}_${end}`; // รวมค่าให้อยู่ในรูปแบบ "2026-06-15_2026-06-19" เพื่อส่งเข้าฟังก์ชัน PDF และ getReportPreviewData
+                timeValue = `${start}_${end}`;
             } else {
                 timeValue = document.getElementById('reportDateInput').value;
             }
