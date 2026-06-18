@@ -296,7 +296,7 @@
         </div>
     </footer>
 
-   <script>
+  <script>
         window.addEventListener('DOMContentLoaded', () => {
             setTodayDateInput();
             fetchInitialConfig();
@@ -663,41 +663,61 @@
                 .catch(err => tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`);
         }
 
+        // 🛠 ปรับปรุงส่วนการสลับประเภทข้อมูลเพื่อรองรับ "รายสัปดาห์ (weekly)"
         function toggleReportDateInput() {
             const type = document.querySelector('input[name="reportType"]:checked').value;
             const label = document.getElementById('dateLabel');
-            const input = document.getElementById('reportDateInput');
+            const inputContainer = document.getElementById('reportDateInput').parentElement;
+
+            // เคลียร์กล่อง Input เก่าออกก่อนเพื่อสลับรูปแบบ
+            inputContainer.innerHTML = '';
 
             if (type === 'daily') {
-                label.innerText = "3. เลือกวันที่ต้องการออกรายงาน"; input.type = "date"; setTodayDateInput();
+                label.innerText = "3. เลือกวันที่ต้องการออกรายงาน";
+                inputContainer.innerHTML = `<input type="date" id="reportDateInput" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-hidden transition">`;
+                setTodayDateInput();
+            } else if (type === 'weekly') {
+                label.innerText = "3. เลือกช่วงสัปดาห์ (วันเริ่มต้น - วันสิ้นสุด)";
+                inputContainer.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <input type="date" id="reportWeekStart" class="w-1/2 bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-700 focus:bg-white outline-hidden">
+                        <span class="text-slate-400">ถึง</span>
+                        <input type="date" id="reportWeekEnd" class="w-1/2 bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-700 focus:bg-white outline-hidden">
+                    </div>
+                    <input type="hidden" id="reportDateInput" value="">
+                `;
             } else {
-                label.innerText = "3. เลือกเดือน/ปี ที่ต้องการออกรายงาน"; input.type = "month";
+                label.innerText = "3. เลือกเดือน/ปี ที่ต้องการออกรายงาน";
+                inputContainer.innerHTML = `<input type="month" id="reportDateInput" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-hidden transition">`;
                 const today = new Date();
-                input.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+                document.getElementById('reportDateInput').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
             }
         }
 
+        // 🛠 ปรับปรุงส่วนการส่งข้อมูลพิมพ์ PDF ไปหลังบ้านให้เข้าใจคำว่า "วันเริ่ม_วันสิ้นสุด"
         function handleGeneratePDF() {
             const type = document.querySelector('input[name="reportType"]:checked').value;
             const className = document.getElementById('reportClassSelect').value;
-            const timeValue = document.getElementById('reportDateInput').value;
+            let timeValue = "";
+
+            if (type === 'weekly') {
+                const start = document.getElementById('reportWeekStart').value;
+                const end = document.getElementById('reportWeekEnd').value;
+                if (!start || !end) {
+                    Swal.fire({ title: 'แจ้งเตือน', text: 'กรุณาระบุวันเริ่มต้นและสิ้นสุดสัปดาห์ให้ครบถ้วนค่ะ', icon: 'warning', confirmButtonColor: '#1e1b4b' });
+                    return;
+                }
+                timeValue = `${start}_${end}`; // รวมค่าให้อยู่ในรูปแบบ "2026-06-15_2026-06-19" เพื่อส่งเข้าฟังก์ชัน PDF และ getReportPreviewData
+            } else {
+                timeValue = document.getElementById('reportDateInput').value;
+            }
 
             if (!className) { 
-                Swal.fire({
-                    title: 'แจ้งเตือน',
-                    text: 'กรุณาเลือกระดับชั้นก่อนค่ะ',
-                    icon: 'warning',
-                    confirmButtonColor: '#1e1b4b'
-                });
+                Swal.fire({ title: 'แจ้งเตือน', text: 'กรุณาเลือกระดับชั้นก่อนค่ะ', icon: 'warning', confirmButtonColor: '#1e1b4b' });
                 return; 
             }
             if (!timeValue) { 
-                Swal.fire({
-                    title: 'แจ้งเตือน',
-                    text: 'กรุณาระบุวัน/เดือนก่อนค่ะ',
-                    icon: 'warning',
-                    confirmButtonColor: '#1e1b4b'
-                });
+                Swal.fire({ title: 'แจ้งเตือน', text: 'กรุณาระบุวัน/เดือนก่อนค่ะ', icon: 'warning', confirmButtonColor: '#1e1b4b' });
                 return; 
             }
 
