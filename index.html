@@ -235,16 +235,15 @@
 
                 <div class="overflow-x-auto rounded-lg border border-slate-200">
                     <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold text-center">
-                                <th class="p-3 text-center w-20">ห้อง</th>
-                                <th class="p-3 text-left">ชื่อครูที่ปรึกษา (ร่วม)</th>
-                                <th class="p-3 text-emerald-700 bg-emerald-50/40 w-36">รวมลงแถว (ครั้ง)</th>
-                                <th class="p-3 text-rose-700 bg-rose-50/40 w-36">รวมไม่ลงแถว (ครั้ง)</th>
-                                <th class="p-3 bg-slate-100 w-28">รวมทั้งหมด</th>
-                                <th class="p-3 text-left w-72">สาเหตุการไม่ลงแถว (จำเพาะบุคคล)</th>
-                            </tr>
-                        </thead>
+                       <thead>
+                             <tr>
+                                 <th>ระดับชั้น</th>
+                                 <th>ชื่อ-สกุล</th>
+                                 <th>จำนวนลงแถวทั้งหมด (ครั้ง)</th>
+                                 <th>รวมลงแถว (ครั้ง)</th>
+                                 <th>รวมไม่ลงแถว (ครั้ง)</th>
+                             </tr>
+                       </thead>
                         <tbody id="statsTableBody" class="divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
@@ -638,14 +637,14 @@
         function loadMonthlyStats() {
             const levelFilter = document.getElementById('statsClassSelect').value;
             const tbody = document.getElementById('statsTableBody');
-            tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-500"><i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังสรุปสถิติตามสาเหตุ...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังสรุปสถิติ...</td></tr>`;
 
             fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}`)
                 .then(res => res.json())
                 .then(data => {
                     tbody.innerHTML = '';
                     if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-400">ยังไม่มีข้อมูลในระบบสะสมค่ะ</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">ยังไม่มีข้อมูลในระบบสะสมค่ะ</td></tr>`;
                         return;
                     }
                     data.forEach(item => {
@@ -654,18 +653,14 @@
                         tr.innerHTML = `
                             <td class="p-3 font-bold text-slate-900">${item.className}</td>
                             <td class="p-3 text-left font-medium text-slate-700">${item.teacherName}</td>
+                            <td class="p-3 bg-slate-100/80 font-mono font-bold text-slate-800">${item.total}</td>
                             <td class="p-3 text-emerald-700 bg-emerald-50/20 font-semibold">${item.present}</td>
                             <td class="p-3 text-rose-700 bg-rose-50/20 font-semibold">${item.absent}</td>
-                            <td class="p-3 text-slate-600">${item.sick}</td>
-                            <td class="p-3 text-slate-600">${item.personal}</td>
-                            <td class="p-3 text-slate-600">${item.late}</td>
-                            <td class="p-3 text-slate-600">${item.mission}</td>
-                            <td class="p-3 bg-slate-100/80 font-mono font-bold text-slate-800">${item.total}</td>
                         `;
                         tbody.appendChild(tr);
                     });
                 })
-                .catch(err => tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`);
+                .catch(err => tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`);
         }
 
         function toggleReportDateInput() {
