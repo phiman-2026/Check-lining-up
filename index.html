@@ -634,34 +634,53 @@
             .finally(() => showLoading(false));
         }
 
-        function loadMonthlyStats() {
-            const levelFilter = document.getElementById('statsClassSelect').value;
-            const tbody = document.getElementById('statsTableBody');
-            tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังสรุปสถิติ...</td></tr>`;
+       function loadMonthlyStats() {
+    const levelFilter = document.getElementById('statsClassSelect').value;
+    
+    // 🌟 1. ดึงค่าปุ่มตริ๊กตัวเลือก (สมมติว่าไอดีปุ่มหรือสวิตช์เลือกสัปดาห์/เดือน มีการเก็บค่านะค่ะ)
+    // หรือถ้ายังไม่ได้ทำตัวแปรสลับ ให้เปลี่ยนตรงนี้เป็นคำว่า 'monthly' หรือ 'weekly' ดูก่อนได้ค่ะ
+    // ตัวอย่างเช่นดึงค่าจาก radio หรือปุ่มที่กดเลือกสัปดาห์/เดือน:
+    const rangeType = document.querySelector('input[name="statsRange"]:checked')?.value || 'monthly'; 
 
-            fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}`)
-                .then(res => res.json())
-                .then(data => {
-                    tbody.innerHTML = '';
-                    if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">ยังไม่มีข้อมูลในระบบสะสมค่ะ</td></tr>`;
-                        return;
-                    }
-                    data.forEach(item => {
-                        const tr = document.createElement('tr');
-                        tr.className = "hover:bg-slate-50 text-center";
-                        tr.innerHTML = `
-                            <td class="p-3 font-bold text-slate-900">${item.className}</td>
-                            <td class="p-3 text-left font-medium text-slate-700">${item.teacherName}</td>
-                            <td class="p-3 bg-slate-100/80 font-mono font-bold text-slate-800">${item.total}</td>
-                            <td class="p-3 text-emerald-700 bg-emerald-50/20 font-semibold">${item.present}</td>
-                            <td class="p-3 text-rose-700 bg-rose-50/20 font-semibold">${item.absent}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                })
-                .catch(err => tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`);
-        }
+    const tbody = document.getElementById('statsTableBody');
+    tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังสรุปสถิติ...</td></tr>`;
+
+    // 🌟 2. เพิ่ม &rangeType=${rangeType} ต่อท้าย URL ไปด้วยค่ะ
+    fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}&rangeType=${rangeType}`)
+        .then(res => res.json())
+        .then(data => {
+            tbody.innerHTML = '';
+            
+            // 🌟 3. ป้องกัน TypeError ดักจับกรณีหลังบ้านส่งตัวหนังสือ Error มา
+            if (!data || !Array.isArray(data)) {
+                console.error("หลังบ้านส่งค่าผิดพลาด:", data);
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-rose-500">❌ เกิดข้อผิดพลาดจากระบบหลังบ้าน: ${data.msg || 'รูปแบบข้อมูลไม่ถูกต้อง'}</td></tr>`;
+                return;
+            }
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">ยังไม่มีข้อมูลในระบบสะสมค่ะ</td></tr>`;
+                return;
+            }
+            
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 text-center";
+                
+                // 🌟 4. ในฟังก์ชัน getDynamicStatsByClass คอลัมน์สุดท้ายส่งชื่อว่า "reasonText" นะค่ะ 
+                // (จากเดิมคุณอัฟฟานเขียน item.absent ดิบๆ สลับคอลัมน์กันอยู่เล็กน้อย ลองปรับตามนี้ให้ตรงตารางสรุปในรูปภาพค่ะ)
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-slate-900">${item.className}</td>
+                    <td class="p-3 text-left font-medium text-slate-700">${item.teacherName}</td>
+                    <td class="p-3 bg-slate-100/80 font-mono font-bold text-slate-800">${item.total}</td>
+                    <td class="p-3 text-emerald-700 bg-emerald-50/20 font-semibold">${item.present}</td>
+                    <td class="p-3 text-rose-700 bg-rose-50/20 font-semibold">${item.absent}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        })
+        .catch(err => tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`);
+}
 
         // 🛠 ปรับปรุงส่วนการสลับประเภทข้อมูลเพื่อรองรับ "รายสัปดาห์ (weekly)"
         function toggleReportDateInput() {
