@@ -380,41 +380,41 @@
 
         // สลับโหมดบันทึกข้อมูลใหม่ / แก้ไขข้อมูลที่บันทึกไปแล้ว
         function toggleEditMode() {
-            isEditMode = !isEditMode;
-            const btn = document.getElementById('toggleModeBtn');
-            const text = document.getElementById('modeText');
-            const tbody = document.getElementById('attendanceTableBody');
+    isEditMode = !isEditMode;
+    const btn = document.getElementById('toggleModeBtn');
+    const text = document.getElementById('modeText');
+    const tbody = document.getElementById('attendanceTableBody');
 
-            if (isEditMode) {
-                btn.className = "bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-100 transition flex items-center gap-1.5 cursor-pointer";
-                text.innerText = "เปลี่ยนเป็นโหมดเช็คปกติ (ซ่อนรายการเช็คแล้ว)";
-                alert("เปิดโหมดแก้ไขแล้วค่ะ! ระบบจะแสดงทุกระดับชั้น รวมถึงชั้นที่คุณเช็คเวลาของวันนี้ไปแล้ว เพื่อให้เข้าไปติ๊กส่งซ้ำเขียนทับตัวเก่าได้ค่ะ");
-            } else {
-                btn.className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
-                text.innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
-            }
-            
-            document.getElementById('checkClassSelect').value = "";
-            tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
-            document.getElementById('submitBtnArea').classList.add('hidden');
-            renderDropdowns();
-        }
+    if (isEditMode) {
+        btn.className = "bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-100 transition flex items-center gap-1.5 cursor-pointer";
+        text.innerText = "เปลี่ยนเป็นโหมดเช็คปกติ (ซ่อนรายการเช็คแล้ว)";
+        // นำบรรทัด alert(...) หรือ แจ้งเตือนเดิมออกเรียบร้อยแล้ว ระบบจะทำงานทันทีโดยไม่มีป๊อปอัปขัดจังหวะ
+    } else {
+        btn.className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
+        text.innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
+    }
+    
+    document.getElementById('checkClassSelect').value = "";
+    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
+    document.getElementById('submitBtnArea').classList.add('hidden');
+    renderDropdowns();
+}
 
-       function handleLogout() {
+      function handleLogout() {
     currentRecorder = null;
     document.getElementById('userStatus').innerHTML = `<i class="fa-solid fa-user-clock text-indigo-300"></i> <span>ยังไม่ได้เข้าสู่ระบบ</span>`;
     document.getElementById('logoutBtn').classList.add('hidden');
     document.getElementById('loginSection').classList.remove('hidden');
     document.getElementById('attendanceFormSection').classList.add('hidden');
     
-    // ปรับการแจ้งเตือน "ออกจากระบบเรียบร้อยแล้วค่ะ" ให้สวยงามด้วย SweetAlert2
+    // ปรับการแจ้งเตือน "ออกจากระบบเรียบร้อยแล้วค่ะ" ให้สวยงามและทันสมัย
     Swal.fire({
-        title: 'ออกจากระบบสำเร็จ!',
+        title: 'ออกจากระบบสำเร็จ',
         text: 'ออกจากระบบเรียบร้อยแล้วค่ะ',
         icon: 'success',
         confirmButtonText: 'ตกลง',
-        confirmButtonColor: '#312e81', // สี Indigo เข้ากับธีมโรงเรียน
-        timer: 2000, // ปิดอัตโนมัติภายใน 2 วินาที
+        confirmButtonColor: '#1e1b4b', // สี Indigo-950 เข้ากับธีมบาร์บน
+        timer: 2000,
         timerProgressBar: true
     });
 }
