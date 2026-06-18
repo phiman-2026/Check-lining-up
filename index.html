@@ -3,301 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบเช็คการปฏิบัติงานลงแถวครู - โรงเรียนพิมานพิทยาสรรค์</title>
+    <title>ระบบบันทึกเวลาปฏิบัติหน้าที่</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        body { font-family: 'Sarabun', sans-serif; }
-    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
 
-    <script>
-        // ⚠️ ลิงก์ Web App URL เดิมที่คุณอัฟฟานกำหนดไว้
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzy3H3uljjyxiC1GSKM7PIYCs8sOR27LjaNdQiSKW3PvUTcxS5ptFsArMpjwHgNP9v7/exec";
-        
-        let classList = [];
-        let checkedLevels = []; 
-        let currentRecorder = null;
-        let isEditMode = false; 
-        let currentStatsRangeType = 'weekly'; // ตัวแปรคุมสถานะการเลือกสถิติเริ่มต้นที่ รายสัปดาห์
-    </script>
+    <div id="loadingOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xs flex flex-col items-center justify-center z-50 hidden">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent"></div>
+        <p class="mt-4 text-indigo-200 text-sm animate-pulse">กำลังประมวลผล กรุณารอสักครู่...</p>
+    </div>
 
-    <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
-            <div class="flex items-center gap-3 text-center sm:text-left">
-                <div class="bg-white p-2 rounded-full text-indigo-900 w-10 h-10 flex items-center justify-center font-bold text-xl shadow-inner">พ.พ.</div>
+    <nav class="bg-slate-950 border-b border-slate-850 px-4 py-3 sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2 rounded-lg text-white">
+                    <i class="fa-solid fa-clipboard-user text-xl"></i>
+                </div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-wide">ระบบเช็คการปฏิบัติงานลงแถวของครูที่ปรึกษา</h1>
-                    <p class="text-xs text-indigo-200">งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
+                    <h1 class="text-md font-bold tracking-wide">ระบบบันทึกเวลาปฏิบัติหน้าที่</h1>
+                    <div id="userStatus" class="text-xs text-slate-400 flex items-center gap-1">
+                        <i class="fa-solid fa-user-clock text-indigo-400"></i> <span>ยังไม่ได้เข้าสู่ระบบ</span>
+                    </div>
                 </div>
             </div>
             
             <div class="flex items-center gap-2">
-                <div id="userStatus" class="text-sm bg-indigo-800/60 px-4 py-2 rounded-lg border border-indigo-700 flex items-center gap-2">
-                    <i class="fa-solid fa-user-clock text-indigo-300"></i>
-                    <span>ยังไม่ได้เข้าสู่ระบบ</span>
-                </div>
-                <button id="logoutBtn" onclick="handleLogout()" class="hidden bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-xs transition cursor-pointer">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i> ออกจากระบบ
+                <button id="logoutBtn" onclick="handleLogout()" class="hidden bg-rose-950/40 text-rose-400 border border-rose-900/50 hover:bg-rose-900/40 px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer">
+                    <i class="fa-solid fa-sign-out-alt mr-1"></i> ออกจากระบบ
                 </button>
             </div>
         </div>
+    </nav>
 
-        <div class="bg-indigo-950 border-t border-indigo-800">
-            <div class="max-w-7xl mx-auto px-2 flex overflow-x-auto text-sm">
-                <button onclick="switchTab('dashboard-tab')" id="btn-dashboard-tab" class="tab-btn px-4 py-3 text-white border-b-2 border-indigo-400 font-medium flex items-center gap-2 shrink-0 bg-indigo-900/50">
-                    <i class="fa-solid fa-chart-pie text-indigo-400"></i> สรุปวันนี้รายชั้น
-                </button>
-                <button onclick="switchTab('check-tab')" id="btn-check-tab" class="tab-btn px-4 py-3 text-indigo-300 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0">
-                    <i class="fa-solid fa-list-check"></i> บันทึกการลงแถว
-                </button>
-                <button onclick="switchTab('stats-tab')" id="btn-stats-tab" class="tab-btn px-4 py-3 text-indigo-300 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0">
-                    <i class="fa-solid fa-chart-column"></i> หน้าสถิติรายงาน
-                </button>
-                <button onclick="switchTab('report-tab')" id="btn-report-tab" class="tab-btn px-4 py-3 text-indigo-300 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0">
-                    <i class="fa-solid fa-file-pdf"></i> ออกรายงาน PDF
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6">
+    <main class="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
         
-        <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 hidden">
-            <div class="bg-white px-6 py-4 rounded-xl shadow-xl flex items-center gap-3">
-                <svg class="animate-spin h-5 w-5 text-indigo-600" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span class="text-sm font-medium text-slate-700">กำลังประมวลผลข้อมูล...</span>
-            </div>
+        <div class="flex border-b border-slate-800 overflow-x-auto">
+            <button id="btn-dashboard-tab" onclick="switchTab('dashboard-tab')" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-indigo-400 bg-indigo-900/50 text-white transition cursor-pointer whitespace-nowrap">
+                <i class="fa-solid fa-chart-pie mr-1.5"></i>แดชบอร์ดรายวัน
+            </button>
+            <button id="btn-attendance-tab" onclick="switchTab('attendance-tab')" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-indigo-300 hover:text-white transition cursor-pointer whitespace-nowrap">
+                <i class="fa-solid fa-user-check mr-1.5"></i>เช็คชื่อ/ลงเวลา
+            </button>
+            <button id="btn-stats-tab" onclick="switchTab('stats-tab')" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-indigo-300 hover:text-white transition cursor-pointer whitespace-nowrap">
+                <i class="fa-solid fa-business-time mr-1.5"></i>สถิติสะสม
+            </button>
+            <button id="btn-report-tab" onclick="switchTab('report-tab')" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-indigo-300 hover:text-white transition cursor-pointer whitespace-nowrap">
+                <i class="fa-solid fa-file-pdf mr-1.5"></i>ออกรายงาน PDF
+            </button>
         </div>
 
-        <div id="successModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl scale-95 transition-all space-y-4 border border-slate-100">
-                <div class="bg-emerald-50 text-emerald-600 w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto shadow-inner animate-bounce">
-                    <i class="fa-solid fa-circle-check"></i>
+        <div id="dashboard-tab" class="tab-content space-y-4">
+            <div class="bg-slate-950 border border-slate-850 rounded-xl p-4 shadow-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                    <h2 class="text-sm font-semibold text-indigo-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-table-list"></i> ตารางสรุปการลงแถวประจำวัน
+                    </h2>
+                    <select id="dbClassSelect" onchange="loadDailySummary()" class="bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-hidden focus:border-indigo-500 max-w-xs w-full">
+                        <option value="">-- เลือกระดับชั้น --</option>
+                    </select>
                 </div>
-                <div class="space-y-1">
-                    <h3 class="text-lg font-bold text-slate-900">สร้างรายงานทางราชการสำเร็จ</h3>
-                    <p class="text-sm text-slate-500">ระบบได้บันทึกเอกสาร PDF เข้าสู่ Google Drive เรียบร้อยแล้วค่ะ</p>
-                </div>
-                <div class="pt-2 flex flex-col gap-2">
-                    <a id="modalDownloadLink" href="#" target="_blank" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm cursor-pointer">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i> คลิกเปิดดูรายงาน PDF ตรงนี้
-                    </a>
-                    <button onclick="closeModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2 rounded-xl transition text-sm cursor-pointer">
-                        ปิดหน้าต่างนี้
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <section id="dashboard-tab" class="tab-content block space-y-6">
-            <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-4 sm:p-6">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-950 flex items-center gap-2">
-                            <i class="fa-solid fa-calendar-day text-indigo-600"></i> สรุปการลงแถวประจำวันนี้
-                        </h2>
-                        <p class="text-xs text-slate-500 mt-0.5">เลือกระดับชั้นเพื่อดูรายละเอียดรายบุคคลและห้องเรียน</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label for="dbClassSelect" class="text-sm font-medium text-slate-700 shrink-0">ระดับชั้น:</label>
-                        <select id="dbClassSelect" onchange="loadDailySummary()" class="w-full md:w-48 bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-medium shadow-2xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden">
-                            <option value="">-- เลือกระดับชั้น --</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto rounded-lg border border-slate-200">
-                    <table class="w-full text-left border-collapse text-sm">
+                <div class="overflow-x-auto rounded-lg border border-slate-850">
+                    <table class="w-full text-left border-collapse text-xs">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
-                                <th class="p-3 text-center w-24">ห้องเรียน</th>
-                                <th class="p-3">ชื่อครูที่ปรึกษา (ร่วม)</th>
-                                <th class="p-3 text-center w-36">สถานะวันนี้</th>
-                                <th class="p-3">เหตุผลกรณีไม่ลงแถว</th>
-                                <th class="p-3 text-center w-24">เวลาบันทึก</th>
-                                <th class="p-3">ผู้บันทึกตรวจ</th>
+                            <tr class="bg-slate-900 text-slate-300 border-b border-slate-850">
+                                <th class="p-3 text-center font-semibold w-24">ระดับชั้น</th>
+                                <th class="p-3 font-semibold">ชื่อ-นามสกุลครู</th>
+                                <th class="p-3 text-center font-semibold w-32">สถานะ</th>
+                                <th class="p-3 font-semibold">หมายเหตุ / เหตุผล</th>
+                                <th class="p-3 text-center font-semibold w-24">เวลา</th>
+                                <th class="p-3 font-semibold w-36">ผู้บันทึก</th>
                             </tr>
                         </thead>
-                        <tbody id="dashboardTableBody" class="divide-y divide-slate-100">
+                        <tbody id="dashboardTableBody" class="divide-y divide-slate-850/50 bg-slate-950/40">
                             <tr>
-                                <td colspan="6" class="p-8 text-center text-slate-400">
-                                    <i class="fa-solid fa-arrow-pointer block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล
+                                <td colspan="6" class="p-8 text-center text-slate-500">
+                                    <i class="fa-solid fa-arrow-pointer block text-xl mb-2 text-indigo-500/50"></i> กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <section id="check-tab" class="tab-content hidden space-y-6">
-            <div id="loginSection" class="max-w-md mx-auto bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-4">
-                <div class="text-center space-y-1">
-                    <div class="bg-indigo-50 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner"><i class="fa-solid fa-lock"></i></div>
-                    <h3 class="text-lg font-bold text-slate-900">ยืนยันตัวตนผู้บันทึกข้อมูล</h3>
-                    <p class="text-xs text-slate-500">กรุณากรอกรหัส PIN ประจำตัวเพื่อเข้าสู่หน้าเช็คชื่อ</p>
+        <div id="attendance-tab" class="tab-content space-y-4 hidden">
+            <div id="loginSection" class="bg-slate-950 border border-slate-850 rounded-xl p-6 shadow-xl max-w-md mx-auto text-center space-y-4">
+                <div class="w-12 h-12 bg-indigo-950 text-indigo-400 rounded-full flex items-center justify-center mx-auto text-lg">
+                    <i class="fa-solid fa-lock"></i>
                 </div>
-                <div class="space-y-3">
-                    <input type="password" id="pinInput" placeholder="••••" maxlength="6" class="w-full text-center tracking-widest bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 font-bold text-lg focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden transition">
-                    <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg shadow-xs transition flex items-center justify-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-key text-xs"></i> ตรวจสอบรหัสผ่าน
-                    </button>
+                <div>
+                    <h3 class="text-sm font-semibold">ยืนยันตัวตนผู้ตรวจ</h3>
+                    <p class="text-xs text-slate-400 mt-1">กรุณากรอกรหัส PIN เพื่อเข้าสู่ระบบบันทึกเวลา</p>
                 </div>
+                <input type="password" id="pinInput" placeholder="••••" maxlength="6" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-2.5 text-center font-mono text-lg tracking-widest text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-hidden">
+                <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2 rounded-lg text-sm transition cursor-pointer shadow-md">
+                    เข้าสู่ระบบ <i class="fa-solid fa-sign-in-alt ml-1"></i>
+                </button>
             </div>
 
-            <div id="attendanceFormSection" class="hidden bg-white rounded-xl shadow-xs border border-slate-200 p-4 sm:p-6 space-y-4">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-emerald-50 text-emerald-700 w-10 h-10 rounded-lg flex items-center justify-center text-lg shadow-xs"><i class="fa-solid fa-clipboard-user"></i></div>
-                        <div>
-                            <h3 class="text-lg font-bold text-slate-950">บันทึกเวลาปฏิบัติหน้าที่ลงแถว</h3>
-                            <p class="text-xs text-slate-500">ระบบจะซ่อนชั้นที่เช็คเสร็จแล้ว หากต้องการปรับข้อมูลให้กด "โหมดแก้ไข"</p>
-                        </div>
+            <div id="attendanceFormSection" class="bg-slate-950 border border-slate-850 rounded-xl p-4 shadow-xl hidden space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-850 pb-4">
+                    <div class="flex items-center gap-2">
+                        <select id="checkClassSelect" onchange="loadAttendanceForm()" class="bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 outline-hidden focus:border-indigo-500 w-48">
+                            <option value="">-- เลือกระดับชั้น --</option>
+                        </select>
                     </div>
-                    
-                    <div class="flex flex-wrap items-center gap-3">
-                        <button type="button" id="toggleModeBtn" onclick="toggleEditMode()" class="bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer">
-                            <i class="fa-solid fa-pen-to-square"></i> <span id="modeText">เปิดโหมดแก้ไขข้อมูลเดิม</span>
-                        </button>
-                        
-                        <div class="flex items-center gap-2">
-                            <label for="checkClassSelect" class="text-sm font-medium text-slate-700 shrink-0">ระดับชั้น:</label>
-                            <select id="checkClassSelect" onchange="loadAttendanceForm()" class="w-full md:w-36 bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-medium shadow-2xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden">
-                                <option value="">-- เลือกระดับชั้น --</option>
-                            </select>
-                        </div>
-                    </div>
+                    <button id="toggleModeBtn" onclick="toggleEditMode()" class="bg-amber-950/40 text-amber-400 border border-amber-900/50 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-900/40 transition flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-user-gear"></i> <span id="modeText">เปิดโหมดแก้ไขข้อมูลเดิม</span>
+                    </button>
                 </div>
 
-                <form id="attendanceForm" onsubmit="submitAttendance(event)" class="space-y-4">
-                    <div class="overflow-x-auto rounded-lg border border-slate-200">
-                        <table class="w-full text-left border-collapse text-sm">
+                <form id="attendanceForm" onsubmit="submitAttendance(event)">
+                    <div class="overflow-x-auto rounded-lg border border-slate-850">
+                        <table class="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
-                                    <th class="p-3 text-center w-24">ห้องเรียน</th>
-                                    <th class="p-3">ชื่อครูที่ปรึกษา (ร่วม)</th>
-                                    <th class="p-3 text-center w-64">สถานะการลงแถว</th>
-                                    <th class="p-3">ระบุสาเหตุ (กรณีไม่ลงแถว)</th>
+                                <tr class="bg-slate-900 text-slate-300 border-b border-slate-850">
+                                    <th class="p-3 text-center font-semibold w-24">ระดับชั้น</th>
+                                    <th class="p-3 font-semibold">ชื่อ-นามสกุลครู</th>
+                                    <th class="p-3 text-center font-semibold w-56">การลงปฏิบัติหน้าที่</th>
+                                    <th class="p-3 font-semibold w-48">กรณีไม่ลงแถว (ระบุเหตุผล)</th>
                                 </tr>
                             </thead>
-                            <tbody id="attendanceTableBody" class="divide-y divide-slate-100">
+                            <tbody id="attendanceTableBody" class="divide-y divide-slate-850/50 bg-slate-950/40">
                                 <tr>
-                                    <td colspan="4" class="p-8 text-center text-slate-400">
-                                        <i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ
+                                    <td colspan="4" class="p-8 text-center text-slate-500">
+                                        <i class="fa-solid fa-layer-group block text-xl mb-2 text-indigo-500/50"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     
-                    <div id="submitBtnArea" class="flex justify-end pt-2 hidden">
-                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-2.5 rounded-lg shadow-xs transition flex items-center gap-2 cursor-pointer">
-                            <i class="fa-solid fa-floppy-disk"></i> บันทึกและบันทึกการส่ง
+                    <div id="submitBtnArea" class="pt-4 flex justify-end hidden">
+                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-6 py-2 rounded-lg text-xs transition cursor-pointer shadow-md flex items-center gap-1.5">
+                            <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูลทั้งหมด
                         </button>
                     </div>
                 </form>
             </div>
-        </section>
+        </div>
 
-        <section id="stats-tab" class="tab-content hidden space-y-6">
-            <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-4 sm:p-6">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-950 flex items-center gap-2">
-                            <i class="fa-solid fa-chart-column text-indigo-600"></i> สถิติรายงานการปฏิบัติหน้าที่ลงแถว
+        <div id="stats-tab" class="tab-content space-y-4 hidden">
+            <div class="bg-slate-950 border border-slate-850 rounded-xl p-4 shadow-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-sm font-semibold text-indigo-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-chart-bar"></i> สรุปสถิติการลงแถวสะสม
                         </h2>
-                        <p class="text-xs text-slate-500 mt-0.5">เลือกช่วงเวลาเพื่อดูยอดรวมจำนวนครั้ง และคัดกรองเฉพาะสาเหตุผู้ไม่ลงแถว</p>
+                        <select id="statsClassSelect" onchange="loadMonthlyStats()" class="bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-slate-200 outline-hidden">
+                            <option value="">แสดงทุกระดับชั้น</option>
+                        </select>
                     </div>
-                    
-                    <div class="flex flex-wrap items-center gap-4">
-                        <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
-                            <button type="button" onclick="changeStatsRange('weekly')" id="rangeWeeklyBtn" class="px-3 py-1 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-3xs transition cursor-pointer">รายสัปดาห์</button>
-                            <button type="button" onclick="changeStatsRange('monthly')" id="rangeMonthlyBtn" class="px-3 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer">รายเดือน</button>
-                        </div>
-
-                        <div class="flex items-center gap-2">
-                            <label for="statsClassSelect" class="text-sm font-medium text-slate-700 shrink-0">ระดับชั้น:</label>
-                            <select id="statsClassSelect" onchange="loadMonthlyStats()" class="w-full md:w-44 bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-medium outline-hidden focus:border-indigo-500">
-                                <option value="">แสดงทุกระดับชั้น</option>
-                            </select>
-                        </div>
+                    <div class="bg-slate-900 p-0.5 rounded-lg border border-slate-800 flex items-center">
+                        <button id="rangeWeeklyBtn" onclick="changeStatsRange('weekly')" class="px-3 py-1 text-xs font-semibold rounded-md bg-indigo-600 text-white shadow-xs transition cursor-pointer">รายสัปดาห์</button>
+                        <button id="rangeMonthlyBtn" onclick="changeStatsRange('monthly')" class="px-3 py-1 text-xs font-semibold rounded-md text-slate-400 hover:text-slate-200 transition cursor-pointer">รายเดือน</button>
                     </div>
                 </div>
 
-              <div class="overflow-x-auto rounded-lg border border-slate-200">
-    <table class="w-full text-left border-collapse text-sm">
-        <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold text-center">
-                <th class="p-3">ระดับชั้น</th>
-                <th class="p-3">ชื่อ-สกุล</th>
-                <th class="p-3">จำนวนลงแถวทั้งหมด (ครั้ง)</th>
-                <th class="p-3">รวมลงแถว (ครั้ง)</th>
-                <th class="p-3">รวมไม่ลงแถว (ครั้ง)</th>
-            </tr>
-        </thead>
-        <tbody id="statsTableBody" class="divide-y divide-slate-100"></tbody>
-    </table>
-</div>
-            </div>
-        </section>
-
-        <section id="report-tab" class="tab-content hidden max-w-xl mx-auto space-y-6">
-            <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-5">
-                <div class="text-center border-b border-slate-100 pb-4">
-                    <div class="bg-rose-50 text-rose-600 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner"><i class="fa-solid fa-file-invoice"></i></div>
-                    <h3 class="text-lg font-bold text-slate-900">พิมพ์เอกสารรายงานทางราชการ</h3>
-                    <p class="text-xs text-slate-500">พิมพ์รายงานสรุปเป็น PDF ดึงลิงก์และเซฟลง Google Drive ได้ทันที</p>
-                </div>
-
-                <div class="space-y-4 text-sm">
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">1. ประเภทรายงาน</label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="flex items-center justify-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-100 font-medium transition">
-                                <input type="radio" name="reportType" value="daily" checked onchange="toggleReportDateInput()"> รายงานสรุปรายวัน
-                            </label>
-                            <label class="flex items-center justify-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-100 font-medium transition">
-                                <input type="radio" name="reportType" value="monthly" onchange="toggleReportDateInput()"> รายงานสรุปรายเดือน
-                            </label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="reportClassSelect" class="block font-semibold text-slate-700 mb-1">2. เลือกระดับชั้นเรียน</label>
-                        <select id="reportClassSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 outline-hidden focus:bg-white focus:border-indigo-500"></select>
-                    </div>
-
-                    <div id="reportDateWrapper">
-                        <label id="dateLabel" class="block font-semibold text-slate-700 mb-1">3. เลือกวันที่ต้องการออกรายงาน</label>
-                        <input type="date" id="reportDateInput" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 font-medium focus:bg-white outline-hidden">
-                    </div>
-
-                    <button onclick="handleGeneratePDF()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-lg shadow-xs transition flex items-center justify-center gap-2 text-base cursor-pointer mt-2">
-                        <i class="fa-solid fa-file-pdf"></i> สร้างรายงาน PDF และดึงลิงก์
-                    </button>
+                <div class="overflow-x-auto rounded-lg border border-slate-850">
+                    <table class="w-full border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-300 border-b border-slate-850">
+                                <th class="p-3 text-center font-semibold w-24">ระดับชั้น</th>
+                                <th class="p-3 text-left font-semibold">ชื่อ-นามสกุลครู</th>
+                                <th class="p-3 text-center font-semibold w-24">รวมทั้งหมด (ครั้ง)</th>
+                                <th class="p-3 text-center font-semibold w-24">ปฏิบัติหน้าที่</th>
+                                <th class="p-3 text-center font-semibold w-24">ไม่ลงแถว</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statsTableBody" class="divide-y divide-slate-850/50 bg-slate-950/40">
+                            </tbody>
+                    </table>
                 </div>
             </div>
-        </section>
+        </div>
+
+        <div id="report-tab" class="tab-content space-y-4 hidden">
+            <div class="bg-slate-950 border border-slate-850 rounded-xl p-6 shadow-xl max-w-xl mx-auto space-y-5">
+                <div class="border-b border-slate-850 pb-3">
+                    <h2 class="text-sm font-semibold text-indigo-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-invoice"></i> ตั้งค่าการออกรายงานสรุปการลงแถว (PDF)
+                    </h2>
+                </div>
+                
+                <div class="space-y-2">
+                    <label class="text-xs font-medium text-slate-300 block">1. เลือกรูปแบบสรุปรายงาน</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <label class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex items-center gap-2 cursor-pointer hover:border-slate-700">
+                            <input type="radio" name="reportType" value="daily" checked onchange="toggleReportDateInput()">
+                            <span class="text-xs">สรุปรายวัน</span>
+                        </label>
+                        <label class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex items-center gap-2 cursor-pointer hover:border-slate-700">
+                            <input type="radio" name="reportType" value="weekly" onchange="toggleReportDateInput()">
+                            <span class="text-xs">สรุปรายสัปดาห์</span>
+                        </label>
+                        <label class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex items-center gap-2 cursor-pointer hover:border-slate-700">
+                            <input type="radio" name="reportType" value="monthly" onchange="toggleReportDateInput()">
+                            <span class="text-xs">สรุปรายเดือน</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-xs font-medium text-slate-300 block">2. เลือกระดับชั้นที่ต้องการตรวจรายงาน</label>
+                    <select id="reportClassSelect" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 outline-hidden focus:border-indigo-500">
+                        </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label id="dateLabel" class="text-xs font-medium text-slate-300 block">3. เลือกวันที่ต้องการออกรายงาน</label>
+                    <div>
+                        <input type="date" id="reportDateInput" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 outline-hidden focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <button onclick="handleGeneratePDF()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-lg text-xs transition cursor-pointer shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-file-pdf text-sm"></i> ประมวลผลและสร้างเอกสาร PDF
+                </button>
+            </div>
+        </div>
 
     </main>
 
-    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-4 mt-8">
-        <div class="max-w-7xl mx-auto px-4 text-center text-xs space-y-1">
-            <p>© 2026 งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
+    <div id="successModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xs items-center justify-center z-50 hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
+            <div class="w-12 h-12 bg-emerald-950 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-xl animate-bounce">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div>
+                <h3 class="text-sm font-semibold text-white">สร้างรายงาน PDF สำเร็จแล้ว!</h3>
+                <p class="text-xs text-slate-400 mt-1">ระบบได้ทำการจัดเตรียมไฟล์เอกสารของคุณเรียบร้อยแล้วค่ะ</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeModal()" class="w-1/3 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-lg text-xs font-medium transition cursor-pointer">ปิด</button>
+                <a id="modalDownloadLink" href="#" target="_blank" class="w-2/3 bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-medium transition inline-flex items-center justify-center gap-1.5 shadow-md">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> เปิดดูเอกสาร
+                </a>
+            </div>
         </div>
-    </footer>
+    </div>
 
-  <script>
-        // ⚠️ ลิงก์ Web App URL เดิมที่คุณอัฟฟานกำหนดไว้
+    <script>
+        // ⚠️ ลิงก์ Web App URL เดิมที่คุณกำหนดไว้
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzy3H3uljjyxiC1GSKM7PIYCs8sOR27LjaNdQiSKW3PvUTcxS5ptFsArMpjwHgNP9v7/exec";
         
         let classList = [];
@@ -330,14 +279,12 @@
             document.getElementById(tabId).classList.remove('hidden');
 
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('text-white', 'border-b-2', 'border-indigo-400', 'bg-indigo-900/50');
-                btn.classList.add('text-indigo-300', 'border-transparent');
+                btn.className = "tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-indigo-300 hover:text-white transition cursor-pointer whitespace-nowrap";
             });
 
             const activeBtn = document.getElementById(`btn-${tabId}`);
             if (activeBtn) {
-                activeBtn.classList.remove('text-indigo-300', 'border-transparent');
-                activeBtn.classList.add('text-white', 'border-b-2', 'border-indigo-400', 'bg-indigo-900/50');
+                activeBtn.className = "tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-indigo-400 bg-indigo-900/50 text-white transition cursor-pointer whitespace-nowrap";
             }
 
             if (tabId === 'stats-tab') loadMonthlyStats();
@@ -377,7 +324,7 @@
             dbSelect.innerHTML = '<option value="">-- เลือกระดับชั้น --</option>';
             checkSelect.innerHTML = '<option value="">-- เลือกระดับชั้น --</option>';
             statsSelect.innerHTML = '<option value="">แสดงทุกระดับชั้น</option>';
-            reportSelect.innerHTML = '';
+            reportSelect.innerHTML = '<option value="">-- เลือกระดับชั้น --</option>';
 
             classList.forEach(cls => {
                 dbSelect.appendChild(createOptionElement(cls, cls));
@@ -405,15 +352,15 @@
             const tbody = document.getElementById('attendanceTableBody');
 
             if (isEditMode) {
-                btn.className = "bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-100 transition flex items-center gap-1.5 cursor-pointer";
+                btn.className = "bg-emerald-950/40 text-emerald-400 border border-emerald-900/50 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-900/40 transition flex items-center gap-1.5 cursor-pointer";
                 text.innerText = "เปลี่ยนเป็นโหมดเช็คปกติ (ซ่อนรายการเช็คแล้ว)";
             } else {
-                btn.className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
+                btn.className = "bg-amber-950/40 text-amber-400 border border-amber-900/50 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-900/40 transition flex items-center gap-1.5 cursor-pointer";
                 text.innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
             }
             
             document.getElementById('checkClassSelect').value = "";
-            tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-500"><i class="fa-solid fa-layer-group block text-xl mb-2 text-indigo-500/50"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
             document.getElementById('submitBtnArea').classList.add('hidden');
             renderDropdowns();
         }
@@ -441,7 +388,7 @@
             const selectedClass = document.getElementById('dbClassSelect').value;
             const tbody = document.getElementById('dashboardTableBody');
             if (!selectedClass) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400"><i class="fa-solid fa-arrow-pointer block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500"><i class="fa-solid fa-arrow-pointer block text-xl mb-2 text-indigo-500/50"></i> กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</td></tr>`;
                 return;
             }
 
@@ -451,22 +398,23 @@
                 .then(data => {
                     tbody.innerHTML = '';
                     if (!data || data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">ไม่พบตารางรายห้องเรียน</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500">ไม่พบตารางรายห้องเรียน</td></tr>`;
                         return;
                     }
                     data.forEach(item => {
-                        let statusColor = "text-slate-500 bg-slate-100";
-                        if (item.status === "ปฏิบัติหน้าที่") statusColor = "text-emerald-700 bg-emerald-50 border border-emerald-200";
-                        else if (item.status === "ไม่ลงแถว") statusColor = "text-rose-700 bg-rose-50 border border-rose-200";
+                        let statusColor = "text-slate-400 bg-slate-900 border border-slate-800";
+                        if (item.status === "ปฏิบัติหน้าที่") statusColor = "text-emerald-400 bg-emerald-950/40 border border-emerald-900/50";
+                        else if (item.status === "ไม่ลงแถว") statusColor = "text-rose-400 bg-rose-950/40 border border-rose-900/50";
 
                         const tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-900/50 transition";
                         tr.innerHTML = `
-                            <td class="p-3 text-center font-bold text-slate-900">${item.className}</td>
-                            <td class="p-3 font-medium text-slate-700">${item.teacherName}</td>
+                            <td class="p-3 text-center font-bold text-slate-200">${item.className}</td>
+                            <td class="p-3 font-medium text-slate-300">${item.teacherName}</td>
                             <td class="p-3 text-center"><span class="px-2.5 py-1 rounded-md text-xs font-semibold ${statusColor}">${item.status}</span></td>
-                            <td class="p-3 text-slate-600">${item.reason || '-'}</td>
-                            <td class="p-3 text-center text-xs font-mono text-slate-500">${item.time || '-'}</td>
-                            <td class="p-3 text-slate-600 text-xs">${item.recorder || '-'}</td>
+                            <td class="p-3 text-slate-400">${item.reason || '-'}</td>
+                            <td class="p-3 text-center text-xs font-mono text-slate-400">${item.time || '-'}</td>
+                            <td class="p-3 text-slate-400 text-xs">${item.recorder || '-'}</td>
                         `;
                         tbody.appendChild(tr);
                     });
@@ -527,7 +475,7 @@
             const submitArea = document.getElementById('submitBtnArea');
 
             if (!selectedClass) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-500"><i class="fa-solid fa-layer-group block text-xl mb-2 text-indigo-500/50"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
                 submitArea.classList.add('hidden');
                 return;
             }
@@ -538,7 +486,7 @@
                 .then(data => {
                     tbody.innerHTML = '';
                     if (!data || data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">ไม่พบข้อมูลรายชื่อค่ะ</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-500">ไม่พบข้อมูลรายชื่อค่ะ</td></tr>`;
                         submitArea.classList.add('hidden');
                         return;
                     }
@@ -546,25 +494,26 @@
                     data.forEach((item, index) => {
                         const isAbsent = item.existingStatus === "ไม่ลงแถว";
                         const tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-900/30 transition";
                         tr.innerHTML = `
-                            <td class="p-3 text-center font-bold text-slate-900">
+                            <td class="p-3 text-center font-bold text-slate-200">
                                 ${item.className}
                                 <input type="hidden" name="class_${index}" value="${item.className}">
                                 <input type="hidden" name="teacher_${index}" value="${item.teacherName}">
                             </td>
-                            <td class="p-3 font-medium text-slate-700">${item.teacherName}</td>
+                            <td class="p-3 font-medium text-slate-300">${item.teacherName}</td>
                             <td class="p-3">
                                 <div class="flex items-center gap-4 justify-center">
-                                    <label class="flex items-center gap-1.5 cursor-pointer text-emerald-700 font-medium">
-                                        <input type="radio" name="status_${index}" value="ปฏิบัติหน้าที่" ${!isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, false)"> ปฏิบัติหน้าที่
+                                    <label class="flex items-center gap-1.5 cursor-pointer text-emerald-400 font-medium select-none">
+                                        <input type="radio" name="status_${index}" value="ปฏิบัติหน้าที่" ${!isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, false)" class="accent-emerald-500"> ปฏิบัติหน้าที่
                                     </label>
-                                    <label class="flex items-center gap-1.5 cursor-pointer text-rose-700 font-medium">
-                                        <input type="radio" name="status_${index}" value="ไม่ลงแถว" ${isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, true)"> ไม่ลงแถว
+                                    <label class="flex items-center gap-1.5 cursor-pointer text-rose-400 font-medium select-none">
+                                        <input type="radio" name="status_${index}" value="ไม่ลงแถว" ${isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, true)" class="accent-rose-500"> ไม่ลงแถว
                                     </label>
                                 </div>
                             </td>
                             <td class="p-3">
-                                <select id="reason_${index}" ${!isAbsent ? 'disabled' : ''} class="w-full ${!isAbsent ? 'bg-slate-100 opacity-50' : 'bg-white'} border border-slate-300 rounded-md px-2 py-1 text-xs focus:bg-white outline-hidden">
+                                <select id="reason_${index}" ${!isAbsent ? 'disabled' : ''} class="w-full ${!isAbsent ? 'bg-slate-900/50 opacity-40' : 'bg-slate-900'} border border-slate-800 rounded-md px-2 py-1 text-xs focus:border-indigo-500 text-slate-200 outline-hidden transition">
                                     <option value="ลาป่วย" ${item.existingReason === 'ลาป่วย' ? 'selected' : ''}>ลาป่วย</option>
                                     <option value="ลากิจ" ${item.existingReason === 'ลากิจ' ? 'selected' : ''}>ลากิจ</option>
                                     <option value="สาย" ${item.existingReason === 'สาย' ? 'selected' : ''}>มาสาย</option>
@@ -591,10 +540,10 @@
             const select = document.getElementById(`reason_${index}`);
             if (show) {
                 select.removeAttribute('disabled');
-                select.className = "w-full bg-white border border-slate-300 rounded-md px-2 py-1 text-xs outline-hidden";
+                select.className = "w-full bg-slate-900 border border-slate-800 rounded-md px-2 py-1 text-xs text-slate-200 outline-hidden transition";
             } else {
                 select.setAttribute('disabled', 'true');
-                select.className = "w-full bg-slate-100 border border-slate-300 rounded-md px-2 py-1 text-xs opacity-50 outline-hidden";
+                select.className = "w-full bg-slate-900/50 border border-slate-800 rounded-md px-2 py-1 text-xs opacity-40 text-slate-200 outline-hidden transition";
             }
         }
 
@@ -636,11 +585,11 @@
                     });
                     
                     isEditMode = false;
-                    document.getElementById('toggleModeBtn').className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
+                    document.getElementById('toggleModeBtn').className = "bg-amber-950/40 text-amber-400 border border-amber-900/50 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-900/40 transition flex items-center gap-1.5 cursor-pointer";
                     document.getElementById('modeText').innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
                     
                     document.getElementById('checkClassSelect').value = "";
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-500"><i class="fa-solid fa-layer-group block text-xl mb-2 text-indigo-500/50"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
                     document.getElementById('submitBtnArea').classList.add('hidden');
                     
                     fetchInitialConfig(); 
@@ -665,18 +614,17 @@
             .finally(() => showLoading(false));
         }
 
-        // 🌟 ฟังก์ชันสลับช่วงสถิติและสลับ CSS ปุ่มตามที่คุณอัฟฟานออกแบบไว้ในส่วนเนื้อหา
         function changeStatsRange(type) {
             currentStatsRangeType = type;
             const weeklyBtn = document.getElementById('rangeWeeklyBtn');
             const monthlyBtn = document.getElementById('rangeMonthlyBtn');
 
             if (type === 'weekly') {
-                weeklyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-3xs transition cursor-pointer";
-                monthlyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer";
+                weeklyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md bg-indigo-600 text-white shadow-sm transition cursor-pointer";
+                monthlyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md text-slate-400 hover:text-slate-200 transition cursor-pointer";
             } else {
-                monthlyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-3xs transition cursor-pointer";
-                weeklyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer";
+                monthlyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md bg-indigo-600 text-white shadow-sm transition cursor-pointer";
+                weeklyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md text-slate-400 hover:text-slate-200 transition cursor-pointer";
             }
             loadMonthlyStats();
         }
@@ -684,9 +632,8 @@
         function loadMonthlyStats() {
             const levelFilter = document.getElementById('statsClassSelect').value;
             const tbody = document.getElementById('statsTableBody');
-            tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังสรุปสถิติ...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i class="fa-solid fa-spinner animate-spin mr-2 text-indigo-400"></i>กำลังสรุปสถิติ...</td></tr>`;
 
-            // 🌟 เปลี่ยนมาดึงช่วงเวลาจากตัวแปรสากล currentStatsRangeType เพื่อรองรับประเภทสัปดาห์/เดือนอย่างสมบูรณ์
             fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}&rangeType=${currentStatsRangeType}`)
                 .then(res => res.json())
                 .then(data => {
@@ -699,19 +646,19 @@
                     }
 
                     if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">ยังไม่มีข้อมูลในระบบสะสมค่ะ</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500">ยังไม่มีข้อมูลในระบบสะสมค่ะ</td></tr>`;
                         return;
                     }
                     
                     data.forEach(item => {
                         const tr = document.createElement('tr');
-                        tr.className = "hover:bg-slate-50 text-center";
+                        tr.className = "hover:bg-slate-900/40 text-center transition";
                         tr.innerHTML = `
-                            <td class="p-3 font-bold text-slate-900">${item.className}</td>
-                            <td class="p-3 text-left font-medium text-slate-700">${item.teacherName}</td>
-                            <td class="p-3 bg-slate-100/80 font-mono font-bold text-slate-800">${item.total}</td>
-                            <td class="p-3 text-emerald-700 bg-emerald-50/20 font-semibold">${item.present}</td>
-                            <td class="p-3 text-rose-700 bg-rose-50/20 font-semibold">${item.absent}</td>
+                            <td class="p-3 font-bold text-slate-200">${item.className}</td>
+                            <td class="p-3 text-left font-medium text-slate-300">${item.teacherName}</td>
+                            <td class="p-3 bg-slate-900/60 font-mono font-bold text-slate-100">${item.total}</td>
+                            <td class="p-3 text-emerald-400 bg-emerald-950/20 font-semibold">${item.present}</td>
+                            <td class="p-3 text-rose-400 bg-rose-950/20 font-semibold">${item.absent}</td>
                         `;
                         tbody.appendChild(tr);
                     });
@@ -730,21 +677,21 @@
 
             if (type === 'daily') {
                 label.innerText = "3. เลือกวันที่ต้องการออกรายงาน";
-                inputContainer.innerHTML = `<input type="date" id="reportDateInput" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-hidden transition">`;
+                inputContainer.innerHTML = `<input type="date" id="reportDateInput" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 outline-hidden transition">`;
                 setTodayDateInput();
             } else if (type === 'weekly') {
                 label.innerText = "3. เลือกช่วงสัปดาห์ (วันเริ่มต้น - วันสิ้นสุด)";
                 inputContainer.innerHTML = `
                     <div class="flex items-center gap-2">
-                        <input type="date" id="reportWeekStart" class="w-1/2 bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-700 focus:bg-white outline-hidden">
-                        <span class="text-slate-400">ถึง</span>
-                        <input type="date" id="reportWeekEnd" class="w-1/2 bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-700 focus:bg-white outline-hidden">
+                        <input type="date" id="reportWeekStart" class="w-1/2 bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 outline-hidden">
+                        <span class="text-slate-500 text-xs">ถึง</span>
+                        <input type="date" id="reportWeekEnd" class="w-1/2 bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 outline-hidden">
                     </div>
                     <input type="hidden" id="reportDateInput" value="">
                 `;
             } else {
                 label.innerText = "3. เลือกเดือน/ปี ที่ต้องการออกรายงาน";
-                inputContainer.innerHTML = `<input type="month" id="reportDateInput" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-700 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-hidden transition">`;
+                inputContainer.innerHTML = `<input type="month" id="reportDateInput" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:border-indigo-500 outline-hidden transition">`;
                 const today = new Date();
                 document.getElementById('reportDateInput').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
             }
