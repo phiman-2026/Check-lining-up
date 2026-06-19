@@ -296,7 +296,7 @@
         </div>
     </footer>
 
-   <script>
+  <script>
         window.addEventListener('DOMContentLoaded', () => {
             setTodayDateInput();
             fetchInitialConfig();
@@ -327,7 +327,8 @@
             activeBtn.classList.remove('text-indigo-300', 'border-transparent');
             activeBtn.classList.add('text-white', 'border-b-2', 'border-indigo-400', 'bg-indigo-900/50');
 
-            if (tabId === 'stats-tab') loadMonthlyStats();
+            // เมื่อเปิดแท็บสถิติ ให้โหลดข้อมูลตามช่วงเวลาปัจจุบันที่เลือกไว้
+            if (tabId === 'stats-tab') loadAttendanceStats();
         }
 
         function closeModal() {
@@ -427,7 +428,7 @@
             const selectedClass = document.getElementById('dbClassSelect').value;
             const tbody = document.getElementById('dashboardTableBody');
             if (!selectedClass) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400"><i class="fa-solid fa-arrow-pointer-separator block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400"><i class="fa-solid fa-arrow-pointer block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</td></tr>`;
                 return;
             }
 
@@ -634,12 +635,30 @@
             .finally(() => showLoading(false));
         }
 
-        function loadMonthlyStats() {
+        // 🌟 ฟังก์ชันจัดการสลับปุ่ม รายสัปดาห์ / รายเดือน (เพิ่มใหม่)
+        function changeStatsRange(rangeType) {
+            currentStatsRangeType = rangeType;
+            const weeklyBtn = document.getElementById('rangeWeeklyBtn');
+            const monthlyBtn = document.getElementById('rangeMonthlyBtn');
+
+            if (rangeType === 'weekly') {
+                weeklyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition cursor-pointer";
+                monthlyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer";
+            } else {
+                monthlyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition cursor-pointer";
+                weeklyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer";
+            }
+            loadAttendanceStats(); // เรียกโหลดข้อมูลใหม่ทันทีหลังสลับช่วงเวลา
+        }
+
+        // 🌟 ปรับปรุงเพื่อดึงสถิติตามเงื่อนไข rangeType และ className (แก้ไขชื่อและตรรกะภายใน)
+        function loadAttendanceStats() {
             const levelFilter = document.getElementById('statsClassSelect').value;
             const tbody = document.getElementById('statsTableBody');
             tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังสรุปสถิติ...</td></tr>`;
 
-            fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}`)
+            // แนบพารามิเตอร์ rangeType ไปกับ URL เพื่อให้หลังบ้านแยกข้อมูลได้ถูกต้อง
+            fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}&rangeType=${currentStatsRangeType}`)
                 .then(res => res.json())
                 .then(data => {
                     tbody.innerHTML = '';
@@ -661,6 +680,11 @@
                     });
                 })
                 .catch(err => tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`);
+        }
+
+        // เผื่อหน้าดร็อปดาวน์สถิติเรียกอัปเดตข้อมูล
+        function loadMonthlyStats() {
+            loadAttendanceStats();
         }
 
         function toggleReportDateInput() {
