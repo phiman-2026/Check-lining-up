@@ -7,148 +7,158 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2=family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=K2D:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { font-family: 'Sarabun', sans-serif; }
+        body { 
+            font-family: 'K2D', sans-serif; 
+            background-color: #f1f5f9; /* สลับเป็นพื้นหลังสีเทา Slate 100 ให้อารมณ์แอปพลิเคชัน */
+        }
+        /* ปรับดีไซน์ Scrollbar ของแถบเมนูและตารางในมือถือให้ดูเนียนตา */
+        .overflow-x-auto::-webkit-scrollbar {
+            height: 4px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 10px;
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="text-slate-800 min-h-screen flex flex-col antialiased">
 
-    <!-- HEADER BAR -->
-    <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
-            <div class="flex items-center gap-3 text-center sm:text-left">
-                <div class="bg-white p-2 rounded-full text-indigo-900 w-10 h-10 flex items-center justify-center font-bold text-xl shadow-inner">พ.พ.</div>
+    <header class="bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-md sticky top-0 z-40 border-b border-slate-700/50">
+        <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3 text-center sm:text-left flex-col sm:flex-row">
+                <div class="bg-white/10 p-1 rounded-xl text-white w-12 h-12 flex items-center justify-center font-bold text-lg shadow-inner border border-white/10 backdrop-blur-xs">
+                    <img src="https://via.placeholder.com/150" alt="พ.พ." class="w-full h-full object-contain rounded-lg error-fallback hidden" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <span class="flex items-center justify-center w-full h-full text-sm tracking-tighter">พ.พ.</span>
+                </div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-wide">ระบบเช็คการปฏิบัติงานลงแถวของครูที่ปรึกษา</h1>
-                    <p class="text-xs text-indigo-200">งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
+                    <h1 class="text-lg font-bold tracking-wide text-blue-100">ระบบเช็คการปฏิบัติงานลงแถวของครูที่ปรึกษา</h1>
+                    <p class="text-xs text-slate-400 font-light mt-0.5">งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
                 </div>
             </div>
             
-            <div class="flex items-center gap-2">
-                <div id="userStatus" class="text-sm bg-indigo-800/60 px-4 py-2 rounded-lg border border-indigo-700 flex items-center gap-2">
-                    <i class="fa-solid fa-user-clock text-indigo-300"></i>
-                    <span>ยังไม่ได้เข้าสู่ระบบ</span>
+            <div class="flex items-center gap-2.5 w-full sm:w-auto justify-center sm:justify-end">
+                <div id="userStatus" class="text-xs bg-slate-800/80 px-4 py-2.5 rounded-xl border border-slate-700 flex items-center gap-2 shadow-2xs">
+                    <i class="fa-solid fa-user-clock text-blue-400"></i>
+                    <span class="font-medium text-slate-300">ยังไม่ได้เข้าสู่ระบบ</span>
                 </div>
-                <button id="logoutBtn" onclick="handleLogout()" class="hidden bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-xs transition cursor-pointer">
+                <button id="logoutBtn" onclick="handleLogout()" class="hidden bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-md transition-all cursor-pointer active:scale-95">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> ออกจากระบบ
                 </button>
             </div>
         </div>
 
-        <!-- MAIN NAVIGATION TABS -->
-        <div class="bg-indigo-950 border-t border-indigo-800">
-            <div class="max-w-7xl mx-auto px-2 flex overflow-x-auto text-sm">
-                <button onclick="checkAuthAndSwitchTab('dashboard-tab')" id="btn-dashboard-tab" class="tab-btn px-4 py-3 text-white border-b-2 border-indigo-400 font-medium flex items-center gap-2 shrink-0 bg-indigo-900/50">
-                    <i class="fa-solid fa-chart-pie text-indigo-400"></i> สรุปวันนี้รายชั้น
+        <div class="bg-slate-950/40 border-t border-slate-800/80 backdrop-blur-md">
+            <div class="max-w-7xl mx-auto px-2 flex overflow-x-auto text-xs sm:text-sm">
+                <button onclick="checkAuthAndSwitchTab('dashboard-tab')" id="btn-dashboard-tab" class="tab-btn px-5 py-3.5 text-white border-b-2 border-blue-500 font-medium flex items-center gap-2 shrink-0 bg-slate-800/60 transition">
+                    <i class="fa-solid fa-chart-pie text-blue-400"></i> สรุปวันนี้รายชั้น
                 </button>
-                <button onclick="checkAuthAndSwitchTab('check-tab')" id="btn-check-tab" class="tab-btn px-4 py-3 text-indigo-300 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0">
+                <button onclick="checkAuthAndSwitchTab('check-tab')" id="btn-check-tab" class="tab-btn px-5 py-3.5 text-slate-400 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0 transition">
                     <i class="fa-solid fa-list-check"></i> บันทึกการลงแถว
                 </button>
-                <button onclick="checkAuthAndSwitchTab('stats-tab')" id="btn-stats-tab" class="tab-btn px-4 py-3 text-indigo-300 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0">
+                <button onclick="checkAuthAndSwitchTab('stats-tab')" id="btn-stats-tab" class="tab-btn px-5 py-3.5 text-slate-400 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0 transition">
                     <i class="fa-solid fa-chart-column"></i> หน้าสถิติรายงาน
                 </button>
-                <button onclick="checkAuthAndSwitchTab('report-tab')" id="btn-report-tab" class="tab-btn px-4 py-3 text-indigo-300 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0">
+                <button onclick="checkAuthAndSwitchTab('report-tab')" id="btn-report-tab" class="tab-btn px-5 py-3.5 text-slate-400 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0 transition">
                     <i class="fa-solid fa-file-pdf"></i> ออกรายงาน PDF
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- MAIN CONTENT CONTAINER -->
     <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 relative">
         
-        <!-- LOADING OVERLAY -->
-        <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 hidden">
-            <div class="bg-white px-6 py-4 rounded-xl shadow-xl flex items-center gap-3">
-                <svg class="animate-spin h-5 w-5 text-indigo-600" viewBox="0 0 24 24">
+        <div id="loadingOverlay" class="fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center z-50 hidden">
+            <div class="bg-white px-6 py-4 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-3.5">
+                <svg class="animate-spin h-5 w-5 text-blue-600" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span class="text-sm font-medium text-slate-700">กำลังประมวลผลข้อมูล...</span>
+                <span class="text-sm font-semibold text-slate-700">กำลังประมวลผลข้อมูล...</span>
             </div>
         </div>
 
-        <!-- SUCCESS MODAL FOR PDF -->
-        <div id="successModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div id="successModal" class="fixed inset-0 bg-slate-950/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
             <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl scale-95 transition-all space-y-4 border border-slate-100">
                 <div class="bg-emerald-50 text-emerald-600 w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto shadow-inner animate-bounce">
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
                 <div class="space-y-1">
                     <h3 class="text-lg font-bold text-slate-900">สร้างรายงานทางราชการสำเร็จ</h3>
-                    <p class="text-sm text-slate-500">ระบบได้บันทึกเอกสาร PDF เข้าสู่ Google Drive เรียบร้อยแล้วค่ะ</p>
+                    <p class="text-xs text-slate-500">ระบบได้บันทึกเอกสาร PDF เข้าสู่ Google Drive เรียบร้อยแล้วค่ะ</p>
                 </div>
-                <div class="pt-2 flex flex-col gap-2">
-                    <a id="modalDownloadLink" href="#" target="_blank" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm cursor-pointer">
+                <div class="pt-2 flex flex-col gap-2.5">
+                    <a id="modalDownloadLink" href="#" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm cursor-pointer active:scale-98">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i> คลิกเปิดดูรายงาน PDF ตรงนี้
                     </a>
-                    <button onclick="closeModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2 rounded-xl transition text-sm cursor-pointer">
+                    <button onclick="closeModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2.5 rounded-xl transition text-sm cursor-pointer">
                         ปิดหน้าต่างนี้
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- SECTION 0: GATEWAY / LOGIN COMPONENT -->
-        <section id="loginSection" class="max-w-md mx-auto my-12 bg-white rounded-xl shadow-md border border-slate-200 p-6 space-y-5">
+        <section id="loginSection" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6 space-y-5">
             <div class="text-center space-y-1">
-                <div class="bg-indigo-50 text-indigo-700 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner">
+                <div class="bg-blue-50 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner">
                     <i class="fa-solid fa-lock"></i>
                 </div>
                 <h3 class="text-lg font-bold text-slate-900">เข้าสู่ระบบตรวจสอบและบันทึกเวลา</h3>
-                <p class="text-xs text-slate-500">กรุณากรอกรหัส PIN ประจำระดับชั้นเพื่อเปิดใช้งานระบบงานทั้งหมด</p>
+                <p class="text-xs text-slate-400 leading-relaxed">กรุณากรอกรหัส PIN ประจำระดับชั้นเพื่อเปิดใช้งานระบบงานทั้งหมด</p>
             </div>
 
             <form id="pinForm" onsubmit="event.preventDefault(); handleLogin();" class="space-y-4">
                 <div class="space-y-3">
-                    <input type="password" id="pinInput" placeholder="••••••" maxlength="6" class="w-full text-center tracking-widest bg-slate-50 border border-slate-300 rounded-lg px-4 py-2.5 font-bold text-lg focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden transition">
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg shadow-xs transition flex items-center justify-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-key text-xs"></i> เข้าสู่ระบบด้วยรหัส PIN
+                    <input type="password" id="pinInput" placeholder="••••••" maxlength="6" class="w-full text-center tracking-widest bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-hidden transition-all">
+                    <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+                        <i class="fa-solid fa-key text-xs text-blue-400"></i> เข้าสู่ระบบด้วยรหัส PIN
                     </button>
                 </div>
             </form>
         </section>
 
-        <!-- CONTAINER FOR PROTECTED CONTENTS -->
         <div id="protectedContent" class="hidden space-y-6">
 
-            <!-- SECTION 1: DASHBOARD TAB -->
             <section id="dashboard-tab" class="tab-content hidden space-y-6">
-                <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-4 sm:p-6">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
-                        <div>
-                            <h2 class="text-xl font-bold text-slate-950 flex items-center gap-2">
-                                <i class="fa-solid fa-calendar-day text-indigo-600"></i> สรุปการลงแถวประจำวันนี้
-                            </h2>
-                            <p class="text-xs text-slate-500 mt-0.5">รายละเอียดข้อมูลสถานะและเวลาบันทึกรายบุคคล</p>
+                <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-4 sm:p-6">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-calendar-day"></i></div>
+                            <div>
+                                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">สรุปการลงแถวประจำวันนี้</h2>
+                                <p class="text-xs text-slate-400 mt-0.5">รายละเอียดข้อมูลสถานะและเวลาบันทึกรายบุคคล</p>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <label for="dbClassSelect" class="text-sm font-medium text-slate-700 shrink-0">ระดับชั้น:</label>
-                            <select id="dbClassSelect" onchange="loadDailySummary()" class="w-full md:w-48 bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-medium shadow-2xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden">
+                        <div class="flex items-center gap-2.5 w-full lg:w-auto justify-end">
+                            <label for="dbClassSelect" class="text-xs font-semibold text-slate-500 shrink-0">ระดับชั้น:</label>
+                            <select id="dbClassSelect" onchange="loadDailySummary()" class="w-full lg:w-48 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium shadow-2xs focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-hidden transition">
                                 <option value="">-- เลือกระดับชั้น --</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto rounded-lg border border-slate-200">
-                        <table class="w-full text-left border-collapse text-sm">
+                    <div class="overflow-x-auto rounded-xl border border-slate-200/70 shadow-2xs">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm whitespace-nowrap">
                             <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
-                                    <th class="p-3 text-center w-24">ห้องเรียน</th>
-                                    <th class="p-3">ชื่อครูที่ปรึกษา (ร่วม)</th>
-                                    <th class="p-3 text-center w-36">status วันนี้</th>
-                                    <th class="p-3">เหตุผลกรณีไม่ลงแถว</th>
-                                    <th class="p-3 text-center w-24">เวลาบันทึก</th>
-                                    <th class="p-3">ผู้บันทึกตรวจ</th>
+                                <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-600 font-semibold">
+                                    <th class="p-3.5 text-center w-24">ห้องเรียน</th>
+                                    <th class="p-3.5">ชื่อครูที่ปรึกษา (ร่วม)</th>
+                                    <th class="p-3.5 text-center w-36">status วันนี้</th>
+                                    <th class="p-3.5">เหตุผลกรณีไม่ลงแถว</th>
+                                    <th class="p-3.5 text-center w-24">เวลาบันทึก</th>
+                                    <th class="p-3.5">ผู้บันทึกตรวจ</th>
                                 </tr>
                             </thead>
                             <tbody id="dashboardTableBody" class="divide-y divide-slate-100">
                                 <tr>
-                                    <td colspan="6" class="p-8 text-center text-slate-400">
-                                        <i class="fa-solid fa-arrow-pointer block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล
+                                    <td colspan="6" class="p-10 text-center text-slate-400 bg-slate-50/40">
+                                        <div class="max-w-xs mx-auto">
+                                            <i class="fa-solid fa-arrow-pointer block text-2xl text-slate-300 mb-2"></i> 
+                                            <span class="text-xs font-medium text-slate-500">กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</span>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -157,106 +167,106 @@
                 </div>
             </section>
 
-            <!-- SECTION 2: ATTENDANCE CHECK TAB -->
             <section id="check-tab" class="tab-content hidden space-y-6">
-                <div id="attendanceFormSection" class="bg-white rounded-xl shadow-xs border border-slate-200 p-4 sm:p-6 space-y-4">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div id="attendanceFormSection" class="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-4 sm:p-6 space-y-5">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                         <div class="flex items-center gap-3">
-                            <div class="bg-emerald-50 text-emerald-700 w-10 h-10 rounded-lg flex items-center justify-center text-lg shadow-xs"><i class="fa-solid fa-clipboard-user"></i></div>
+                            <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-clipboard-user"></i></div>
                             <div>
-                                <h3 class="text-lg font-bold text-slate-950">บันทึกเวลาปฏิบัติหน้าที่ลงแถว</h3>
-                                <p class="text-xs text-slate-500">เลือกห้องเรียนระดับชั้นเพื่อบันทึกสถานะการลงแถว</p>
+                                <h3 class="text-lg font-bold text-slate-900">บันทึกเวลาปฏิบัติหน้าที่ลงแถว</h3>
+                                <p class="text-xs text-slate-400 mt-0.5">เลือกห้องเรียนระดับชั้นเพื่อบันทึกสถานะการลงแถว</p>
                             </div>
                         </div>
                         
-                        <div class="flex flex-wrap items-center gap-3">
-                            <button type="button" id="toggleModeBtn" onclick="toggleEditMode()" class="bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer">
-                                <i class="fa-solid fa-pen-to-square"></i> <span id="modeText">เปิดโหมดแก้ไขข้อมูลเดิม</span>
+                        <div class="flex flex-col sm:flex-row flex-wrap items-center gap-3 w-full lg:w-auto">
+                            <button type="button" id="toggleModeBtn" onclick="toggleEditMode()" class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-semibold px-3 py-2 rounded-xl text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
+                                <i class="fa-solid fa-pen-to-square text-blue-500"></i> <span id="modeText">เปิดโหมดแก้ไขข้อมูลเดิม</span>
                             </button>
                             
-                            <div class="flex flex-wrap items-center gap-4">
-    <!-- บล็อกระดับชั้นเดิมของคุณอัฟฟาน -->
-    <div class="flex items-center gap-2">
-        <label for="checkClassSelect" class="text-sm font-medium text-slate-700 shrink-0">ระดับชั้น:</label>
-        <select id="checkClassSelect" onchange="loadAttendanceForm()" class="w-full md:w-36 bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-medium shadow-2xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden">
-            <option value="">-- เลือกระดับชั้น --</option>
-        </select>
-    </div>
+                            <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                                <div class="flex items-center gap-2 flex-1 sm:flex-none">
+                                    <label for="checkClassSelect" class="text-xs font-semibold text-slate-500 shrink-0">ระดับชั้น:</label>
+                                    <select id="checkClassSelect" onchange="loadAttendanceForm()" class="w-full sm:w-36 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium shadow-2xs focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-hidden transition">
+                                        <option value="">-- เลือกระดับชั้น --</option>
+                                    </select>
+                                </div>
 
-    <!-- 🌟 บล็อกเลือกวันที่สําหรับโหมดแก้ไข (จะแสดงเฉพาะตอนเปิดโหมดแก้ไขเท่านั้น) -->
-    <div id="editDateWrapper" class="flex items-center gap-2 hidden">
-        <label for="editDateInput" class="text-sm font-medium text-slate-700 shrink-0">วันที่แก้ไข:</label>
-        <input type="date" id="editDateInput" onchange="loadAttendanceForm()" class="w-full md:w-40 bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-medium shadow-2xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden">
-    </div>
-</div>
+                                <div id="editDateWrapper" class="flex items-center gap-2 hidden flex-1 sm:flex-none">
+                                    <label for="editDateInput" class="text-xs font-semibold text-slate-500 shrink-0">วันที่แก้ไข:</label>
+                                    <input type="date" id="editDateInput" onchange="loadAttendanceForm()" class="w-full sm:w-40 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium shadow-2xs focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-hidden transition">
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <form id="attendanceForm" onsubmit="submitAttendance(event)" class="space-y-4">
-                        <div class="overflow-x-auto rounded-lg border border-slate-200">
-                            <table class="w-full text-left border-collapse text-sm">
+                    <form id="attendanceForm" onsubmit="submitAttendance(event)" class="space-y-5">
+                        <div class="overflow-x-auto rounded-xl border border-slate-200/70 shadow-2xs">
+                            <table class="w-full text-left border-collapse text-xs sm:text-sm whitespace-nowrap">
                                 <thead>
-                                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold">
-                                        <th class="p-3 text-center w-24">ห้องเรียน</th>
-                                        <th class="p-3">ชื่อครูที่ปรึกษา (ร่วม)</th>
-                                        <th class="p-3 text-center w-64">สถานะการลงแถว</th>
-                                        <th class="p-3">ระบุสาเหตุ (กรณีไม่ลงแถว)</th>
+                                    <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-600 font-semibold">
+                                        <th class="p-3.5 text-center w-24">ห้องเรียน</th>
+                                        <th class="p-3.5">ชื่อครูที่ปรึกษา (ร่วม)</th>
+                                        <th class="p-3.5 text-center w-64">สถานะการลงแถว</th>
+                                        <th class="p-3.5 w-60">ระบุสาเหตุ (กรณีไม่ลงแถว)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="attendanceTableBody" class="divide-y divide-slate-100">
                                     <tr>
-                                        <td colspan="4" class="p-8 text-center text-slate-400">
-                                            <i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ
+                                        <td colspan="4" class="p-10 text-center text-slate-400 bg-slate-50/40">
+                                            <div class="max-w-xs mx-auto">
+                                                <i class="fa-solid fa-layer-group block text-2xl text-slate-300 mb-2"></i> 
+                                                <span class="text-xs font-medium text-slate-500">กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</span>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         
-                        <div id="submitBtnArea" class="flex justify-end pt-2 hidden">
-    <button type="submit" id="submitAttendanceBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-2.5 rounded-lg shadow-xs transition flex items-center gap-2 cursor-pointer">
-        <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล
-    </button>
-</div>
+                        <div id="submitBtnArea" class="flex justify-end pt-1 hidden">
+                            <button type="submit" id="submitAttendanceBtn" class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-slate-800 hover:from-blue-700 hover:to-slate-900 text-white font-medium px-6 py-2.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+                                <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล
+                            </button>
+                        </div>
                     </form>
                 </div>
             </section>
 
-            <!-- SECTION 3: STATISTICS REPORT TAB -->
             <section id="stats-tab" class="tab-content hidden space-y-6">
-                <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-4 sm:p-6">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
-                        <div>
-                            <h2 class="text-xl font-bold text-slate-950 flex items-center gap-2">
-                                <i class="fa-solid fa-chart-column text-indigo-600"></i> สถิติรายงานการปฏิบัติหน้าที่ลงแถว
-                            </h2>
-                            <p class="text-xs text-slate-500 mt-0.5">สรุปจำนวนรวมการลงแถวและการขาดแยกรายคนสะสม</p>
+                <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-4 sm:p-6">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-chart-column"></i></div>
+                            <div>
+                                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">สถิติรายงานการปฏิบัติหน้าที่ลงแถว</h2>
+                                <p class="text-xs text-slate-400 mt-0.5">สรุปจำนวนรวมการลงแถวและการขาดแยกรายคนสะสม</p>
+                            </div>
                         </div>
                         
-                        <div class="flex flex-wrap items-center gap-4">
-                            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
-                                <button type="button" onclick="changeStatsRange('weekly')" id="rangeWeeklyBtn" class="px-3 py-1 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-3xs transition cursor-pointer">รายสัปดาห์</button>
-                                <button type="button" onclick="changeStatsRange('monthly')" id="rangeMonthlyBtn" class="px-3 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer">รายเดือน</button>
+                        <div class="flex flex-col sm:flex-row flex-wrap items-center gap-3.5 w-full lg:w-auto justify-end">
+                            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 w-full sm:w-auto justify-center">
+                                <button type="button" onclick="changeStatsRange('weekly')" id="rangeWeeklyBtn" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-white text-slate-800 shadow-2xs transition cursor-pointer">รายสัปดาห์</button>
+                                <button type="button" onclick="changeStatsRange('monthly')" id="rangeMonthlyBtn" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-500 hover:text-slate-900 transition cursor-pointer">รายเดือน</button>
                             </div>
 
-                            <div class="flex items-center gap-2">
-                                <label for="statsClassSelect" class="text-sm font-medium text-slate-700 shrink-0">ระดับชั้น:</label>
-                                <select id="statsClassSelect" onchange="loadMonthlyStats()" class="w-full md:w-44 bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-medium outline-hidden focus:border-indigo-500">
+                            <div class="flex items-center gap-2 w-full sm:w-auto flex-1 sm:flex-none">
+                                <label for="statsClassSelect" class="text-xs font-semibold text-slate-500 shrink-0">ระดับชั้น:</label>
+                                <select id="statsClassSelect" onchange="loadMonthlyStats()" class="w-full sm:w-44 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-medium outline-hidden focus:bg-white focus:border-blue-500 transition">
                                     <option value="">แสดงทุกระดับชั้น</option>
                                 </select>
                             </div>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto rounded-lg border border-slate-200">
-                        <table class="w-full text-left border-collapse text-sm">
+                    <div class="overflow-x-auto rounded-xl border border-slate-200/70 shadow-2xs">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm whitespace-nowrap">
                             <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-semibold text-center">
-                                    <th class="p-3">ระดับชั้น</th>
-                                    <th class="p-3">ชื่อ-สกุล</th>
-                                    <th class="p-3">จำนวนลงแถวทั้งหมด (ครั้ง)</th>
-                                    <th class="p-3">รวมลงแถว (ครั้ง)</th>
-                                    <th class="p-3">รวมไม่ลงแถว (ครั้ง)</th>
+                                <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-600 font-semibold text-center">
+                                    <th class="p-3.5">ระดับชั้น</th>
+                                    <th class="p-3.5 text-left">ชื่อ-สกุล</th>
+                                    <th class="p-3.5">จำนวนลงแถวทั้งหมด (ครั้ง)</th>
+                                    <th class="p-3.5 text-emerald-600">รวมลงแถว (ครั้ง)</th>
+                                    <th class="p-3.5 text-rose-600">รวมไม่ลงแถว (ครั้ง)</th>
                                 </tr>
                             </thead>
                             <tbody id="statsTableBody" class="divide-y divide-slate-100"></tbody>
@@ -265,39 +275,38 @@
                 </div>
             </section>
 
-            <!-- SECTION 4: PDF GENERATION TAB -->
             <section id="report-tab" class="tab-content hidden max-w-xl mx-auto space-y-6">
-                <form id="reportForm" onsubmit="event.preventDefault(); handleGeneratePDF();" class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-5">
+                <form id="reportForm" onsubmit="event.preventDefault(); handleGeneratePDF();" class="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6 space-y-5">
                     <div class="text-center border-b border-slate-100 pb-4">
-                        <div class="bg-rose-50 text-rose-600 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner"><i class="fa-solid fa-file-invoice"></i></div>
+                        <div class="bg-blue-50 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner"><i class="fa-solid fa-file-invoice"></i></div>
                         <h3 class="text-lg font-bold text-slate-900">พิมพ์เอกสารรายงานทางราชการ</h3>
-                        <p class="text-xs text-slate-500">พิมพ์รายงานสรุปเป็น PDF ดึงลิงก์และบันทึกลง Google Drive ประจำระดับชั้น</p>
+                        <p class="text-xs text-slate-400 leading-relaxed">พิมพ์รายงานสรุปเป็น PDF ดึงลิงก์และบันทึกลง Google Drive ประจำระดับชั้น</p>
                     </div>
 
-                    <div class="space-y-4 text-sm">
+                    <div class="space-y-4 text-xs sm:text-sm">
                         <div>
-                            <label class="block font-semibold text-slate-700 mb-1">1. ประเภทรายงาน</label>
+                            <label class="block font-semibold text-slate-600 mb-1.5">1. ประเภทรายงาน</label>
                             <div class="grid grid-cols-2 gap-3">
-                                <label class="flex items-center justify-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-100 font-medium transition">
-                                    <input type="radio" name="reportType" value="daily" checked onchange="toggleReportDateInput()"> รายงานสรุปรายวัน
+                                <label class="flex items-center justify-center gap-2 p-3.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 font-medium transition-all text-xs">
+                                    <input type="radio" name="reportType" value="daily" checked onchange="toggleReportDateInput()" class="accent-blue-600"> รายงานสรุปรายวัน
                                 </label>
-                                <label class="flex items-center justify-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-100 font-medium transition">
-                                    <input type="radio" name="reportType" value="monthly" onchange="toggleReportDateInput()"> รายงานสรุปรายเดือน
+                                <label class="flex items-center justify-center gap-2 p-3.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 font-medium transition-all text-xs">
+                                    <input type="radio" name="reportType" value="monthly" onchange="toggleReportDateInput()" class="accent-blue-600"> รายงานสรุปรายเดือน
                                 </label>
                             </div>
                         </div>
 
                         <div>
-                            <label for="reportClassSelect" class="block font-semibold text-slate-700 mb-1">2. เลือกระดับชั้นเรียน</label>
-                            <select id="reportClassSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 outline-hidden focus:bg-white focus:border-indigo-500"></select>
+                            <label for="reportClassSelect" class="block font-semibold text-slate-600 mb-1.5">2. เลือกระดับชั้นเรียน</label>
+                            <select id="reportClassSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 outline-hidden focus:bg-white focus:border-blue-500 transition-all"></select>
                         </div>
 
                         <div id="reportDateWrapper">
-                            <label id="dateLabel" class="block font-semibold text-slate-700 mb-1">3. เลือกวันที่ต้องการออกรายงาน</label>
-                            <input type="date" id="reportDateInput" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 font-medium focus:bg-white outline-hidden">
+                            <label id="dateLabel" class="block font-semibold text-slate-600 mb-1.5">3. เลือกวันที่ต้องการออกรายงาน</label>
+                            <input type="date" id="reportDateInput" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 font-medium focus:bg-white focus:border-blue-500 outline-hidden transition-all">
                         </div>
 
-                        <button type="submit" id="generatePdfBtn" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-3 rounded-lg shadow-xs transition flex items-center justify-center gap-2 text-base cursor-pointer mt-2">
+                        <button type="submit" id="generatePdfBtn" class="w-full bg-gradient-to-r from-blue-600 to-slate-800 hover:from-blue-700 hover:to-slate-900 text-white font-semibold py-3.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-base cursor-pointer mt-2 active:scale-98">
                             <i class="fa-solid fa-file-pdf"></i> สร้างรายงาน PDF และดึงลิงก์
                         </button>
                     </div>
@@ -308,10 +317,9 @@
 
     </main>
 
-    <!-- FOOTER COMPONENT -->
-    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-4 mt-8">
+    <footer class="bg-slate-800 text-slate-400 border-t border-slate-700 py-4.5 mt-8">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs space-y-1">
-            <p>© 2026 งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
+            <p class="font-light text-slate-400">© 2026 งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
         </div>
     </footer>
 
