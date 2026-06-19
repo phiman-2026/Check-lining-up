@@ -307,7 +307,7 @@
     </footer>
 
     <!-- CONTROL JAVASCRIPT EXECUTIONS -->
-    <script>
+   <script>
         // ⚠️ ลิงก์ Web App URL ตัวเดิมของคุณอัฟฟาน
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzy3H3uljjyxiC1GSKM7PIYCs8sOR27LjaNdQiSKW3PvUTcxS5ptFsArMpjwHgNP9v7/exec";
         
@@ -403,7 +403,7 @@
                 .finally(() => showLoading(false));
         }
 
-        // 🌟 ปรับปรุงการเรนเดอร์ Dropdown ตัวเลือกให้แสดงผลสิทธิ์ตามระดับชั้นของผู้ใช้
+        // 🌟 ปรับปรุงการเรนเดอร์ Dropdown ตัวเลือกให้แสดงผลสิทธิ์ตามระดับชั้นของผู้ใช้ (แก้ไขส่วนเงื่อนไขการซ่อน)
         function renderDropdowns() {
             const dbSelect = document.getElementById('dbClassSelect');
             const checkSelect = document.getElementById('checkClassSelect');
@@ -429,8 +429,9 @@
                 statsSelect.appendChild(createOptionElement(cls, cls));
                 reportSelect.appendChild(createOptionElement(cls, cls));
 
-                if (!isEditMode && checkedLevels.includes(cls)) {
-                    // ซ่อนรายการที่เช็คเสร็จแล้วเฉพาะโหมดเช็คปกติ
+                // 🌟 ปรับปรุง: ถ้าล็อกอินโดยระบุสิทธิ์ห้องเรียน (ไม่ใช่ Admin ส่วนกลาง) ให้แสดงชั้นเรียนนั้นเสมอเพื่อให้หน้าจอโหลดฟอร์มมาแสดงได้ทันที
+                if (!isEditMode && checkedLevels.includes(cls) && (!userAssignedClass || userAssignedClass === 'ALL')) {
+                    // ซ่อนรายการที่เช็คเสร็จแล้วเฉพาะโหมดเช็คปกติ และเปิดให้แอดมินส่วนกลางดูเท่านั้น
                 } else {
                     checkSelect.appendChild(createOptionElement(cls, cls));
                 }
@@ -528,7 +529,8 @@
                     // ปรับแต่ง Dropdown คัดกรองตามสิทธิ์ระดับชั้นทันทีหลังล็อกอินสำเร็จ
                     renderDropdowns();
                     
-                    switchTab('dashboard-tab');
+                    // 🌟 ปรับปรุง: เปลี่ยนปลายทางหลังล็อกอินให้วิ่งไปเปิดแท็บบันทึกข้อมูล (check-tab) ตามหน้างานที่แจ้งในรูปภาพแนบ เพื่อให้พร้อมเช็คชื่อทันที
+                    switchTab('check-tab');
 
                     // ✅ นำโมเดลแจ้งเตือนเข้าระบบสำเร็จ (Swal.fire) ออกแล้ว และจะข้ามไปเปิดหน้าทำงานทันที
                     // 🌟 เพิ่มการสั่งโหลดข้อมูลเข้าหน้าเช็คชื่ออัตโนมัติ เพื่อแก้ปัญหาหน้าไม่แสดงข้อมูลหลังล็อกอิน
