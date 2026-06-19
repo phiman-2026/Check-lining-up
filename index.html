@@ -4,18 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบเช็คการปฏิบัติงานลงแถวครู - โรงเรียนพิมานพิทยาสรรค์</title>
+    <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- 🌟 ฟอนต์ K2D ทั้งระบบ -->
     <link href="https://fonts.googleapis.com/css2?family=K2D:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body { 
             font-family: 'K2D', sans-serif; 
-            background-color: #f1f5f9; /* สลับเป็นพื้นหลังสีเทา Slate 100 ให้อารมณ์แอปพลิเคชัน */
+            background-color: #f0f4f8; /* พื้นหลังสีเทาอมน้ำเงินจางๆ สไตล์แอปพลิเคชัน */
         }
-        /* ปรับดีไซน์ Scrollbar ของแถบเมนูและตารางในมือถือให้ดูเนียนตา */
+        /* ปรับดีไซน์ Scrollbar ของแถบเมนูและตารางในมือถือ */
         .overflow-x-auto::-webkit-scrollbar {
             height: 4px;
         }
@@ -27,23 +29,25 @@
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased">
 
-    <header class="bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-md sticky top-0 z-40 border-b border-slate-700/50">
+    <!-- ─── HEADER BAR (ปรับเป็นโทนสีน้ำเงินเข้ม/กรมท่าพรีเมียม Navy Blue) ─── -->
+    <header class="bg-gradient-to-b from-blue-900 to-slate-950 text-white shadow-md sticky top-0 z-40 border-b border-blue-800/50">
         <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3 text-center sm:text-left flex-col sm:flex-row">
+                <!-- แบนเนอร์โลโก้ พ.พ. -->
                 <div class="bg-white/10 p-1 rounded-xl text-white w-12 h-12 flex items-center justify-center font-bold text-lg shadow-inner border border-white/10 backdrop-blur-xs">
                     <img src="https://via.placeholder.com/150" alt="พ.พ." class="w-full h-full object-contain rounded-lg error-fallback hidden" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-                    <span class="flex items-center justify-center w-full h-full text-sm tracking-tighter">พ.พ.</span>
+                    <span class="flex items-center justify-center w-full h-full text-sm tracking-tighter text-blue-200">พ.พ.</span>
                 </div>
                 <div>
                     <h1 class="text-lg font-bold tracking-wide text-blue-100">ระบบเช็คการปฏิบัติงานลงแถวของครูที่ปรึกษา</h1>
-                    <p class="text-xs text-slate-400 font-light mt-0.5">งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
+                    <p class="text-xs text-blue-300/80 font-light mt-0.5">งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-2.5 w-full sm:w-auto justify-center sm:justify-end">
-                <div id="userStatus" class="text-xs bg-slate-800/80 px-4 py-2.5 rounded-xl border border-slate-700 flex items-center gap-2 shadow-2xs">
+                <div id="userStatus" class="text-xs bg-blue-950/80 px-4 py-2.5 rounded-xl border border-blue-800 flex items-center gap-2 shadow-2xs">
                     <i class="fa-solid fa-user-clock text-blue-400"></i>
-                    <span class="font-medium text-slate-300">ยังไม่ได้เข้าสู่ระบบ</span>
+                    <span class="font-medium text-blue-200">ยังไม่ได้เข้าสู่ระบบ</span>
                 </div>
                 <button id="logoutBtn" onclick="handleLogout()" class="hidden bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-md transition-all cursor-pointer active:scale-95">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> ออกจากระบบ
@@ -51,28 +55,31 @@
             </div>
         </div>
 
-        <div class="bg-slate-950/40 border-t border-slate-800/80 backdrop-blur-md">
+        <!-- MAIN NAVIGATION TABS (แถบเมนูสไตล์แอปพลิเคชัน โทนน้ำเงินเข้มเข้มข้น) -->
+        <div class="bg-blue-950/60 border-t border-blue-900/60 backdrop-blur-md">
             <div class="max-w-7xl mx-auto px-2 flex overflow-x-auto text-xs sm:text-sm">
-                <button onclick="checkAuthAndSwitchTab('dashboard-tab')" id="btn-dashboard-tab" class="tab-btn px-5 py-3.5 text-white border-b-2 border-blue-500 font-medium flex items-center gap-2 shrink-0 bg-slate-800/60 transition">
-                    <i class="fa-solid fa-chart-pie text-blue-400"></i> สรุปวันนี้รายชั้น
+                <button onclick="checkAuthAndSwitchTab('dashboard-tab')" id="btn-dashboard-tab" class="tab-btn px-5 py-3.5 text-white border-b-2 border-blue-400 font-medium flex items-center gap-2 shrink-0 bg-blue-900/40 transition">
+                    <i class="fa-solid fa-chart-pie text-blue-300"></i> สรุปวันนี้รายชั้น
                 </button>
-                <button onclick="checkAuthAndSwitchTab('check-tab')" id="btn-check-tab" class="tab-btn px-5 py-3.5 text-slate-400 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0 transition">
+                <button onclick="checkAuthAndSwitchTab('check-tab')" id="btn-check-tab" class="tab-btn px-5 py-3.5 text-blue-300/60 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0 transition">
                     <i class="fa-solid fa-list-check"></i> บันทึกการลงแถว
                 </button>
-                <button onclick="checkAuthAndSwitchTab('stats-tab')" id="btn-stats-tab" class="tab-btn px-5 py-3.5 text-slate-400 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0 transition">
+                <button onclick="checkAuthAndSwitchTab('stats-tab')" id="btn-stats-tab" class="tab-btn px-5 py-3.5 text-blue-300/60 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0 transition">
                     <i class="fa-solid fa-chart-column"></i> หน้าสถิติรายงาน
                 </button>
-                <button onclick="checkAuthAndSwitchTab('report-tab')" id="btn-report-tab" class="tab-btn px-5 py-3.5 text-slate-400 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0 transition">
+                <button onclick="checkAuthAndSwitchTab('report-tab')" id="btn-report-tab" class="tab-btn px-5 py-3.5 text-blue-300/60 hover:text-white border-b-2 border-transparent font-medium flex items-center gap-2 shrink-0 transition">
                     <i class="fa-solid fa-file-pdf"></i> ออกรายงาน PDF
                 </button>
             </div>
         </div>
     </header>
 
+    <!-- ─── MAIN CONTENT CONTAINER ─── -->
     <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 relative">
         
-        <div id="loadingOverlay" class="fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center z-50 hidden">
-            <div class="bg-white px-6 py-4 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-3.5">
+        <!-- LOADING OVERLAY -->
+        <div id="loadingOverlay" class="fixed inset-0 bg-blue-950/40 backdrop-blur-xs flex items-center justify-center z-50 hidden">
+            <div class="bg-white px-6 py-4 rounded-2xl shadow-xl border border-blue-100 flex items-center gap-3.5">
                 <svg class="animate-spin h-5 w-5 text-blue-600" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -81,7 +88,8 @@
             </div>
         </div>
 
-        <div id="successModal" class="fixed inset-0 bg-slate-950/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <!-- SUCCESS MODAL FOR PDF -->
+        <div id="successModal" class="fixed inset-0 bg-blue-950/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
             <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl scale-95 transition-all space-y-4 border border-slate-100">
                 <div class="bg-emerald-50 text-emerald-600 w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto shadow-inner animate-bounce">
                     <i class="fa-solid fa-circle-check"></i>
@@ -101,7 +109,8 @@
             </div>
         </div>
 
-        <section id="loginSection" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6 space-y-5">
+        <!-- SECTION 0: GATEWAY / LOGIN COMPONENT -->
+        <section id="loginSection" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xs border border-blue-100 p-6 space-y-5">
             <div class="text-center space-y-1">
                 <div class="bg-blue-50 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner">
                     <i class="fa-solid fa-lock"></i>
@@ -112,18 +121,20 @@
 
             <form id="pinForm" onsubmit="event.preventDefault(); handleLogin();" class="space-y-4">
                 <div class="space-y-3">
-                    <input type="password" id="pinInput" placeholder="••••••" maxlength="6" class="w-full text-center tracking-widest bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 font-bold text-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-hidden transition-all">
-                    <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-98">
-                        <i class="fa-solid fa-key text-xs text-blue-400"></i> เข้าสู่ระบบด้วยรหัส PIN
+                    <input type="password" id="pinInput" placeholder="••••••" maxlength="6" class="w-full text-center tracking-widest bg-slate-50 border border-blue-200 rounded-xl px-4 py-3 font-bold text-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-hidden transition-all">
+                    <button type="submit" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-medium py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+                        <i class="fa-solid fa-key text-xs text-blue-300"></i> เข้าสู่ระบบด้วยรหัส PIN
                     </button>
                 </div>
             </form>
         </section>
 
+        <!-- CONTAINER FOR PROTECTED CONTENTS -->
         <div id="protectedContent" class="hidden space-y-6">
 
+            <!-- SECTION 1: DASHBOARD TAB -->
             <section id="dashboard-tab" class="tab-content hidden space-y-6">
-                <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-4 sm:p-6">
+                <div class="bg-white rounded-2xl shadow-xs border border-blue-50 p-4 sm:p-6">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
                         <div class="flex items-center gap-3">
                             <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-calendar-day"></i></div>
@@ -140,10 +151,10 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto rounded-xl border border-slate-200/70 shadow-2xs">
+                    <div class="overflow-x-auto rounded-xl border border-blue-50 shadow-2xs">
                         <table class="w-full text-left border-collapse text-xs sm:text-sm whitespace-nowrap">
                             <thead>
-                                <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-600 font-semibold">
+                                <tr class="bg-blue-50/40 border-b border-blue-100 text-blue-900 font-semibold">
                                     <th class="p-3.5 text-center w-24">ห้องเรียน</th>
                                     <th class="p-3.5">ชื่อครูที่ปรึกษา (ร่วม)</th>
                                     <th class="p-3.5 text-center w-36">status วันนี้</th>
@@ -156,7 +167,7 @@
                                 <tr>
                                     <td colspan="6" class="p-10 text-center text-slate-400 bg-slate-50/40">
                                         <div class="max-w-xs mx-auto">
-                                            <i class="fa-solid fa-arrow-pointer block text-2xl text-slate-300 mb-2"></i> 
+                                            <i class="fa-solid fa-arrow-pointer block text-2xl text-blue-300 mb-2"></i> 
                                             <span class="text-xs font-medium text-slate-500">กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</span>
                                         </div>
                                     </td>
@@ -167,8 +178,9 @@
                 </div>
             </section>
 
+            <!-- SECTION 2: ATTENDANCE CHECK TAB -->
             <section id="check-tab" class="tab-content hidden space-y-6">
-                <div id="attendanceFormSection" class="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-4 sm:p-6 space-y-5">
+                <div id="attendanceFormSection" class="bg-white rounded-2xl shadow-xs border border-blue-50 p-4 sm:p-6 space-y-5">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                         <div class="flex items-center gap-3">
                             <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-clipboard-user"></i></div>
@@ -179,8 +191,8 @@
                         </div>
                         
                         <div class="flex flex-col sm:flex-row flex-wrap items-center gap-3 w-full lg:w-auto">
-                            <button type="button" id="toggleModeBtn" onclick="toggleEditMode()" class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-semibold px-3 py-2 rounded-xl text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
-                                <i class="fa-solid fa-pen-to-square text-blue-500"></i> <span id="modeText">เปิดโหมดแก้ไขข้อมูลเดิม</span>
+                            <button type="button" id="toggleModeBtn" onclick="toggleEditMode()" class="w-full sm:w-auto bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-semibold px-3 py-2 rounded-xl text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
+                                <i class="fa-solid fa-pen-to-square text-blue-600"></i> <span id="modeText">เปิดโหมดแก้ไขข้อมูลเดิม</span>
                             </button>
                             
                             <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
@@ -200,10 +212,10 @@
                     </div>
 
                     <form id="attendanceForm" onsubmit="submitAttendance(event)" class="space-y-5">
-                        <div class="overflow-x-auto rounded-xl border border-slate-200/70 shadow-2xs">
+                        <div class="overflow-x-auto rounded-xl border border-blue-50 shadow-2xs">
                             <table class="w-full text-left border-collapse text-xs sm:text-sm whitespace-nowrap">
                                 <thead>
-                                    <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-600 font-semibold">
+                                    <tr class="bg-blue-50/40 border-b border-blue-100 text-blue-900 font-semibold">
                                         <th class="p-3.5 text-center w-24">ห้องเรียน</th>
                                         <th class="p-3.5">ชื่อครูที่ปรึกษา (ร่วม)</th>
                                         <th class="p-3.5 text-center w-64">สถานะการลงแถว</th>
@@ -214,7 +226,7 @@
                                     <tr>
                                         <td colspan="4" class="p-10 text-center text-slate-400 bg-slate-50/40">
                                             <div class="max-w-xs mx-auto">
-                                                <i class="fa-solid fa-layer-group block text-2xl text-slate-300 mb-2"></i> 
+                                                <i class="fa-solid fa-layer-group block text-2xl text-blue-300 mb-2"></i> 
                                                 <span class="text-xs font-medium text-slate-500">กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</span>
                                             </div>
                                         </td>
@@ -224,7 +236,7 @@
                         </div>
                         
                         <div id="submitBtnArea" class="flex justify-end pt-1 hidden">
-                            <button type="submit" id="submitAttendanceBtn" class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-slate-800 hover:from-blue-700 hover:to-slate-900 text-white font-medium px-6 py-2.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
+                            <button type="submit" id="submitAttendanceBtn" class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-medium px-6 py-2.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
                                 <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล
                             </button>
                         </div>
@@ -232,8 +244,9 @@
                 </div>
             </section>
 
+            <!-- SECTION 3: STATISTICS REPORT TAB -->
             <section id="stats-tab" class="tab-content hidden space-y-6">
-                <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-4 sm:p-6">
+                <div class="bg-white rounded-2xl shadow-xs border border-blue-50 p-4 sm:p-6">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
                         <div class="flex items-center gap-3">
                             <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-chart-column"></i></div>
@@ -244,9 +257,9 @@
                         </div>
                         
                         <div class="flex flex-col sm:flex-row flex-wrap items-center gap-3.5 w-full lg:w-auto justify-end">
-                            <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 w-full sm:w-auto justify-center">
-                                <button type="button" onclick="changeStatsRange('weekly')" id="rangeWeeklyBtn" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-white text-slate-800 shadow-2xs transition cursor-pointer">รายสัปดาห์</button>
-                                <button type="button" onclick="changeStatsRange('monthly')" id="rangeMonthlyBtn" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-500 hover:text-slate-900 transition cursor-pointer">รายเดือน</button>
+                            <div class="flex items-center gap-1 bg-blue-50 p-1 rounded-xl border border-blue-100 w-full sm:w-auto justify-center">
+                                <button type="button" onclick="changeStatsRange('weekly')" id="rangeWeeklyBtn" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-white text-blue-800 shadow-2xs transition cursor-pointer">รายสัปดาห์</button>
+                                <button type="button" onclick="changeStatsRange('monthly')" id="rangeMonthlyBtn" class="px-4 py-1.5 text-xs font-semibold rounded-lg text-blue-600/70 hover:text-blue-900 transition cursor-pointer">รายเดือน</button>
                             </div>
 
                             <div class="flex items-center gap-2 w-full sm:w-auto flex-1 sm:flex-none">
@@ -258,10 +271,10 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto rounded-xl border border-slate-200/70 shadow-2xs">
+                    <div class="overflow-x-auto rounded-xl border border-blue-50 shadow-2xs">
                         <table class="w-full text-left border-collapse text-xs sm:text-sm whitespace-nowrap">
                             <thead>
-                                <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-600 font-semibold text-center">
+                                <tr class="bg-blue-50/40 border-b border-blue-100 text-blue-900 font-semibold text-center">
                                     <th class="p-3.5">ระดับชั้น</th>
                                     <th class="p-3.5 text-left">ชื่อ-สกุล</th>
                                     <th class="p-3.5">จำนวนลงแถวทั้งหมด (ครั้ง)</th>
@@ -275,8 +288,9 @@
                 </div>
             </section>
 
+            <!-- SECTION 4: PDF GENERATION TAB -->
             <section id="report-tab" class="tab-content hidden max-w-xl mx-auto space-y-6">
-                <form id="reportForm" onsubmit="event.preventDefault(); handleGeneratePDF();" class="bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6 space-y-5">
+                <form id="reportForm" onsubmit="event.preventDefault(); handleGeneratePDF();" class="bg-white rounded-2xl shadow-xs border border-blue-50 p-6 space-y-5">
                     <div class="text-center border-b border-slate-100 pb-4">
                         <div class="bg-blue-50 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner"><i class="fa-solid fa-file-invoice"></i></div>
                         <h3 class="text-lg font-bold text-slate-900">พิมพ์เอกสารรายงานทางราชการ</h3>
@@ -287,10 +301,10 @@
                         <div>
                             <label class="block font-semibold text-slate-600 mb-1.5">1. ประเภทรายงาน</label>
                             <div class="grid grid-cols-2 gap-3">
-                                <label class="flex items-center justify-center gap-2 p-3.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 font-medium transition-all text-xs">
+                                <label class="flex items-center justify-center gap-2 p-3.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-blue-50 font-medium transition-all text-xs">
                                     <input type="radio" name="reportType" value="daily" checked onchange="toggleReportDateInput()" class="accent-blue-600"> รายงานสรุปรายวัน
                                 </label>
-                                <label class="flex items-center justify-center gap-2 p-3.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 font-medium transition-all text-xs">
+                                <label class="flex items-center justify-center gap-2 p-3.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-blue-50 font-medium transition-all text-xs">
                                     <input type="radio" name="reportType" value="monthly" onchange="toggleReportDateInput()" class="accent-blue-600"> รายงานสรุปรายเดือน
                                 </label>
                             </div>
@@ -306,7 +320,7 @@
                             <input type="date" id="reportDateInput" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 font-medium focus:bg-white focus:border-blue-500 outline-hidden transition-all">
                         </div>
 
-                        <button type="submit" id="generatePdfBtn" class="w-full bg-gradient-to-r from-blue-600 to-slate-800 hover:from-blue-700 hover:to-slate-900 text-white font-semibold py-3.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-base cursor-pointer mt-2 active:scale-98">
+                        <button type="submit" id="generatePdfBtn" class="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-semibold py-3.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-base cursor-pointer mt-2 active:scale-98">
                             <i class="fa-solid fa-file-pdf"></i> สร้างรายงาน PDF และดึงลิงก์
                         </button>
                     </div>
@@ -317,9 +331,10 @@
 
     </main>
 
-    <footer class="bg-slate-800 text-slate-400 border-t border-slate-700 py-4.5 mt-8">
+    <!-- ─── FOOTER COMPONENT ─── -->
+    <footer class="bg-blue-950 text-blue-300/60 border-t border-blue-900/40 py-4.5 mt-8">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs space-y-1">
-            <p class="font-light text-slate-400">© 2026 งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
+            <p class="font-light">© 2026 งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
         </div>
     </footer>
 
