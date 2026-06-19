@@ -491,13 +491,7 @@
             // คืนค่า Dropdown
             renderDropdowns();
 
-            Swal.fire({
-                title: 'ออกจากระบบสำเร็จ',
-                text: 'ออกจากระบบเรียบร้อยแล้วค่ะ',
-                icon: 'success',
-                confirmButtonColor: '#1e1b4b', 
-                timer: 2000
-            });
+            // ✅ นำโมเดลแจ้งเตือนออกจากระบบสำเร็จ (Swal.fire) ออกตามคำขอเพื่อความลื่นไหล
         }
 
         function handleLogin() {
@@ -536,13 +530,13 @@
                     
                     switchTab('dashboard-tab');
 
-                    Swal.fire({
-                        title: 'เข้าสู่ระบบสำเร็จ',
-                        text: `ยินดีต้อนรับคุณ ${currentRecorder} (${classBadge}) เข้าสู่ระบบค่ะ`,
-                        icon: 'success',
-                        confirmButtonColor: '#1e1b4b',
-                        timer: 2500
-                    });
+                    // ✅ นำโมเดลแจ้งเตือนเข้าระบบสำเร็จ (Swal.fire) ออกแล้ว และจะข้ามไปเปิดหน้าทำงานทันที
+                    // 🌟 เพิ่มการสั่งโหลดข้อมูลเข้าหน้าเช็คชื่ออัตโนมัติ เพื่อแก้ปัญหาหน้าไม่แสดงข้อมูลหลังล็อกอิน
+                    if (userAssignedClass !== 'ALL') {
+                        document.getElementById('checkClassSelect').value = userAssignedClass;
+                        loadDailySummary();
+                        loadAttendanceForm();
+                    }
                 } else { 
                     Swal.fire({
                         title: 'เข้าสู่ระบบล้มเหลว',
