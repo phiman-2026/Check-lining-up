@@ -174,12 +174,21 @@
                                 <i class="fa-solid fa-pen-to-square"></i> <span id="modeText">เปิดโหมดแก้ไขข้อมูลเดิม</span>
                             </button>
                             
-                            <div class="flex items-center gap-2">
-                                <label for="checkClassSelect" class="text-sm font-medium text-slate-700 shrink-0">ระดับชั้น:</label>
-                                <select id="checkClassSelect" onchange="loadAttendanceForm()" class="w-full md:w-36 bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-medium shadow-2xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden">
-                                    <option value="">-- เลือกระดับชั้น --</option>
-                                </select>
-                            </div>
+                            <div class="flex flex-wrap items-center gap-4">
+    <!-- บล็อกระดับชั้นเดิมของคุณอัฟฟาน -->
+    <div class="flex items-center gap-2">
+        <label for="checkClassSelect" class="text-sm font-medium text-slate-700 shrink-0">ระดับชั้น:</label>
+        <select id="checkClassSelect" onchange="loadAttendanceForm()" class="w-full md:w-36 bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-medium shadow-2xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden">
+            <option value="">-- เลือกระดับชั้น --</option>
+        </select>
+    </div>
+
+    <!-- 🌟 บล็อกเลือกวันที่สําหรับโหมดแก้ไข (จะแสดงเฉพาะตอนเปิดโหมดแก้ไขเท่านั้น) -->
+    <div id="editDateWrapper" class="flex items-center gap-2 hidden">
+        <label for="editDateInput" class="text-sm font-medium text-slate-700 shrink-0">วันที่แก้ไข:</label>
+        <input type="date" id="editDateInput" onchange="loadAttendanceForm()" class="w-full md:w-40 bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-medium shadow-2xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-hidden">
+    </div>
+</div>
                         </div>
                     </div>
 
@@ -205,10 +214,10 @@
                         </div>
                         
                         <div id="submitBtnArea" class="flex justify-end pt-2 hidden">
-                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-2.5 rounded-lg shadow-xs transition flex items-center gap-2 cursor-pointer">
-                                <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล
-                            </button>
-                        </div>
+    <button type="submit" id="submitAttendanceBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-2.5 rounded-lg shadow-xs transition flex items-center gap-2 cursor-pointer">
+        <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล
+    </button>
+</div>
                     </form>
                 </div>
             </section>
@@ -307,19 +316,21 @@
     </footer>
 
     <!-- CONTROL JAVASCRIPT EXECUTIONS -->
-   <script>
+  <script>
         // ⚠️ ลิงก์ Web App URL ตัวเดิมของคุณอัฟฟาน
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzy3H3uljjyxiC1GSKM7PIYCs8sOR27LjaNdQiSKW3PvUTcxS5ptFsArMpjwHgNP9v7/exec";
         
         let classList = [];
         let checkedLevels = []; 
         let currentRecorder = null;
-        let userAssignedClass = null; // เก็บสิทธิ์ระดับชั้นของผู้ใช้ที่ล็อกอินเข้ามา ("ม.1", "ม.2" หรือ "ALL")
+        let userAssignedClass = null; 
         let isEditMode = false; 
         let currentStatsRangeType = 'weekly'; 
 
         window.addEventListener('DOMContentLoaded', () => {
             setTodayDateInput();
+            // ตั้งค่าวันที่เริ่มต้นสำหรับช่องแก้ไขข้อมูลย้อนหลังให้เป็นวันปัจจุบัน
+            setTodayEditDateInput();
             fetchInitialConfig();
 
             const pinInput = document.getElementById('pinInput');
@@ -345,7 +356,18 @@
             document.getElementById('reportDateInput').value = `${yyyy}-${mm}-${dd}`;
         }
 
-        // ตรวจสอบสิทธิ์แบบเด็ดขาด: ล็อกไม่ให้เปิดใช้งานทุกแท็บหากยังไม่ได้เข้าระบบ
+        // ตั้งค่าเริ่มต้นของวันที่สำหรับการแก้ไขข้อมูลย้อนหลัง
+        function setTodayEditDateInput() {
+            const editDateInp = document.getElementById('editDateInput');
+            if (editDateInp) {
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const dd = String(today.getDate()).padStart(2, '0');
+                editDateInp.value = `${yyyy}-${mm}-${dd}`;
+            }
+        }
+
         function checkAuthAndSwitchTab(tabId) {
             if (!currentRecorder) {
                 Swal.fire({
@@ -389,7 +411,6 @@
                 .then(data => {
                     classList = data.classList || [];
                     checkedLevels = data.checkedLevels || [];
-                    // ถ้าเข้าระบบอยู่แล้วให้จัด Dropdown ใหม่ตามสิทธิ์
                     renderDropdowns();
                 })
                 .catch(err => {
@@ -403,7 +424,6 @@
                 .finally(() => showLoading(false));
         }
 
-        // 🌟 ปรับปรุงการเรนเดอร์ Dropdown ตัวเลือกให้แสดงผลสิทธิ์ตามระดับชั้นของผู้ใช้ (แก้ไขส่วนเงื่อนไขการซ่อน)
         function renderDropdowns() {
             const dbSelect = document.getElementById('dbClassSelect');
             const checkSelect = document.getElementById('checkClassSelect');
@@ -415,12 +435,10 @@
             statsSelect.innerHTML = '';
             reportSelect.innerHTML = '';
 
-            // คัดกรองรายการที่จะแสดงใน Dropdown ตามสิทธิ์
             let allowedClasses = classList;
             if (userAssignedClass && userAssignedClass !== 'ALL') {
                 allowedClasses = classList.filter(cls => cls === userAssignedClass);
             } else {
-                // ถ้าเป็น Admin (ALL) ให้หน้าสถิติตั้งค่าเริ่มต้น "แสดงทุกระดับชั้น" ได้
                 statsSelect.appendChild(createOptionElement('แสดงทุกระดับชั้น', ''));
             }
 
@@ -429,25 +447,31 @@
                 statsSelect.appendChild(createOptionElement(cls, cls));
                 reportSelect.appendChild(createOptionElement(cls, cls));
 
-                // 🌟 ปรับปรุง: ถ้าล็อกอินโดยระบุสิทธิ์ห้องเรียน (ไม่ใช่ Admin ส่วนกลาง) ให้แสดงชั้นเรียนนั้นเสมอเพื่อให้หน้าจอโหลดฟอร์มมาแสดงได้ทันที
-                if (!isEditMode && checkedLevels.includes(cls) && (!userAssignedClass || userAssignedClass === 'ALL')) {
-                    // ซ่อนรายการที่เช็คเสร็จแล้วเฉพาะโหมดเช็คปกติ และเปิดให้แอดมินส่วนกลางดูเท่านั้น
+                // ถ้าอยู่ในโหมดแก้ไข ให้ยอมให้แสดงระดับชั้นเสมอ แต่ถ้าโหมดปกติและเช็คไปแล้ว จะกรองออกเพื่อป้องกันการเช็คซ้ำประจำวัน
+                if (!isEditMode && checkedLevels.includes(cls)) {
+                    // ไม่เพิ่มลงใน checkSelect เพื่อป้องกันการกดเช็คซ้ำประจำวัน
                 } else {
                     checkSelect.appendChild(createOptionElement(cls, cls));
                 }
             });
 
-            // ถ้ามีตัวเลือกเพียงชั้นเดียว (หัวหน้าระดับ) ให้เลือกเป็นค่าเริ่มต้นและดึงข้อมูลให้อัตโนมัติเลย
             if (allowedClasses.length === 1) {
                 dbSelect.value = allowedClasses[0];
-                checkSelect.value = allowedClasses[0];
                 statsSelect.value = allowedClasses[0];
                 reportSelect.value = allowedClasses[0];
                 
-                // ดึงข้อมูลฟอร์มและสรุปมารอทันทีเพื่อความสะดวก
-                if (currentRecorder) {
-                    loadDailySummary();
-                    loadAttendanceForm();
+                // ในโหมดปกติ ถ้าตรวจพบว่าระดับชั้นนี้เช็คชื่อประจำวันสำเร็จแล้ว จะไม่โหลดข้อมูลรายคนขึ้นมาแสดงโดยตรง
+                if (!isEditMode && checkedLevels.includes(allowedClasses[0])) {
+                    checkSelect.value = "";
+                    const tbody = document.getElementById('attendanceTableBody');
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-amber-600 font-medium bg-amber-50/50 border border-dashed border-amber-200 rounded-xl"><i class="fa-solid fa-circle-check block text-3xl mb-2 text-amber-500"></i> ระดับชั้นเรียนนี้ได้รับการเช็คชื่อประจำวันเรียบร้อยแล้วค่ะ<br><span class="text-xs text-slate-500 font-normal block mt-1">หากต้องการปรับปรุงข้อมูล กรุณากดเปิด "โหมดแก้ไขข้อมูลเดิม" ด้านบนนะคะ</span></td></tr>`;
+                    document.getElementById('submitBtnArea').classList.add('hidden');
+                } else {
+                    checkSelect.value = allowedClasses[0];
+                    if (currentRecorder) {
+                        loadDailySummary();
+                        loadAttendanceForm();
+                    }
                 }
             }
         }
@@ -458,18 +482,23 @@
             return opt;
         }
 
+        // ปรับปรุงฟังก์ชันการสลับโหมดแก้ไข พร้อมรองรับการเลือกวันที่เพื่อดึงข้อมูลย้อนหลัง
         function toggleEditMode() {
             isEditMode = !isEditMode;
             const btn = document.getElementById('toggleModeBtn');
             const text = document.getElementById('modeText');
             const tbody = document.getElementById('attendanceTableBody');
+            const editDateWrapper = document.getElementById('editDateWrapper'); // สมมติว่ามี wrapper คุมกล่องใส่วันที่ใน HTML ส่วนคัดกรอง
 
             if (isEditMode) {
                 btn.className = "bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-100 transition flex items-center gap-1.5 cursor-pointer";
                 text.innerText = "เปลี่ยนเป็นโหมดเช็คปกติ (ซ่อนรายการเช็คแล้ว)";
+                if (editDateWrapper) editDateWrapper.classList.remove('hidden'); // แสดงที่เลือกวันที่ย้อนหลัง
             } else {
                 btn.className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
                 text.innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
+                if (editDateWrapper) editDateWrapper.classList.add('hidden'); // ซ่อนที่เลือกวันที่ย้อนหลัง
+                setTodayEditDateInput(); // คืนค่าวันที่เป็นวันปัจจุบัน
             }
             
             document.getElementById('checkClassSelect').value = "";
@@ -489,10 +518,7 @@
             document.getElementById('pinInput').value = '';
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             
-            // คืนค่า Dropdown
             renderDropdowns();
-
-            // ✅ นำโมเดลแจ้งเตือนออกจากระบบสำเร็จ (Swal.fire) ออกตามคำขอเพื่อความลื่นไหล
         }
 
         function handleLogin() {
@@ -515,8 +541,6 @@
             .then(res => {
                 if (res.success) {
                     currentRecorder = res.fullName;
-                    
-                    // 🌟 รับค่าระดับชั้นที่ดูแลส่งกลับมาจากหลังบ้าน (หากไม่มีหรือระบุเป็นแอดมิน ให้ใส่ 'ALL')
                     userAssignedClass = res.assignedClass || 'ALL'; 
 
                     const classBadge = userAssignedClass === 'ALL' ? 'Admin ส่วนกลาง' : `หัวหน้าระดับ ${userAssignedClass}`;
@@ -524,20 +548,22 @@
                     
                     document.getElementById('logoutBtn').classList.remove('hidden');
                     document.getElementById('loginSection').classList.add('hidden'); 
-                    document.getElementById('protectedContent').classList.remove('hidden'); // เปิดให้เห็นเนื้อหาเว็บ
+                    document.getElementById('protectedContent').classList.remove('hidden'); 
                     
-                    // ปรับแต่ง Dropdown คัดกรองตามสิทธิ์ระดับชั้นทันทีหลังล็อกอินสำเร็จ
                     renderDropdowns();
-                    
-                    // 🌟 ปรับปรุง: เปลี่ยนปลายทางหลังล็อกอินให้วิ่งไปเปิดแท็บบันทึกข้อมูล (check-tab) ตามหน้างานที่แจ้งในรูปภาพแนบ เพื่อให้พร้อมเช็คชื่อทันที
                     switchTab('check-tab');
 
-                    // ✅ นำโมเดลแจ้งเตือนเข้าระบบสำเร็จ (Swal.fire) ออกแล้ว และจะข้ามไปเปิดหน้าทำงานทันที
-                    // 🌟 เพิ่มการสั่งโหลดข้อมูลเข้าหน้าเช็คชื่ออัตโนมัติ เพื่อแก้ปัญหาหน้าไม่แสดงข้อมูลหลังล็อกอิน
+                    // ถ้าเช็คชื่อของวันนั้นสำเร็จเรียบร้อยแล้ว จะไม่แสดงข้อมูลรายคนในตารางทันทีเพื่อป้องกันครูลงข้อมูลซ้ำซ้อนซ้ำประจำวัน
                     if (userAssignedClass !== 'ALL') {
-                        document.getElementById('checkClassSelect').value = userAssignedClass;
-                        loadDailySummary();
-                        loadAttendanceForm();
+                        if (checkedLevels.includes(userAssignedClass)) {
+                            document.getElementById('checkClassSelect').value = "";
+                            document.getElementById('attendanceTableBody').innerHTML = `<tr><td colspan="4" class="p-8 text-center text-amber-600 font-medium bg-amber-50/50 border border-dashed border-amber-200 rounded-xl"><i class="fa-solid fa-circle-check block text-3xl mb-2 text-amber-500"></i> ระดับชั้นเรียนนี้ได้รับการเช็คชื่อประจำวันเรียบร้อยแล้วค่ะ<br><span class="text-xs text-slate-500 font-normal block mt-1">หากต้องการปรับปรุงข้อมูล กรุณากดเปิด "โหมดแก้ไขข้อมูลเดิม" ด้านบนนะคะ</span></td></tr>`;
+                            document.getElementById('submitBtnArea').classList.add('hidden');
+                        } else {
+                            document.getElementById('checkClassSelect').value = userAssignedClass;
+                            loadDailySummary();
+                            loadAttendanceForm();
+                        }
                     }
                 } else { 
                     Swal.fire({
@@ -596,10 +622,15 @@
                 .finally(() => showLoading(false));
         }
 
+        // ปรับปรุงฟังก์ชันการเรียกรายชื่อฟอร์ม โดยส่งค่าพารามิเตอร์ "วันที่เลือก" และ "โหมดแก้ไข" ไปที่ Apps Script ด้วย
         function loadAttendanceForm() {
             const selectedClass = document.getElementById('checkClassSelect').value;
             const tbody = document.getElementById('attendanceTableBody');
             const submitArea = document.getElementById('submitBtnArea');
+            
+            // ดึงค่าจากช่องเลือกวันที่ ถ้าไม่มีให้ส่งค่าว่าง (หลังบ้านจะปรับใช้เป็นวันปัจจุบันอัตโนมัติ)
+            const editDateInp = document.getElementById('editDateInput');
+            const targetDate = editDateInp ? editDateInp.value : '';
 
             if (!selectedClass) {
                 tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
@@ -608,7 +639,8 @@
             }
 
             showLoading(true);
-            fetch(`${WEB_APP_URL}?action=getTeachersByClass&className=${encodeURIComponent(selectedClass)}`)
+            // แนบพารามิเตอร์ targetDate และ isEditMode ไปยังฝั่ง Server-side Script ด้วยเพื่อรองรับการดึงข้อมูลย้อนหลังตามวันที่กำหนด
+            fetch(`${WEB_APP_URL}?action=getTeachersByClass&className=${encodeURIComponent(selectedClass)}&targetDate=${targetDate}&isEditMode=${isEditMode}`)
                 .then(res => res.json())
                 .then(data => {
                     tbody.innerHTML = '';
@@ -673,11 +705,27 @@
             }
         }
 
+        // 🌟 ปรับปรุงการกดบันทึก: ให้ปุ่มหมุนติ้วๆ ทำงานแทนหน้าจอโหลดเต็มสีดำ และสลับเปลี่ยนไปยังแท็บสรุปผลเมื่อทำรายการเสร็จสิ้นสำเร็จ
         function submitAttendance(e) {
             e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitAttendanceBtn'); // ค้นหาปุ่มบันทึก
+            let originalBtnHtml = "";
+            
+            if (submitBtn) {
+                originalBtnHtml = submitBtn.innerHTML;
+                // เปลี่ยนเนื้อหาของปุ่มเป็นแอนิเมชันรูปไอคอนหมุนติ้วๆ พร้อมล็อกปุ่มชั่วคราว
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> กำลังบันทึกข้อมูล...`;
+            }
+
             const tbody = document.getElementById('attendanceTableBody');
             const rowsCount = tbody.querySelectorAll('tr').length;
             const attendanceData = [];
+
+            // ดึงข้อมูลวันที่สำหรับการแก้ไข หรือบันทึกข้อมูล
+            const editDateInp = document.getElementById('editDateInput');
+            const targetDate = editDateInp ? editDateInp.value : '';
 
             for (let i = 0; i < rowsCount; i++) {
                 const className = document.querySelector(`input[name="class_${i}"]`).value;
@@ -689,14 +737,21 @@
                 attendanceData.push({ className, teacherName, status, reason });
             }
 
-            showLoading(true);
+            // ส่งข้อมูลไปยังหลังบ้าน Apps Script
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                body: JSON.stringify({ action: 'saveAttendance', attendanceData: attendanceData, recorderName: currentRecorder })
+                body: JSON.stringify({ 
+                    action: 'saveAttendance', 
+                    attendanceData: attendanceData, 
+                    recorderName: currentRecorder,
+                    targetDate: targetDate, // ส่งวันที่ไปด้วยเพื่อให้ระบุแถวบันทึกและแก้ไขได้อย่างแม่นยำ
+                    isEditMode: isEditMode
+                })
             })
             .then(res => res.json())
             .then(res => {
                 if (res.success) {
+                    // แจ้งเตือนเมื่อดำเนินการจัดเก็บลงฐานข้อมูลสำเร็จ
                     Swal.fire({
                         title: 'บันทึกสำเร็จ',
                         text: res.msg,
@@ -704,16 +759,30 @@
                         confirmButtonColor: '#1e1b4b'
                     });
                     
+                    // ปรับเปลี่ยนคืนสถานะหน้าจอ และปิดโหมดแก้ไขข้อมูลเดิมกลับมาเป็นปกติ
                     isEditMode = false;
                     document.getElementById('toggleModeBtn').className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
                     document.getElementById('modeText').innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
                     
+                    const editDateWrapper = document.getElementById('editDateWrapper');
+                    if (editDateWrapper) editDateWrapper.classList.add('hidden');
+                    setTodayEditDateInput();
+
                     document.getElementById('checkClassSelect').value = "";
                     tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
                     document.getElementById('submitBtnArea').classList.add('hidden');
                     
+                    // สั่งรีเฟรชข้อมูลสถานะและโครงสร้างล่าสุด
                     fetchInitialConfig(); 
+                    
+                    // 🌟 เปลี่ยนเส้นทางพาผู้ใช้งานไปยังหน้าแท็บสรุปข้อมูลทันที
                     switchTab('dashboard-tab');
+                    
+                    // ถ้าระบุสิทธิ์ผู้ตรวจชั้นเรียนไว้ ให้ระบบรีเฟรชตารางหน้าสรุปผลวันนี้ให้อัตโนมัติด้วยเลยครับ
+                    if (userAssignedClass && userAssignedClass !== 'ALL') {
+                        document.getElementById('dbClassSelect').value = userAssignedClass;
+                        loadDailySummary();
+                    }
                 } else { 
                     Swal.fire({
                         title: 'เกิดข้อผิดพลาด',
@@ -731,7 +800,13 @@
                     confirmButtonColor: '#1e1b4b'
                 });
             })
-            .finally(() => showLoading(false));
+            .finally(() => {
+                // คืนสภาพปุ่มบันทึกดั้งเดิมหลังจากส่งคำขอและประมวลผลคำสั่งสำเร็จ
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
+                }
+            });
         }
 
         function changeStatsRange(rangeType) {
