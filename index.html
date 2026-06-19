@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบเช็คการปฏิบัติงานลงแถวครู - โรงเรียนพิมานพิทยาสรรค์</title>
-    <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- 🌟 ฟอนต์ K2D ทั้งระบบ -->
     <link href="https://fonts.googleapis.com/css2?family=K2D:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -38,33 +36,28 @@
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased">
 
-    <!-- ─── HEADER BAR (เน้นชื่อระบบเด่น คม ชัด อ่านง่ายที่สุด) ─── -->
     <header class="relative text-white shadow-md sticky top-0 z-40 border-b border-blue-900/50 overflow-hidden">
         
-        <!-- 🌟 รูปภาพพื้นหลังแบนเนอร์ -->
         <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1470&auto=format&fit=crop')] bg-cover bg-center z-0"></div>
 
-        <!-- เนื้อหาภายในแบนเนอร์ (ขยายขนาดตัวอักษรและซ้อนเอฟเฟกต์อ่านง่ายสไตล์คมชัดพิเศษ) -->
         <div class="relative z-10 max-w-7xl mx-auto px-4 py-5 flex flex-col lg:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-4 text-center lg:text-left flex-col sm:flex-row">
-                <!-- แบนเนอร์โลโก้ พ.พ. -->
-                <div class="bg-blue-950 p-1.5 rounded-xl text-white w-14 h-14 flex items-center justify-center font-black text-xl shadow-lg border-2 border-white/30 shrink-0 drop-shadow-md">
-                    <img src="https://via.placeholder.com/150" alt="พ.ส." class="w-full h-full object-contain rounded-lg error-fallback hidden" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-                    <span class="flex items-center justify-center w-full h-full text-base tracking-tighter text-blue-100">พ.ส.</span>
+                
+                <div class="bg-white/95 p-1 rounded-full w-16 h-16 flex items-center justify-center shadow-lg border-2 border-white/40 shrink-0 drop-shadow-md">
+                    <img src="https://via.placeholder.com/150" alt="ตราโรงเรียน" class="w-full h-full object-contain rounded-full" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <span class="hidden items-center justify-center w-full h-full text-blue-900 text-2xl"><i class="fa-solid fa-school text-amber-500"></i></span>
                 </div>
+
                 <div>
-                    <!-- 🌟 ชื่อระบบตัวหลัก: ปรับขนาดใหญ่ขึ้น หนาขึ้น คมกริบขึ้นมาก -->
                     <h1 class="text-2xl sm:text-3xl font-black tracking-wide text-white system-title-glow leading-tight">
                         ระบบเช็คการปฏิบัติงานลงแถวของครูที่ปรึกษา
                     </h1>
-                    <!-- ชื่อหน่วยงาน: ปรับสีทองอ่อน ให้ตัดกับตัวหลักและเด่นจากฉากหลัง -->
                     <p class="text-xs sm:text-sm text-amber-300 font-bold mt-1 tracking-wide system-sub-glow">
-                        งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์
+                        กลุ่มกิจการนักเรียน โรงเรียนพิมานพิทยาสรรค์
                     </p>
                 </div>
             </div>
             
-            <!-- ปรับกล่องสถานะให้เข้มชัดเจนตัดกับรูปภาพแบคกราวด์ -->
             <div class="flex items-center gap-2.5 w-full lg:w-auto justify-center lg:justify-end">
                 <div id="userStatus" class="text-xs bg-blue-950/95 text-white px-4 py-2.5 rounded-xl border-2 border-white/20 flex items-center gap-2 shadow-lg font-medium">
                     <i class="fa-solid fa-user-clock text-blue-400"></i>
@@ -76,7 +69,6 @@
             </div>
         </div>
 
-        <!-- ─── MAIN NAVIGATION TABS (สีน้ำเงินเข้มทึบแสง 100% ตัวหนาคมชัดกดง่าย) ─── -->
         <div class="relative z-10 bg-blue-950 border-t border-blue-900 shadow-inner">
             <div class="max-w-7xl mx-auto px-2 flex overflow-x-auto text-xs sm:text-sm">
                 <button onclick="checkAuthAndSwitchTab('dashboard-tab')" id="btn-dashboard-tab" class="tab-btn px-5 py-4 text-white border-b-2 border-blue-400 font-bold flex items-center gap-2 shrink-0 bg-blue-900/60 transition">
@@ -95,10 +87,8 @@
         </div>
     </header>
 
-    <!-- ─── MAIN CONTENT CONTAINER ─── -->
     <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 relative">
         
-        <!-- LOADING OVERLAY -->
         <div id="loadingOverlay" class="fixed inset-0 bg-blue-950/40 backdrop-blur-xs flex items-center justify-center z-50 hidden">
             <div class="bg-white px-6 py-4 rounded-2xl shadow-xl border border-blue-100 flex items-center gap-3.5">
                 <svg class="animate-spin h-5 w-5 text-blue-600" viewBox="0 0 24 24">
@@ -109,7 +99,6 @@
             </div>
         </div>
 
-        <!-- SUCCESS MODAL FOR PDF -->
         <div id="successModal" class="fixed inset-0 bg-blue-950/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
             <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl scale-95 transition-all space-y-4 border border-slate-100">
                 <div class="bg-emerald-50 text-emerald-600 w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto shadow-inner animate-bounce">
@@ -130,7 +119,6 @@
             </div>
         </div>
 
-        <!-- SECTION 0: GATEWAY / LOGIN COMPONENT -->
         <section id="loginSection" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xs border border-blue-100 p-6 space-y-5">
             <div class="text-center space-y-1">
                 <div class="bg-blue-50 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner">
@@ -150,10 +138,8 @@
             </form>
         </section>
 
-        <!-- CONTAINER FOR PROTECTED CONTENTS -->
         <div id="protectedContent" class="hidden space-y-6">
 
-            <!-- SECTION 1: DASHBOARD TAB -->
             <section id="dashboard-tab" class="tab-content hidden space-y-6">
                 <div class="bg-white rounded-2xl shadow-xs border border-blue-50 p-4 sm:p-6">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
@@ -199,7 +185,6 @@
                 </div>
             </section>
 
-            <!-- SECTION 2: ATTENDANCE CHECK TAB -->
             <section id="check-tab" class="tab-content hidden space-y-6">
                 <div id="attendanceFormSection" class="bg-white rounded-2xl shadow-xs border border-blue-50 p-4 sm:p-6 space-y-5">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4">
@@ -265,7 +250,6 @@
                 </div>
             </section>
 
-            <!-- SECTION 3: STATISTICS REPORT TAB -->
             <section id="stats-tab" class="tab-content hidden space-y-6">
                 <div class="bg-white rounded-2xl shadow-xs border border-blue-50 p-4 sm:p-6">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
@@ -309,7 +293,6 @@
                 </div>
             </section>
 
-            <!-- SECTION 4: PDF GENERATION TAB -->
             <section id="report-tab" class="tab-content hidden max-w-xl mx-auto space-y-6">
                 <form id="reportForm" onsubmit="event.preventDefault(); handleGeneratePDF();" class="bg-white rounded-2xl shadow-xs border border-blue-50 p-6 space-y-5">
                     <div class="text-center border-b border-slate-100 pb-4">
@@ -352,12 +335,12 @@
 
     </main>
 
-    <!-- ─── FOOTER COMPONENT ─── -->
     <footer class="bg-blue-950 text-blue-300/60 border-t border-blue-900/40 py-4.5 mt-8">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs space-y-1">
             <p class="font-light">© 2026 งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
         </div>
     </footer>
+
 
     <!-- CONTROL JAVASCRIPT EXECUTIONS -->
   <script>
