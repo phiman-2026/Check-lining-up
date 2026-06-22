@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ระบบเช็คการปฏิบัติงานลงแถวครู - โรงเรียนพิมานพิทยาสรรค์</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +13,7 @@
     <style>
         body { 
             font-family: 'K2D', sans-serif; 
-            background-color: #f0f4f8; /* พื้นหลังสีเทาอมน้ำเงินจางๆ สไตล์แอปพลิเคชัน */
+            background-color: #0f172a; /* พื้นหลังด้านนอกสุดโทนเข้มสำหรับโหมดแอป */
         }
         /* ปรับดีไซน์ Scrollbar ของแถบเมนูและตารางในมือถือ */
         .overflow-x-auto::-webkit-scrollbar {
@@ -32,9 +32,131 @@
             text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
             -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.3);
         }
+
+        /* 📱📱 ส่วนที่เพิ่มเพื่อปรับเป็นสไตล์โมบายแอปพลิเคชัน 📱📱 */
+        @media (max-width: 768px) {
+            /* จำกัดความกว้างแอปให้อยู่ตรงกลางเหมือนโมเดล App Container */
+            body {
+                background-color: #0f172a;
+                align-items: center;
+            }
+            header, main, footer {
+                width: 100%;
+                max-width: 480px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            header {
+                position: sticky;
+                top: 0;
+                z-index: 40;
+            }
+            /* ซ่อนเมนูด้านบนเดิมบนมือถือ เพื่อเตรียมใช้ Bottom Navigation */
+            header > .bg-blue-950 {
+                position: fixed !important;
+                bottom: 0 !important;
+                top: auto !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                width: 100% !important;
+                max-width: 480px !important;
+                border-top: 1px solid rgba(255,255,255,0.1) !important;
+                background-color: #0b1329 !important;
+                box-shadow: 0 -4px 15px rgba(0,0,0,0.3) !important;
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            header > .bg-blue-950 > div {
+                justify-content: space-around !important;
+                padding: 0 !important;
+            }
+            /* ปรับแต่งปุ่มแท็บด้านล่างให้มีลักษณะเหมือนปุ่มแอปพลิเคชัน */
+            .tab-btn {
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 4px !important;
+                padding: 10px 4px !important;
+                font-size: 10px !important;
+                border-bottom: none !important;
+                color: #94a3b8 !important;
+                flex: 1;
+            }
+            /* สไตล์ปุ่มเมนูเมื่อถูกเปิดเลือก (ใช้คลาสสีพื้นหลังของเดิมในการอ้างอิง) */
+            .tab-btn.bg-blue-900\/60, .tab-btn[style*="background"] {
+                color: #38bdf8 !important;
+                background-color: transparent !important;
+                font-weight: bold !important;
+            }
+            
+            /* ปรับระยะห่างเมนูด้านล่างไม่ให้บังเนื้อหา */
+            main {
+                padding-bottom: 80px !important;
+            }
+
+            /* 🗂️ การเปลี่ยนรูปเล่มตาราง (Table) ให้กลายเป็นการ์ดกล่องในจอเล็ก */
+            #attendanceTableBody, #dashboardTableBody, #statsTableBody {
+                display: block !important;
+                width: 100% !important;
+            }
+            table {
+                display: block !important;
+                width: 100% !important;
+            }
+            thead {
+                display: none !important; /* ซ่อนหัวตารางแถวนอนยาวๆ */
+            }
+            table tbody tr {
+                display: block !important;
+                background: #ffffff !important;
+                border: 1px solid #e2e8f0 !important;
+                border-radius: 16px !important;
+                margin-bottom: 14px !important;
+                padding: 14px !important;
+                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05) !important;
+            }
+            table tbody tr td {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 8px 0 !important;
+                border-bottom: 1px dashed #f1f5f9 !important;
+                width: 100% !important;
+                white-space: normal !important;
+            }
+            table tbody tr td:last-child {
+                border-bottom: none !important;
+            }
+            
+            /* สร้างป้ายระบุหัวข้ออัตโนมัติให้กับการ์ดแต่ละช่อง */
+            #dashboardTableBody tr td:nth-child(1)::before { content: "ห้องเรียน:"; font-weight: bold; color: #1e3a8a; }
+            #dashboardTableBody tr td:nth-child(2)::before { content: "ครูที่ปรึกษา:"; font-weight: bold; color: #64748b; }
+            #dashboardTableBody tr td:nth-child(3)::before { content: "สถานะวันนี้:"; font-weight: bold; color: #64748b; }
+            #dashboardTableBody tr td:nth-child(4)::before { content: "เหตุผล:"; font-weight: bold; color: #64748b; }
+            #dashboardTableBody tr td:nth-child(5)::before { content: "เวลาบันทึก:"; font-weight: bold; color: #64748b; }
+            #dashboardTableBody tr td:nth-child(6)::before { content: "ผู้ตรวจ:"; font-weight: bold; color: #64748b; }
+
+            #attendanceTableBody tr td:nth-child(1)::before { content: "ห้องเรียน:"; font-weight: bold; color: #1e3a8a; }
+            #attendanceTableBody tr td:nth-child(2)::before { content: "ครูที่ปรึกษา:"; font-weight: bold; color: #64748b; }
+            #attendanceTableBody tr td:nth-child(3)::before { content: "เช็คสถานะ:"; font-weight: bold; color: #64748b; }
+            #attendanceTableBody tr td:nth-child(4)::before { content: "ระบุสาเหตุ:"; font-weight: bold; color: #64748b; }
+            
+            #statsTableBody tr td:nth-child(1)::before { content: "ระดับชั้น:"; font-weight: bold; color: #1e3a8a; }
+            #statsTableBody tr td:nth-child(2)::before { content: "ชื่อ-สกุล:"; font-weight: bold; color: #64748b; }
+            #statsTableBody tr td:nth-child(3)::before { content: "ลงแถวทั้งหมด:"; font-weight: bold; color: #64748b; }
+            #statsTableBody tr td:nth-child(4)::before { content: "รวมลงแถว:"; font-weight: bold; color: #64748b; }
+            #statsTableBody tr td:nth-child(5)::before { content: "รวมไม่ลงแถว:"; font-weight: bold; color: #64748b; }
+
+            /* ยืดความกว้างช่องเลือกข้อมูลในการ์ดให้กดง่ายขึ้น */
+            table tbody tr td select, 
+            table tbody tr td input,
+            table tbody tr td .flex {
+                width: 65% !important;
+                max-width: 65% !important;
+            }
+        }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col antialiased">
+<body class="text-slate-800 min-h-screen flex flex-col antialiased bg-slate-100">
 
     <header class="relative text-white shadow-md sticky top-0 z-40 border-b border-blue-900/50 overflow-hidden">
         
@@ -340,7 +462,6 @@
             <p class="font-light">© 2026 งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
         </div>
     </footer>
-
 
     <!-- CONTROL JAVASCRIPT EXECUTIONS -->
   <script>
