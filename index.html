@@ -33,15 +33,14 @@
             -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.3);
         }
 
-        /* 📱📱 ส่วนปรับดีไซน์ Mobile App Style (ปลอดภัย ไม่ทับโครงสร้าง JS) 📱📱 */
+        /* 📱📱 ส่วนปรับดีไซน์ Mobile App Style (ปรับปรุงให้เต็มจอและสวยงามยิ่งขึ้น) 📱📱 */
         @media (max-width: 768px) {
             body {
                 background-color: #0f172a;
-                align-items: center;
             }
             header, main, footer {
                 width: 100%;
-                max-width: 480px;
+                max-width: 100%; /* เปลี่ยนจาก 480px ให้เต็มขอบจอมือถือ */
                 margin-left: auto;
                 margin-right: auto;
             }
@@ -58,7 +57,7 @@
                 left: 50% !important;
                 transform: translateX(-50%) !important;
                 width: 100% !important;
-                max-width: 480px !important;
+                max-width: 100% !important;
                 border-top: 1px solid rgba(255,255,255,0.1) !important;
                 background-color: #0b1329 !important;
                 box-shadow: 0 -4px 15px rgba(0,0,0,0.3) !important;
@@ -86,10 +85,11 @@
             }
             
             main {
-                padding-bottom: 90px !important;
+                padding: 12px !important; /* ปรับ Padding ให้นวลตาขึ้น ไม่ชิดขอบจนเกินไป */
+                padding-bottom: 100px !important; /* เพิ่มระยะหลบแท็บด้านล่าง */
             }
 
-            /* 🗂️ การปรับเปลี่ยนตารางให้เป็นการ์ด (เฉพาะแถวข้อมูลที่มีเนื้อหาจริง ไม่ทับ tr แจ้งเตือนเริ่มต้น) */
+            /* 🗂️ การปรับเปลี่ยนตารางให้เป็นการ์ด */
             #attendanceTableBody tr:not(:has(td[colspan])), 
             #dashboardTableBody tr:not(:has(td[colspan])), 
             #statsTableBody tr {
@@ -97,9 +97,11 @@
                 background: #ffffff !important;
                 border: 1px solid #e2e8f0 !important;
                 border-radius: 16px !important;
-                margin-bottom: 14px !important;
-                padding: 14px !important;
+                margin-bottom: 16px !important;
+                padding: 16px !important;
                 box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05) !important;
+                width: 100% !important; /* สั่งให้ตัวการ์ดยืดเต็มหน้าจอ */
+                box-sizing: border-box !important;
             }
             
             /* จัดช่องในตารางเมื่อแปลงร่างเป็นการ์ด */
@@ -109,11 +111,12 @@
                 display: flex !important;
                 justify-content: space-between !important;
                 align-items: center !important;
-                padding: 8px 0 !important;
+                padding: 10px 0 !important; /* ปรับช่องไฟให้อ่านง่ายขึ้น */
                 border-bottom: 1px dashed #f1f5f9 !important;
                 width: 100% !important;
                 white-space: normal !important;
                 text-align: right !important;
+                gap: 12px; /* กันส่วนหัวและส่วนท้ายการ์ดชนกัน */
             }
             
             #attendanceTableBody tr td:last-child, 
@@ -123,30 +126,30 @@
             }
 
             /* หัวข้อของการ์ดแต่ละหน้าจอ */
-            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(1)::before { content: "ห้องเรียน:"; font-weight: bold; color: #1e3a8a; }
-            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(2)::before { content: "ครูที่ปรึกษา:"; font-weight: bold; color: #64748b; }
-            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(3)::before { content: "สถานะวันนี้:"; font-weight: bold; color: #64748b; }
-            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(4)::before { content: "เหตุผล:"; font-weight: bold; color: #64748b; }
-            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(5)::before { content: "เวลาบันทึก:"; font-weight: bold; color: #64748b; }
-            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(6)::before { content: "ผู้ตรวจ:"; font-weight: bold; color: #64748b; }
+            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(1)::before { content: "ห้องเรียน:"; font-weight: bold; color: #1e3a8a; shrink-0; }
+            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(2)::before { content: "ครูที่ปรึกษา:"; font-weight: bold; color: #64748b; shrink-0; }
+            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(3)::before { content: "status วันนี้:"; font-weight: bold; color: #64748b; shrink-0; }
+            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(4)::before { content: "เหตุผล:"; font-weight: bold; color: #64748b; shrink-0; }
+            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(5)::before { content: "เวลาบันทึก:"; font-weight: bold; color: #64748b; shrink-0; }
+            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(6)::before { content: "ผู้ตรวจ:"; font-weight: bold; color: #64748b; shrink-0; }
 
-            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(1)::before { content: "ห้องเรียน:"; font-weight: bold; color: #1e3a8a; }
-            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(2)::before { content: "ครูที่ปรึกษา:"; font-weight: bold; color: #64748b; }
-            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(3)::before { content: "เช็คสถานะ:"; font-weight: bold; color: #64748b; }
-            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(4)::before { content: "ระบุสาเหตุ:"; font-weight: bold; color: #64748b; }
+            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(1)::before { content: "ห้องเรียน:"; font-weight: bold; color: #1e3a8a; shrink-0; }
+            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(2)::before { content: "ครูที่ปรึกษา:"; font-weight: bold; color: #64748b; shrink-0; }
+            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(3)::before { content: "เช็คสถานะ:"; font-weight: bold; color: #64748b; shrink-0; }
+            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(4)::before { content: "ระบุสาเหตุ:"; font-weight: bold; color: #64748b; shrink-0; }
             
-            #statsTableBody tr td:nth-child(1)::before { content: "ระดับชั้น:"; font-weight: bold; color: #1e3a8a; }
-            #statsTableBody tr td:nth-child(2)::before { content: "ชื่อ-สกุล:"; font-weight: bold; color: #64748b; }
-            #statsTableBody tr td:nth-child(3)::before { content: "ลงแถวทั้งหมด:"; font-weight: bold; color: #64748b; }
-            #statsTableBody tr td:nth-child(4)::before { content: "รวมลงแถว:"; font-weight: bold; color: #64748b; }
-            #statsTableBody tr td:nth-child(5)::before { content: "รวมไม่ลงแถว:"; font-weight: bold; color: #64748b; }
+            #statsTableBody tr td:nth-child(1)::before { content: "ระดับชั้น:"; font-weight: bold; color: #1e3a8a; shrink-0; }
+            #statsTableBody tr td:nth-child(2)::before { content: "ชื่อ-สกุล:"; font-weight: bold; color: #64748b; shrink-0; }
+            #statsTableBody tr td:nth-child(3)::before { content: "ลงแถวทั้งหมด:"; font-weight: bold; color: #64748b; shrink-0; }
+            #statsTableBody tr td:nth-child(4)::before { content: "รวมลงแถว:"; font-weight: bold; color: #64748b; shrink-0; }
+            #statsTableBody tr td:nth-child(5)::before { content: "รวมไม่ลงแถว:"; font-weight: bold; color: #64748b; shrink-0; }
 
-            /* ขยายความกว้างตัวเลือกให้กดง่ายขึ้น */
+            /* ขยายความกว้างตัวเลือกให้พอดี ไม่บีบตัวหนังสือแน่น */
             table tbody tr td select, 
             table tbody tr td input,
             table tbody tr td .flex {
-                width: 60% !important;
-                max-width: 60% !important;
+                width: 55% !important;
+                max-width: 55% !important;
                 text-align: left !important;
             }
             
@@ -462,7 +465,7 @@
 
     <footer class="bg-blue-950 text-blue-300/60 border-t border-blue-900/40 py-4.5 mt-8">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs space-y-1">
-            <p class="font-light">© 2026 งานยานพาหนะ โรงเรียนพิมานพิทยาสรรค์</p>
+            <p class="font-light">© 2026 งานสารบรรณ โรงเรียนพิมานพิทยาสรรค์</p>
         </div>
     </footer>
 
