@@ -467,8 +467,8 @@
     </footer>
 
     <!-- CONTROL JAVASCRIPT EXECUTIONS -->
-  <script>
-        // ⚠️ ลิงก์ Web App URL ตัวเดิมของคุณอัฟฟาน
+ <script>
+        // ⚠️ ลิงก์ Web App URL ตัวเดิมของคุณอัฟฟาน (คงเดิมไม่เปลี่ยนแปลง)
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzy3H3uljjyxiC1GSKM7PIYCs8sOR27LjaNdQiSKW3PvUTcxS5ptFsArMpjwHgNP9v7/exec";
         
         let classList = [];
@@ -496,7 +496,10 @@
         });
 
         function showLoading(show) {
-            document.getElementById('loadingOverlay').classList[show ? 'remove' : 'add']('hidden');
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.classList[show ? 'remove' : 'add']('hidden');
+            }
         }
 
         function setTodayDateInput() {
@@ -504,7 +507,8 @@
             const yyyy = today.getFullYear();
             const mm = String(today.getMonth() + 1).padStart(2, '0');
             const dd = String(today.getDate()).padStart(2, '0');
-            document.getElementById('reportDateInput').value = `${yyyy}-${mm}-${dd}`;
+            const el = document.getElementById('reportDateInput');
+            if (el) el.value = `${yyyy}-${mm}-${dd}`;
         }
 
         // ตั้งค่าเริ่มต้นของวันที่สำหรับการแก้ไขข้อมูลย้อนหลัง
@@ -534,7 +538,8 @@
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(tabId).classList.remove('hidden');
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) targetTab.classList.remove('hidden');
 
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('text-white', 'border-b-2', 'border-indigo-400', 'bg-indigo-900/50');
@@ -548,11 +553,15 @@
             }
 
             if (tabId === 'stats-tab') loadAttendanceStats();
+            if (tabId === 'dashboard-tab') loadDailySummary(); // โหลดสรุปเมื่อเปิดหน้า Dashboard
         }
 
         function closeModal() {
-            document.getElementById('successModal').classList.remove('flex');
-            document.getElementById('successModal').classList.add('hidden');
+            const modal = document.getElementById('successModal');
+            if (modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
         }
 
         function fetchInitialConfig() {
@@ -581,46 +590,48 @@
             const statsSelect = document.getElementById('statsClassSelect');
             const reportSelect = document.getElementById('reportClassSelect');
 
-            dbSelect.innerHTML = '<option value="">-- เลือกระดับชั้น --</option>';
-            checkSelect.innerHTML = '<option value="">-- เลือกระดับชั้น --</option>';
-            statsSelect.innerHTML = '';
-            reportSelect.innerHTML = '';
+            if (dbSelect) dbSelect.innerHTML = '<option value="">-- เลือกระดับชั้น --</option>';
+            if (checkSelect) checkSelect.innerHTML = '<option value="">-- เลือกระดับชั้น --</option>';
+            if (statsSelect) statsSelect.innerHTML = '';
+            if (reportSelect) reportSelect.innerHTML = '';
 
             let allowedClasses = classList;
             if (userAssignedClass && userAssignedClass !== 'ALL') {
                 allowedClasses = classList.filter(cls => cls === userAssignedClass);
             } else {
-                statsSelect.appendChild(createOptionElement('แสดงทุกระดับชั้น', ''));
+                if (statsSelect) statsSelect.appendChild(createOptionElement('แสดงทุกระดับชั้น', ''));
             }
 
             allowedClasses.forEach(cls => {
-                dbSelect.appendChild(createOptionElement(cls, cls));
-                statsSelect.appendChild(createOptionElement(cls, cls));
-                reportSelect.appendChild(createOptionElement(cls, cls));
+                if (dbSelect) dbSelect.appendChild(createOptionElement(cls, cls));
+                if (statsSelect) statsSelect.appendChild(createOptionElement(cls, cls));
+                if (reportSelect) reportSelect.appendChild(createOptionElement(cls, cls));
 
-                // ถ้าอยู่ในโหมดแก้ไข ให้ยอมให้แสดงระดับชั้นเสมอ แต่ถ้าโหมดปกติและเช็คไปแล้ว จะกรองออกเพื่อป้องกันการเช็คซ้ำประจำวัน
-                if (!isEditMode && checkedLevels.includes(cls)) {
-                    // ไม่เพิ่มลงใน checkSelect เพื่อป้องกันการกดเช็คซ้ำประจำวัน
-                } else {
-                    checkSelect.appendChild(createOptionElement(cls, cls));
+                if (checkSelect) {
+                    if (!isEditMode && checkedLevels.includes(cls)) {
+                        // ไม่เพิ่มลงใน checkSelect เพื่อป้องกันการกดเช็คซ้ำประจำวัน
+                    } else {
+                        checkSelect.appendChild(createOptionElement(cls, cls));
+                    }
                 }
             });
 
             if (allowedClasses.length === 1) {
-                dbSelect.value = allowedClasses[0];
-                statsSelect.value = allowedClasses[0];
-                reportSelect.value = allowedClasses[0];
+                if (dbSelect) dbSelect.value = allowedClasses[0];
+                if (statsSelect) statsSelect.value = allowedClasses[0];
+                if (reportSelect) reportSelect.value = allowedClasses[0];
                 
-                // ในโหมดปกติ ถ้าตรวจพบว่าระดับชั้นนี้เช็คชื่อประจำวันสำเร็จแล้ว จะไม่โหลดข้อมูลรายคนขึ้นมาแสดงโดยตรง
                 if (!isEditMode && checkedLevels.includes(allowedClasses[0])) {
-                    checkSelect.value = "";
+                    if (checkSelect) checkSelect.value = "";
                     const tbody = document.getElementById('attendanceTableBody');
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-amber-600 font-medium bg-amber-50/50 border border-dashed border-amber-200 rounded-xl"><i class="fa-solid fa-circle-check block text-3xl mb-2 text-amber-500"></i> ระดับชั้นเรียนนี้ได้รับการเช็คชื่อประจำวันเรียบร้อยแล้วค่ะ<br><span class="text-xs text-slate-500 font-normal block mt-1">หากต้องการปรับปรุงข้อมูล กรุณากดเปิด "โหมดแก้ไขข้อมูลเดิม" ด้านบนนะคะ</span></td></tr>`;
-                    document.getElementById('submitBtnArea').classList.add('hidden');
+                    if (tbody) {
+                        tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-amber-600 font-medium bg-amber-50/50 border border-dashed border-amber-200 rounded-xl"><i class="fa-solid fa-circle-check block text-3xl mb-2 text-amber-500"></i> ระดับชั้นเรียนนี้ได้รับการเช็คชื่อประจำวันเรียบร้อยแล้วค่ะ<br><span class="text-xs text-slate-500 font-normal block mt-1">หากต้องการปรับปรุงข้อมูล กรุณากดเปิด "โหมดแก้ไขข้อมูลเดิม" ด้านบนนะคะ</span></td></tr>`;
+                    }
+                    const submitArea = document.getElementById('submitBtnArea');
+                    if (submitArea) submitArea.classList.add('hidden');
                 } else {
-                    checkSelect.value = allowedClasses[0];
+                    if (checkSelect) checkSelect.value = allowedClasses[0];
                     if (currentRecorder) {
-                        loadDailySummary();
                         loadAttendanceForm();
                     }
                 }
@@ -633,28 +644,29 @@
             return opt;
         }
 
-        // ปรับปรุงฟังก์ชันการสลับโหมดแก้ไข พร้อมรองรับการเลือกวันที่เพื่อดึงข้อมูลย้อนหลัง
         function toggleEditMode() {
             isEditMode = !isEditMode;
             const btn = document.getElementById('toggleModeBtn');
             const text = document.getElementById('modeText');
             const tbody = document.getElementById('attendanceTableBody');
-            const editDateWrapper = document.getElementById('editDateWrapper'); // สมมติว่ามี wrapper คุมกล่องใส่วันที่ใน HTML ส่วนคัดกรอง
+            const editDateWrapper = document.getElementById('editDateWrapper');
 
             if (isEditMode) {
-                btn.className = "bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-100 transition flex items-center gap-1.5 cursor-pointer";
-                text.innerText = "เปลี่ยนเป็นโหมดเช็คปกติ (ซ่อนรายการเช็คแล้ว)";
-                if (editDateWrapper) editDateWrapper.classList.remove('hidden'); // แสดงที่เลือกวันที่ย้อนหลัง
+                if (btn) btn.className = "bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-100 transition flex items-center gap-1.5 cursor-pointer";
+                if (text) text.innerText = "เปลี่ยนเป็นโหมดเช็คปกติ (ซ่อนรายการเช็คแล้ว)";
+                if (editDateWrapper) editDateWrapper.classList.remove('hidden');
             } else {
-                btn.className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
-                text.innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
-                if (editDateWrapper) editDateWrapper.classList.add('hidden'); // ซ่อนที่เลือกวันที่ย้อนหลัง
-                setTodayEditDateInput(); // คืนค่าวันที่เป็นวันปัจจุบัน
+                if (btn) btn.className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
+                if (text) text.innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
+                if (editDateWrapper) editDateWrapper.classList.add('hidden');
+                setTodayEditDateInput();
             }
             
-            document.getElementById('checkClassSelect').value = "";
-            tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
-            document.getElementById('submitBtnArea').classList.add('hidden');
+            const checkSelect = document.getElementById('checkClassSelect');
+            if (checkSelect) checkSelect.value = "";
+            if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
+            const submitArea = document.getElementById('submitBtnArea');
+            if (submitArea) submitArea.classList.add('hidden');
             renderDropdowns();
         }
 
@@ -666,14 +678,16 @@
             document.getElementById('protectedContent').classList.add('hidden');
             document.getElementById('loginSection').classList.remove('hidden');
             
-            document.getElementById('pinInput').value = '';
+            const pinInp = document.getElementById('pinInput');
+            if (pinInp) pinInp.value = '';
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             
             renderDropdowns();
         }
 
         function handleLogin() {
-            const pin = document.getElementById('pinInput').value;
+            const pinInput = document.getElementById('pinInput');
+            const pin = pinInput ? pinInput.value : '';
             if (!pin) { 
                 Swal.fire({
                     title: 'แจ้งเตือน',
@@ -702,18 +716,20 @@
                     document.getElementById('protectedContent').classList.remove('hidden'); 
                     
                     renderDropdowns();
-                    switchTab('check-tab');
+                    switchTab('check-tab'); // ย้ายไปหน้าต่างเช็คชื่อทันที
 
-                    // ถ้าเช็คชื่อของวันนั้นสำเร็จเรียบร้อยแล้ว จะไม่แสดงข้อมูลรายคนในตารางทันทีเพื่อป้องกันครูลงข้อมูลซ้ำซ้อนซ้ำประจำวัน
                     if (userAssignedClass !== 'ALL') {
                         if (checkedLevels.includes(userAssignedClass)) {
-                            document.getElementById('checkClassSelect').value = "";
-                            document.getElementById('attendanceTableBody').innerHTML = `<tr><td colspan="4" class="p-8 text-center text-amber-600 font-medium bg-amber-50/50 border border-dashed border-amber-200 rounded-xl"><i class="fa-solid fa-circle-check block text-3xl mb-2 text-amber-500"></i> ระดับชั้นเรียนนี้ได้รับการเช็คชื่อประจำวันเรียบร้อยแล้วค่ะ<br><span class="text-xs text-slate-500 font-normal block mt-1">หากต้องการปรับปรุงข้อมูล กรุณากดเปิด "โหมดแก้ไขข้อมูลเดิม" ด้านบนนะคะ</span></td></tr>`;
-                            document.getElementById('submitBtnArea').classList.add('hidden');
+                            const checkSelect = document.getElementById('checkClassSelect');
+                            if (checkSelect) checkSelect.value = "";
+                            const tbody = document.getElementById('attendanceTableBody');
+                            if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-amber-600 font-medium bg-amber-50/50 border border-dashed border-amber-200 rounded-xl"><i class="fa-solid fa-circle-check block text-3xl mb-2 text-amber-500"></i> ระดับชั้นเรียนนี้ได้รับการเช็คชื่อประจำวันเรียบร้อยแล้วค่ะ<br><span class="text-xs text-slate-500 font-normal block mt-1">หากต้องการปรับปรุงข้อมูล กรุณากดเปิด "โหมดแก้ไขข้อมูลเดิม" ด้านบนนะคะ</span></td></tr>`;
+                            const submitArea = document.getElementById('submitBtnArea');
+                            if (submitArea) submitArea.classList.add('hidden');
                         } else {
-                            document.getElementById('checkClassSelect').value = userAssignedClass;
-                            loadDailySummary();
-                            loadAttendanceForm();
+                            const checkSelect = document.getElementById('checkClassSelect');
+                            if (checkSelect) checkSelect.value = userAssignedClass;
+                            loadAttendanceForm(); // โหลดฟอร์มเช็คชื่อของระดับชั้นตนเอง
                         }
                     }
                 } else { 
@@ -736,9 +752,14 @@
             .finally(() => showLoading(false));
         }
 
+        // ปรับปรุงให้ยืดหยุ่น โดยสามารถส่งชื่อระดับชั้นเข้ามาได้โดยตรง
         function loadDailySummary() {
-            const selectedClass = document.getElementById('dbClassSelect').value;
+            const dbSelect = document.getElementById('dbClassSelect');
+            // หากค่าในหน้าแดชบอร์ดไม่มี ให้ใช้ระดับชั้นของผู้ใช้งานแทนชั่วคราวเพื่อป้องกัน Error
+            const selectedClass = dbSelect ? dbSelect.value : (userAssignedClass !== 'ALL' ? userAssignedClass : '');
             const tbody = document.getElementById('dashboardTableBody');
+            if (!tbody) return;
+
             if (!selectedClass) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400"><i class="fa-solid fa-arrow-pointer block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</td></tr>`;
                 return;
@@ -770,34 +791,36 @@
                         tbody.appendChild(tr);
                     });
                 })
+                .catch(err => {
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`;
+                })
                 .finally(() => showLoading(false));
         }
 
-        // ปรับปรุงฟังก์ชันการเรียกรายชื่อฟอร์ม โดยส่งค่าพารามิเตอร์ "วันที่เลือก" และ "โหมดแก้ไข" ไปที่ Apps Script ด้วย
         function loadAttendanceForm() {
-            const selectedClass = document.getElementById('checkClassSelect').value;
+            const checkSelect = document.getElementById('checkClassSelect');
+            const selectedClass = checkSelect ? checkSelect.value : '';
             const tbody = document.getElementById('attendanceTableBody');
             const submitArea = document.getElementById('submitBtnArea');
+            if (!tbody) return;
             
-            // ดึงค่าจากช่องเลือกวันที่ ถ้าไม่มีให้ส่งค่าว่าง (หลังบ้านจะปรับใช้เป็นวันปัจจุบันอัตโนมัติ)
             const editDateInp = document.getElementById('editDateInput');
             const targetDate = editDateInp ? editDateInp.value : '';
 
             if (!selectedClass) {
                 tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
-                submitArea.classList.add('hidden');
+                if (submitArea) submitArea.classList.add('hidden');
                 return;
             }
 
             showLoading(true);
-            // แนบพารามิเตอร์ targetDate และ isEditMode ไปยังฝั่ง Server-side Script ด้วยเพื่อรองรับการดึงข้อมูลย้อนหลังตามวันที่กำหนด
             fetch(`${WEB_APP_URL}?action=getTeachersByClass&className=${encodeURIComponent(selectedClass)}&targetDate=${targetDate}&isEditMode=${isEditMode}`)
                 .then(res => res.json())
                 .then(data => {
                     tbody.innerHTML = '';
                     if (data.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">ไม่พบข้อมูลรายชื่อค่ะ</td></tr>`;
-                        submitArea.classList.add('hidden');
+                        if (submitArea) submitArea.classList.add('hidden');
                         return;
                     }
 
@@ -832,7 +855,7 @@
                         `;
                         tbody.appendChild(tr);
                     });
-                    submitArea.classList.remove('hidden');
+                    if (submitArea) submitArea.classList.remove('hidden');
                 })
                 .catch(err => {
                     Swal.fire({
@@ -847,62 +870,66 @@
 
         function toggleReasonField(index, show) {
             const select = document.getElementById(`reason_${index}`);
-            if (show) {
-                select.removeAttribute('disabled');
-                select.className = "w-full bg-white border border-slate-300 rounded-md px-2 py-1 text-xs outline-hidden";
-            } else {
-                select.setAttribute('disabled', 'true');
-                select.className = "w-full bg-slate-100 border border-slate-300 rounded-md px-2 py-1 text-xs opacity-50 outline-hidden";
+            if (select) {
+                if (show) {
+                    select.removeAttribute('disabled');
+                    select.className = "w-full bg-white border border-slate-300 rounded-md px-2 py-1 text-xs outline-hidden";
+                } else {
+                    select.setAttribute('disabled', 'true');
+                    select.className = "w-full bg-slate-100 border border-slate-300 rounded-md px-2 py-1 text-xs opacity-50 outline-hidden";
+                }
             }
         }
 
-        // 🌟 ปรับปรุงการกดบันทึก: ให้ปุ่มหมุนติ้วๆ ทำงานแทนหน้าจอโหลดเต็มสีดำ และสลับเปลี่ยนไปยังแท็บสรุปผลเมื่อทำรายการเสร็จสิ้นสำเร็จ
         function submitAttendance(e) {
             e.preventDefault();
             
-            const submitBtn = document.getElementById('submitAttendanceBtn'); // ค้นหาปุ่มบันทึก
+            const submitBtn = document.getElementById('submitAttendanceBtn');
             let originalBtnHtml = "";
             
             if (submitBtn) {
                 originalBtnHtml = submitBtn.innerHTML;
-                // เปลี่ยนเนื้อหาของปุ่มเป็นแอนิเมชันรูปไอคอนหมุนติ้วๆ พร้อมล็อกปุ่มชั่วคราว
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> กำลังบันทึกข้อมูล...`;
             }
 
             const tbody = document.getElementById('attendanceTableBody');
+            if (!tbody) return;
             const rowsCount = tbody.querySelectorAll('tr').length;
             const attendanceData = [];
 
-            // ดึงข้อมูลวันที่สำหรับการแก้ไข หรือบันทึกข้อมูล
             const editDateInp = document.getElementById('editDateInput');
             const targetDate = editDateInp ? editDateInp.value : '';
 
             for (let i = 0; i < rowsCount; i++) {
-                const className = document.querySelector(`input[name="class_${i}"]`).value;
-                const teacherName = document.querySelector(`input[name="teacher_${i}"]`).value;
-                const status = document.querySelector(`input[name="status_${i}"]:checked`).value;
-                const reasonSelect = document.getElementById(`reason_${i}`);
-                const reason = status === "ไม่ลงแถว" ? reasonSelect.value : "-";
+                const classInput = document.querySelector(`input[name="class_${i}"]`);
+                const teacherInput = document.querySelector(`input[name="teacher_${i}"]`);
+                const statusInput = document.querySelector(`input[name="status_${i}"]:checked`);
+                
+                if (classInput && teacherInput && statusInput) {
+                    const className = classInput.value;
+                    const teacherName = teacherInput.value;
+                    const status = statusInput.value;
+                    const reasonSelect = document.getElementById(`reason_${i}`);
+                    const reason = status === "ไม่ลงแถว" && reasonSelect ? reasonSelect.value : "-";
 
-                attendanceData.push({ className, teacherName, status, reason });
+                    attendanceData.push({ className, teacherName, status, reason });
+                }
             }
 
-            // ส่งข้อมูลไปยังหลังบ้าน Apps Script
             fetch(WEB_APP_URL, {
                 method: 'POST',
                 body: JSON.stringify({ 
                     action: 'saveAttendance', 
                     attendanceData: attendanceData, 
                     recorderName: currentRecorder,
-                    targetDate: targetDate, // ส่งวันที่ไปด้วยเพื่อให้ระบุแถวบันทึกและแก้ไขได้อย่างแม่นยำ
+                    targetDate: targetDate,
                     isEditMode: isEditMode
                 })
             })
             .then(res => res.json())
             .then(res => {
                 if (res.success) {
-                    // แจ้งเตือนเมื่อดำเนินการจัดเก็บลงฐานข้อมูลสำเร็จ
                     Swal.fire({
                         title: 'บันทึกสำเร็จ',
                         text: res.msg,
@@ -910,28 +937,28 @@
                         confirmButtonColor: '#1e1b4b'
                     });
                     
-                    // ปรับเปลี่ยนคืนสถานะหน้าจอ และปิดโหมดแก้ไขข้อมูลเดิมกลับมาเป็นปกติ
                     isEditMode = false;
-                    document.getElementById('toggleModeBtn').className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
-                    document.getElementById('modeText').innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
+                    const toggleBtn = document.getElementById('toggleModeBtn');
+                    if (toggleBtn) toggleBtn.className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
+                    const modeTxt = document.getElementById('modeText');
+                    if (modeTxt) modeTxt.innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
                     
                     const editDateWrapper = document.getElementById('editDateWrapper');
                     if (editDateWrapper) editDateWrapper.classList.add('hidden');
                     setTodayEditDateInput();
 
-                    document.getElementById('checkClassSelect').value = "";
+                    const checkSelect = document.getElementById('checkClassSelect');
+                    if (checkSelect) checkSelect.value = "";
                     tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
-                    document.getElementById('submitBtnArea').classList.add('hidden');
+                    const submitArea = document.getElementById('submitBtnArea');
+                    if (submitArea) submitArea.classList.add('hidden');
                     
-                    // สั่งรีเฟรชข้อมูลสถานะและโครงสร้างล่าสุด
                     fetchInitialConfig(); 
-                    
-                    // 🌟 เปลี่ยนเส้นทางพาผู้ใช้งานไปยังหน้าแท็บสรุปข้อมูลทันที
                     switchTab('dashboard-tab');
                     
-                    // ถ้าระบุสิทธิ์ผู้ตรวจชั้นเรียนไว้ ให้ระบบรีเฟรชตารางหน้าสรุปผลวันนี้ให้อัตโนมัติด้วยเลยครับ
                     if (userAssignedClass && userAssignedClass !== 'ALL') {
-                        document.getElementById('dbClassSelect').value = userAssignedClass;
+                        const dbSelect = document.getElementById('dbClassSelect');
+                        if (dbSelect) dbSelect.value = userAssignedClass;
                         loadDailySummary();
                     }
                 } else { 
@@ -952,7 +979,6 @@
                 });
             })
             .finally(() => {
-                // คืนสภาพปุ่มบันทึกดั้งเดิมหลังจากส่งคำขอและประมวลผลคำสั่งสำเร็จ
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalBtnHtml;
@@ -966,18 +992,20 @@
             const monthlyBtn = document.getElementById('rangeMonthlyBtn');
 
             if (rangeType === 'weekly') {
-                weeklyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition cursor-pointer";
-                monthlyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer";
+                if (weeklyBtn) weeklyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition cursor-pointer";
+                if (monthlyBtn) monthlyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer";
             } else {
-                monthlyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition cursor-pointer";
-                weeklyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer";
+                if (monthlyBtn) monthlyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition cursor-pointer";
+                if (weeklyBtn) weeklyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer";
             }
             loadAttendanceStats(); 
         }
 
         function loadAttendanceStats() {
-            const levelFilter = document.getElementById('statsClassSelect').value;
+            const statsSelect = document.getElementById('statsClassSelect');
+            const levelFilter = statsSelect ? statsSelect.value : '';
             const tbody = document.getElementById('statsTableBody');
+            if (!tbody) return;
             tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังสรุปสถิติ...</td></tr>`;
 
             fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}&rangeType=${currentStatsRangeType}`)
@@ -1009,9 +1037,12 @@
         }
 
         function toggleReportDateInput() {
-            const type = document.querySelector('input[name="reportType"]:checked').value;
+            const reportTypeInput = document.querySelector('input[name="reportType"]:checked');
+            const type = reportTypeInput ? reportTypeInput.value : 'daily';
             const label = document.getElementById('dateLabel');
             const input = document.getElementById('reportDateInput');
+
+            if (!label || !input) return;
 
             if (type === 'daily') {
                 label.innerText = "3. เลือกวันที่ต้องการออกรายงาน"; input.type = "date"; setTodayDateInput();
@@ -1023,9 +1054,12 @@
         }
 
         function handleGeneratePDF() {
-            const type = document.querySelector('input[name="reportType"]:checked').value;
-            const className = document.getElementById('reportClassSelect').value;
-            const timeValue = document.getElementById('reportDateInput').value;
+            const reportTypeInput = document.querySelector('input[name="reportType"]:checked');
+            const type = reportTypeInput ? reportTypeInput.value : 'daily';
+            const reportSelect = document.getElementById('reportClassSelect');
+            const className = reportSelect ? reportSelect.value : '';
+            const reportDateInp = document.getElementById('reportDateInput');
+            const timeValue = reportDateInp ? reportDateInp.value : '';
 
             if (!className) { 
                 Swal.fire({
@@ -1056,10 +1090,12 @@
                 if (res.success && res.viewUrl) {
                     const modal = document.getElementById('successModal');
                     const link = document.getElementById('modalDownloadLink');
-                    link.href = res.viewUrl;
+                    if (link) link.href = res.viewUrl;
                     
-                    modal.classList.remove('hidden');
-                    modal.classList.add('flex');
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                    }
                 } else { 
                     Swal.fire({
                         title: 'ออกรายงานล้มเหลว',
@@ -1079,6 +1115,6 @@
             })
             .finally(() => showLoading(false));
         }
-    </script>
+</script>
 </body>
 </html>
