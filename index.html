@@ -13,7 +13,7 @@
     <style>
         body { 
             font-family: 'K2D', sans-serif; 
-            background-color: #0f172a; /* พื้นหลังด้านนอกสุดโทนเข้มสำหรับโหมดแอป */
+            background-color: #0f172a; 
         }
         /* ปรับดีไซน์ Scrollbar ของแถบเมนูและตารางในมือถือ */
         .overflow-x-auto::-webkit-scrollbar {
@@ -33,9 +33,8 @@
             -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.3);
         }
 
-        /* 📱📱 ส่วนที่เพิ่มเพื่อปรับเป็นสไตล์โมบายแอปพลิเคชัน 📱📱 */
+        /* 📱📱 ส่วนปรับดีไซน์ Mobile App Style (ปลอดภัย ไม่ทับโครงสร้าง JS) 📱📱 */
         @media (max-width: 768px) {
-            /* จำกัดความกว้างแอปให้อยู่ตรงกลางเหมือนโมเดล App Container */
             body {
                 background-color: #0f172a;
                 align-items: center;
@@ -51,7 +50,7 @@
                 top: 0;
                 z-index: 40;
             }
-            /* ซ่อนเมนูด้านบนเดิมบนมือถือ เพื่อเตรียมใช้ Bottom Navigation */
+            /* เมนูแท็บด้านล่างสไตล์แอป */
             header > .bg-blue-950 {
                 position: fixed !important;
                 bottom: 0 !important;
@@ -69,7 +68,6 @@
                 justify-content: space-around !important;
                 padding: 0 !important;
             }
-            /* ปรับแต่งปุ่มแท็บด้านล่างให้มีลักษณะเหมือนปุ่มแอปพลิเคชัน */
             .tab-btn {
                 flex-direction: column !important;
                 align-items: center !important;
@@ -81,31 +79,20 @@
                 color: #94a3b8 !important;
                 flex: 1;
             }
-            /* สไตล์ปุ่มเมนูเมื่อถูกเปิดเลือก (ใช้คลาสสีพื้นหลังของเดิมในการอ้างอิง) */
             .tab-btn.bg-blue-900\/60, .tab-btn[style*="background"] {
                 color: #38bdf8 !important;
                 background-color: transparent !important;
                 font-weight: bold !important;
             }
             
-            /* ปรับระยะห่างเมนูด้านล่างไม่ให้บังเนื้อหา */
             main {
-                padding-bottom: 80px !important;
+                padding-bottom: 90px !important;
             }
 
-            /* 🗂️ การเปลี่ยนรูปเล่มตาราง (Table) ให้กลายเป็นการ์ดกล่องในจอเล็ก */
-            #attendanceTableBody, #dashboardTableBody, #statsTableBody {
-                display: block !important;
-                width: 100% !important;
-            }
-            table {
-                display: block !important;
-                width: 100% !important;
-            }
-            thead {
-                display: none !important; /* ซ่อนหัวตารางแถวนอนยาวๆ */
-            }
-            table tbody tr {
+            /* 🗂️ การปรับเปลี่ยนตารางให้เป็นการ์ด (เฉพาะแถวข้อมูลที่มีเนื้อหาจริง ไม่ทับ tr แจ้งเตือนเริ่มต้น) */
+            #attendanceTableBody tr:not(:has(td[colspan])), 
+            #dashboardTableBody tr:not(:has(td[colspan])), 
+            #statsTableBody tr {
                 display: block !important;
                 background: #ffffff !important;
                 border: 1px solid #e2e8f0 !important;
@@ -114,7 +101,11 @@
                 padding: 14px !important;
                 box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05) !important;
             }
-            table tbody tr td {
+            
+            /* จัดช่องในตารางเมื่อแปลงร่างเป็นการ์ด */
+            #attendanceTableBody tr:not(:has(td[colspan])) td, 
+            #dashboardTableBody tr:not(:has(td[colspan])) td, 
+            #statsTableBody tr td {
                 display: flex !important;
                 justify-content: space-between !important;
                 align-items: center !important;
@@ -122,23 +113,27 @@
                 border-bottom: 1px dashed #f1f5f9 !important;
                 width: 100% !important;
                 white-space: normal !important;
-            }
-            table tbody tr td:last-child {
-                border-bottom: none !important;
+                text-align: right !important;
             }
             
-            /* สร้างป้ายระบุหัวข้ออัตโนมัติให้กับการ์ดแต่ละช่อง */
-            #dashboardTableBody tr td:nth-child(1)::before { content: "ห้องเรียน:"; font-weight: bold; color: #1e3a8a; }
-            #dashboardTableBody tr td:nth-child(2)::before { content: "ครูที่ปรึกษา:"; font-weight: bold; color: #64748b; }
-            #dashboardTableBody tr td:nth-child(3)::before { content: "สถานะวันนี้:"; font-weight: bold; color: #64748b; }
-            #dashboardTableBody tr td:nth-child(4)::before { content: "เหตุผล:"; font-weight: bold; color: #64748b; }
-            #dashboardTableBody tr td:nth-child(5)::before { content: "เวลาบันทึก:"; font-weight: bold; color: #64748b; }
-            #dashboardTableBody tr td:nth-child(6)::before { content: "ผู้ตรวจ:"; font-weight: bold; color: #64748b; }
+            #attendanceTableBody tr td:last-child, 
+            #dashboardTableBody tr td:last-child, 
+            #statsTableBody tr td:last-child {
+                border-bottom: none !important;
+            }
 
-            #attendanceTableBody tr td:nth-child(1)::before { content: "ห้องเรียน:"; font-weight: bold; color: #1e3a8a; }
-            #attendanceTableBody tr td:nth-child(2)::before { content: "ครูที่ปรึกษา:"; font-weight: bold; color: #64748b; }
-            #attendanceTableBody tr td:nth-child(3)::before { content: "เช็คสถานะ:"; font-weight: bold; color: #64748b; }
-            #attendanceTableBody tr td:nth-child(4)::before { content: "ระบุสาเหตุ:"; font-weight: bold; color: #64748b; }
+            /* หัวข้อของการ์ดแต่ละหน้าจอ */
+            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(1)::before { content: "ห้องเรียน:"; font-weight: bold; color: #1e3a8a; }
+            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(2)::before { content: "ครูที่ปรึกษา:"; font-weight: bold; color: #64748b; }
+            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(3)::before { content: "สถานะวันนี้:"; font-weight: bold; color: #64748b; }
+            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(4)::before { content: "เหตุผล:"; font-weight: bold; color: #64748b; }
+            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(5)::before { content: "เวลาบันทึก:"; font-weight: bold; color: #64748b; }
+            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(6)::before { content: "ผู้ตรวจ:"; font-weight: bold; color: #64748b; }
+
+            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(1)::before { content: "ห้องเรียน:"; font-weight: bold; color: #1e3a8a; }
+            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(2)::before { content: "ครูที่ปรึกษา:"; font-weight: bold; color: #64748b; }
+            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(3)::before { content: "เช็คสถานะ:"; font-weight: bold; color: #64748b; }
+            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(4)::before { content: "ระบุสาเหตุ:"; font-weight: bold; color: #64748b; }
             
             #statsTableBody tr td:nth-child(1)::before { content: "ระดับชั้น:"; font-weight: bold; color: #1e3a8a; }
             #statsTableBody tr td:nth-child(2)::before { content: "ชื่อ-สกุล:"; font-weight: bold; color: #64748b; }
@@ -146,12 +141,20 @@
             #statsTableBody tr td:nth-child(4)::before { content: "รวมลงแถว:"; font-weight: bold; color: #64748b; }
             #statsTableBody tr td:nth-child(5)::before { content: "รวมไม่ลงแถว:"; font-weight: bold; color: #64748b; }
 
-            /* ยืดความกว้างช่องเลือกข้อมูลในการ์ดให้กดง่ายขึ้น */
+            /* ขยายความกว้างตัวเลือกให้กดง่ายขึ้น */
             table tbody tr td select, 
             table tbody tr td input,
             table tbody tr td .flex {
-                width: 65% !important;
-                max-width: 65% !important;
+                width: 60% !important;
+                max-width: 60% !important;
+                text-align: left !important;
+            }
+            
+            /* หน้าต่างแสดงข้อความ "กรุณาเลือกระดับชั้น" ให้คงความกว้างเต็มตารางแบบเดิม */
+            td[colspan] {
+                display: table-cell !important;
+                text-align: center !important;
+                width: 100% !important;
             }
         }
     </style>
