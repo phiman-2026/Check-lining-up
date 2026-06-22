@@ -98,7 +98,7 @@
                 border: 1px solid #e2e8f0 !important;
                 border-radius: 16px !important;
                 margin-bottom: 16px !important;
-                padding: 16px !important;
+                padding: 14px !important;
                 box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05) !important;
                 width: 100% !important; /* สั่งให้ตัวการ์ดยืดเต็มหน้าจอ */
                 box-sizing: border-box !important;
@@ -111,7 +111,7 @@
                 display: flex !important;
                 justify-content: space-between !important;
                 align-items: center !important;
-                padding: 10px 0 !important; /* ปรับช่องไฟให้อ่านง่ายขึ้น */
+                padding: 8px 0 !important; /* ปรับลดพื้นที่ Padding ภายในการ์ดให้อ่านง่ายและประหยัดพื้นที่บนจอสัมผัส */
                 border-bottom: 1px dashed #f1f5f9 !important;
                 width: 100% !important;
                 white-space: normal !important;
@@ -297,7 +297,7 @@
                                     <th class="p-3.5 text-center w-24">เวลาบันทึก</th>
                                     <th class="p-3.5">ผู้บันทึกตรวจ</th>
                                 </tr>
-                            </thead>
+                            </pre>
                             <tbody id="dashboardTableBody" class="divide-y divide-slate-100">
                                 <tr>
                                     <td colspan="6" class="p-10 text-center text-slate-400 bg-slate-50/40">
@@ -368,8 +368,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        
-                        <div id="submitBtnArea" class="flex justify-end pt-1 hidden">
+                      <div id="submitBtnArea" class="flex justify-end pt-1 hidden">
                             <button type="submit" id="submitAttendanceBtn" class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-medium px-6 py-2.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
                                 <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล
                             </button>
@@ -463,7 +462,7 @@
 
     </main>
 
-    <footer class="bg-blue-950 text-blue-300/60 border-t border-blue-900/40 py-4.5 mt-8">
+    <footer class="bg-blue-950 text-blue-300/60 border-t border-blue-900/40 py-4.5 mt-8 md:block hidden">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs space-y-1">
             <p class="font-light">© 2026 งานสารบรรณ โรงเรียนพิมานพิทยาสรรค์</p>
         </div>
@@ -472,6 +471,7 @@
     <!-- CONTROL JAVASCRIPT EXECUTIONS -->
  <script>
         // ⚠️ ลิงก์ Web App URL ตัวเดิมของคุณอัฟฟาน (คงเดิมไม่เปลี่ยนแปลง)
+      // URL ของ Web App ตัวเดิมที่คุณอัฟฟานใช้งาน (คงเดิม 100%)
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzy3H3uljjyxiC1GSKM7PIYCs8sOR27LjaNdQiSKW3PvUTcxS5ptFsArMpjwHgNP9v7/exec";
         
         let classList = [];
@@ -483,9 +483,8 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             setTodayDateInput();
-            // ตั้งค่าวันที่เริ่มต้นสำหรับช่องแก้ไขข้อมูลย้อนหลังให้เป็นวันปัจจุบัน
             setTodayEditDateInput();
-            fetchInitialConfig();
+            fetchInitialConfig(); // โหลดข้อมูลเบื้องหลังทันทีโดยไม่แสดงหน้าจอ Loading บล็อกผู้ใช้งาน
 
             const pinInput = document.getElementById('pinInput');
             if (pinInput) {
@@ -514,7 +513,6 @@
             if (el) el.value = `${yyyy}-${mm}-${dd}`;
         }
 
-        // ตั้งค่าเริ่มต้นของวันที่สำหรับการแก้ไขข้อมูลย้อนหลัง
         function setTodayEditDateInput() {
             const editDateInp = document.getElementById('editDateInput');
             if (editDateInp) {
@@ -524,6 +522,95 @@
                 const dd = String(today.getDate()).padStart(2, '0');
                 editDateInp.value = `${yyyy}-${mm}-${dd}`;
             }
+        }
+
+        function fetchInitialConfig() {
+            // เอา showLoading(true) ออก เพื่อให้เปิดเว็บครั้งแรกแสดงหน้าจอระบบทันที ไม่ติดหน้าจอหมุนค้าง
+            fetch(`${WEB_APP_URL}?action=getInitialData`)
+                .then(res => res.json())
+                .then(data => {
+                    classList = data.classList || [];
+                    checkedLevels = data.checkedLevels || [];
+                    renderDropdowns();
+                })
+                .catch(err => {
+                    Swal.fire({
+                        title: 'เกิดข้อผิดพลาด',
+                        text: 'โหลดโครงสร้างชั้นล้มเหลว: ' + err,
+                        icon: 'error',
+                        confirmButtonColor: '#1e1b4b'
+                    });
+                });
+        }
+
+        function handleLogin() {
+            const pinInput = document.getElementById('pinInput');
+            const pin = pinInput ? pinInput.value : '';
+            if (!pin) { 
+                Swal.fire({
+                    title: 'แจ้งเตือน',
+                    text: 'กรุณาใส่รหัส PIN ก่อนค่ะ',
+                    icon: 'warning',
+                    confirmButtonColor: '#1e1b4b'
+                });
+                return; 
+            }
+            
+            // เริ่มแสดงหน้าจอหมุนโหลด (Loading) เฉพาะหลังจากกดปุ่มล็อกอินแล้วเท่านั้นเพื่อความรวดเร็ว
+            showLoading(true); 
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'checkPassword', password: pin })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    currentRecorder = res.fullName;
+                    userAssignedClass = res.assignedClass || 'ALL'; 
+
+                    const classBadge = userAssignedClass === 'ALL' ? 'Admin ส่วนกลาง' : `หัวหน้าระดับ ${userAssignedClass}`;
+                    document.getElementById('userStatus').innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="font-medium">ผู้ตรวจ: ${currentRecorder} (${classBadge})</span>`;
+                    
+                    document.getElementById('logoutBtn').classList.remove('hidden');
+                    document.getElementById('loginSection').classList.add('hidden'); 
+                    document.getElementById('protectedContent').classList.remove('hidden'); 
+                    
+                    renderDropdowns();
+                    switchTab('check-tab'); 
+
+                    if (userAssignedClass !== 'ALL') {
+                        if (checkedLevels.includes(userAssignedClass)) {
+                            const checkSelect = document.getElementById('checkClassSelect');
+                            if (checkSelect) checkSelect.value = "";
+                            const tbody = document.getElementById('attendanceTableBody');
+                            // ปรับแต่งข้อความแจ้งเตือนเมื่อเช็คชื่อแล้วให้กระชับและแสดงผลสวยงามบนสมาร์ตโฟน
+                            if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="p-4 sm:p-8 text-center text-amber-600 font-medium bg-amber-50/50 border border-dashed border-amber-200 rounded-xl text-xs sm:text-sm"><i class="fa-solid fa-circle-check block text-2xl sm:text-3xl mb-1.5 text-amber-500"></i> ระดับชั้นเรียนนี้ได้รับการเช็คชื่อเรียบร้อยแล้วค่ะ<br><span class="text-[10px] sm:text-xs text-slate-500 font-normal block mt-1">หากต้องการแก้ไข กรุณาเปิด "โหมดแก้ไขข้อมูลเดิม" ด้านบนนะคะ</span></td></tr>`;
+                            const submitArea = document.getElementById('submitBtnArea');
+                            if (submitArea) submitArea.classList.add('hidden');
+                        } else {
+                            const checkSelect = document.getElementById('checkClassSelect');
+                            if (checkSelect) checkSelect.value = userAssignedClass;
+                            loadAttendanceForm(); 
+                        }
+                    }
+                } else { 
+                    Swal.fire({
+                        title: 'เข้าสู่ระบบล้มเหลว',
+                        text: res.msg || 'รหัส PIN ไม่ถูกต้อง',
+                        icon: 'error',
+                        confirmButtonColor: '#1e1b4b'
+                    });
+                }
+            })
+            .catch(err => {
+                Swal.fire({
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'ขัดข้องการเชื่อมต่อระบบ: ' + err,
+                    icon: 'error',
+                    confirmButtonColor: '#1e1b4b'
+                });
+            })
+            .finally(() => showLoading(false));
         }
 
         function checkAuthAndSwitchTab(tabId) {
@@ -556,7 +643,7 @@
             }
 
             if (tabId === 'stats-tab') loadAttendanceStats();
-            if (tabId === 'dashboard-tab') loadDailySummary(); // โหลดสรุปเมื่อเปิดหน้า Dashboard
+            if (tabId === 'dashboard-tab') loadDailySummary(); 
         }
 
         function closeModal() {
@@ -565,26 +652,6 @@
                 modal.classList.remove('flex');
                 modal.classList.add('hidden');
             }
-        }
-
-        function fetchInitialConfig() {
-            showLoading(true);
-            fetch(`${WEB_APP_URL}?action=getInitialData`)
-                .then(res => res.json())
-                .then(data => {
-                    classList = data.classList || [];
-                    checkedLevels = data.checkedLevels || [];
-                    renderDropdowns();
-                })
-                .catch(err => {
-                    Swal.fire({
-                        title: 'เกิดข้อผิดพลาด',
-                        text: 'โหลดโครงสร้างชั้นล้มเหลว: ' + err,
-                        icon: 'error',
-                        confirmButtonColor: '#1e1b4b'
-                    });
-                })
-                .finally(() => showLoading(false));
         }
 
         function renderDropdowns() {
@@ -612,7 +679,7 @@
 
                 if (checkSelect) {
                     if (!isEditMode && checkedLevels.includes(cls)) {
-                        // ไม่เพิ่มลงใน checkSelect เพื่อป้องกันการกดเช็คซ้ำประจำวัน
+                        // ไม่ระบุซ้ำ
                     } else {
                         checkSelect.appendChild(createOptionElement(cls, cls));
                     }
@@ -628,7 +695,7 @@
                     if (checkSelect) checkSelect.value = "";
                     const tbody = document.getElementById('attendanceTableBody');
                     if (tbody) {
-                        tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-amber-600 font-medium bg-amber-50/50 border border-dashed border-amber-200 rounded-xl"><i class="fa-solid fa-circle-check block text-3xl mb-2 text-amber-500"></i> ระดับชั้นเรียนนี้ได้รับการเช็คชื่อประจำวันเรียบร้อยแล้วค่ะ<br><span class="text-xs text-slate-500 font-normal block mt-1">หากต้องการปรับปรุงข้อมูล กรุณากดเปิด "โหมดแก้ไขข้อมูลเดิม" ด้านบนนะคะ</span></td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="4" class="p-4 sm:p-8 text-center text-amber-600 font-medium bg-amber-50/50 border border-dashed border-amber-200 rounded-xl text-xs sm:text-sm"><i class="fa-solid fa-circle-check block text-2xl sm:text-3xl mb-1.5 text-amber-500"></i> ระดับชั้นเรียนนี้ได้รับการเช็คชื่อเรียบร้อยแล้วค่ะ<br><span class="text-[10px] sm:text-xs text-slate-500 font-normal block mt-1">หากต้องการแก้ไข กรุณาเปิด "โหมดแก้ไขข้อมูลเดิม" ด้านบนนะคะ</span></td></tr>`;
                     }
                     const submitArea = document.getElementById('submitBtnArea');
                     if (submitArea) submitArea.classList.add('hidden');
@@ -655,11 +722,11 @@
             const editDateWrapper = document.getElementById('editDateWrapper');
 
             if (isEditMode) {
-                if (btn) btn.className = "bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-100 transition flex items-center gap-1.5 cursor-pointer";
-                if (text) text.innerText = "เปลี่ยนเป็นโหมดเช็คปกติ (ซ่อนรายการเช็คแล้ว)";
+                if (btn) btn.className = "bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium px-2.5 py-1.5 rounded-lg text-xs hover:bg-emerald-100 transition flex items-center gap-1.5 cursor-pointer shadow-2xs";
+                if (text) text.innerText = "โหมดเช็คปกติ (ซ่อนรายการเช็คแล้ว)";
                 if (editDateWrapper) editDateWrapper.classList.remove('hidden');
             } else {
-                if (btn) btn.className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
+                if (btn) btn.className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-2.5 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer shadow-2xs";
                 if (text) text.innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
                 if (editDateWrapper) editDateWrapper.classList.add('hidden');
                 setTodayEditDateInput();
@@ -667,7 +734,7 @@
             
             const checkSelect = document.getElementById('checkClassSelect');
             if (checkSelect) checkSelect.value = "";
-            if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
+            if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 text-xs sm:text-sm"><i class="fa-solid fa-layer-group block text-xl mb-1.5"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
             const submitArea = document.getElementById('submitBtnArea');
             if (submitArea) submitArea.classList.add('hidden');
             renderDropdowns();
@@ -688,83 +755,15 @@
             renderDropdowns();
         }
 
-        function handleLogin() {
-            const pinInput = document.getElementById('pinInput');
-            const pin = pinInput ? pinInput.value : '';
-            if (!pin) { 
-                Swal.fire({
-                    title: 'แจ้งเตือน',
-                    text: 'กรุณาใส่รหัส PIN ก่อนค่ะ',
-                    icon: 'warning',
-                    confirmButtonColor: '#1e1b4b'
-                });
-                return; 
-            }
-            showLoading(true);
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'checkPassword', password: pin })
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) {
-                    currentRecorder = res.fullName;
-                    userAssignedClass = res.assignedClass || 'ALL'; 
-
-                    const classBadge = userAssignedClass === 'ALL' ? 'Admin ส่วนกลาง' : `หัวหน้าระดับ ${userAssignedClass}`;
-                    document.getElementById('userStatus').innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="font-medium">ผู้ตรวจ: ${currentRecorder} (${classBadge})</span>`;
-                    
-                    document.getElementById('logoutBtn').classList.remove('hidden');
-                    document.getElementById('loginSection').classList.add('hidden'); 
-                    document.getElementById('protectedContent').classList.remove('hidden'); 
-                    
-                    renderDropdowns();
-                    switchTab('check-tab'); // ย้ายไปหน้าต่างเช็คชื่อทันที
-
-                    if (userAssignedClass !== 'ALL') {
-                        if (checkedLevels.includes(userAssignedClass)) {
-                            const checkSelect = document.getElementById('checkClassSelect');
-                            if (checkSelect) checkSelect.value = "";
-                            const tbody = document.getElementById('attendanceTableBody');
-                            if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-amber-600 font-medium bg-amber-50/50 border border-dashed border-amber-200 rounded-xl"><i class="fa-solid fa-circle-check block text-3xl mb-2 text-amber-500"></i> ระดับชั้นเรียนนี้ได้รับการเช็คชื่อประจำวันเรียบร้อยแล้วค่ะ<br><span class="text-xs text-slate-500 font-normal block mt-1">หากต้องการปรับปรุงข้อมูล กรุณากดเปิด "โหมดแก้ไขข้อมูลเดิม" ด้านบนนะคะ</span></td></tr>`;
-                            const submitArea = document.getElementById('submitBtnArea');
-                            if (submitArea) submitArea.classList.add('hidden');
-                        } else {
-                            const checkSelect = document.getElementById('checkClassSelect');
-                            if (checkSelect) checkSelect.value = userAssignedClass;
-                            loadAttendanceForm(); // โหลดฟอร์มเช็คชื่อของระดับชั้นตนเอง
-                        }
-                    }
-                } else { 
-                    Swal.fire({
-                        title: 'เข้าสู่ระบบล้มเหลว',
-                        text: res.msg || 'รหัส PIN ไม่ถูกต้อง',
-                        icon: 'error',
-                        confirmButtonColor: '#1e1b4b'
-                    });
-                }
-            })
-            .catch(err => {
-                Swal.fire({
-                    title: 'เกิดข้อผิดพลาด',
-                    text: 'ขัดข้องการเชื่อมต่อระบบ: ' + err,
-                    icon: 'error',
-                    confirmButtonColor: '#1e1b4b'
-                });
-            })
-            .finally(() => showLoading(false));
-        }
-
-        // ปรับปรุงให้ยืดหยุ่น โดยสามารถส่งชื่อระดับชั้นเข้ามาได้โดยตรง
+        // 1. ส่วนควบคุมตารางหน้าแดชบอร์ด (ปรับสไตล์ตารางและขนาด Badge เพื่อมือถือโดยเฉพาะ)
         function loadDailySummary() {
             const dbSelect = document.getElementById('dbClassSelect');
-            // หากค่าในหน้าแดชบอร์ดไม่มี ให้ใช้ระดับชั้นของผู้ใช้งานแทนชั่วคราวเพื่อป้องกัน Error
             const selectedClass = dbSelect ? dbSelect.value : (userAssignedClass !== 'ALL' ? userAssignedClass : '');
             const tbody = document.getElementById('dashboardTableBody');
             if (!tbody) return;
 
             if (!selectedClass) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400"><i class="fa-solid fa-arrow-pointer block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs sm:text-sm"><i class="fa-solid fa-arrow-pointer block text-xl mb-1.5"></i> กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</td></tr>`;
                 return;
             }
 
@@ -774,7 +773,7 @@
                 .then(data => {
                     tbody.innerHTML = '';
                     if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">ไม่พบตารางรายห้องเรียน</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-xs sm:text-sm">ไม่พบตารางรายห้องเรียน</td></tr>`;
                         return;
                     }
                     data.forEach(item => {
@@ -783,23 +782,25 @@
                         else if (item.status === "ไม่ลงแถว") statusColor = "text-rose-700 bg-rose-50 border border-rose-200";
 
                         const tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-50/80 transition-colors";
                         tr.innerHTML = `
-                            <td class="p-3 text-center font-bold text-slate-900">${item.className}</td>
-                            <td class="p-3 font-medium text-slate-700">${item.teacherName}</td>
-                            <td class="p-3 text-center"><span class="px-2.5 py-1 rounded-md text-xs font-semibold ${statusColor}">${item.status}</span></td>
-                            <td class="p-3 text-slate-600">${item.reason}</td>
-                            <td class="p-3 text-center text-xs font-mono text-slate-500">${item.time}</td>
-                            <td class="p-3 text-slate-600 text-xs">${item.recorder}</td>
+                            <td class="p-2.5 text-center font-bold text-slate-900 text-xs sm:text-sm">${item.className}</td>
+                            <td class="p-2.5 font-medium text-slate-700 text-xs sm:text-sm max-w-[120px] truncate">${item.teacherName}</td>
+                            <td class="p-2.5 text-center"><span class="px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-bold ${statusColor}">${item.status}</span></td>
+                            <td class="p-2.5 text-slate-600 text-xs sm:text-sm min-w-[90px] whitespace-normal break-words">${item.reason}</td>
+                            <td class="p-2.5 text-center text-[10px] font-mono text-slate-400">${item.time}</td>
+                            <td class="p-2.5 text-slate-500 text-[10px] max-w-[100px] truncate">${item.recorder}</td>
                         `;
                         tbody.appendChild(tr);
                     });
                 })
                 .catch(err => {
-                    tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-rose-500 text-xs sm:text-sm">ผิดพลาด: ${err}</td></tr>`;
                 })
                 .finally(() => showLoading(false));
         }
 
+        // 2. ส่วนฟอร์มเช็คเวลาแถว (ปรับปุ่ม Radio และกล่องเลือกเหตุผลให้กดง่ายขึ้นในจอสัมผัส)
         function loadAttendanceForm() {
             const checkSelect = document.getElementById('checkClassSelect');
             const selectedClass = checkSelect ? checkSelect.value : '';
@@ -811,7 +812,7 @@
             const targetDate = editDateInp ? editDateInp.value : '';
 
             if (!selectedClass) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 text-xs sm:text-sm"><i class="fa-solid fa-layer-group block text-xl mb-1.5"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
                 if (submitArea) submitArea.classList.add('hidden');
                 return;
             }
@@ -822,7 +823,7 @@
                 .then(data => {
                     tbody.innerHTML = '';
                     if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">ไม่พบข้อมูลรายชื่อค่ะ</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="4" class="p-5 text-center text-slate-400 text-xs sm:text-sm">ไม่พบข้อมูลรายชื่อค่ะ</td></tr>`;
                         if (submitArea) submitArea.classList.add('hidden');
                         return;
                     }
@@ -830,25 +831,26 @@
                     data.forEach((item, index) => {
                         const isAbsent = item.existingStatus === "ไม่ลงแถว";
                         const tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-50/60 border-b border-slate-100";
                         tr.innerHTML = `
-                            <td class="p-3 text-center font-bold text-slate-900">
+                            <td class="p-2.5 text-center font-bold text-slate-900 text-xs sm:text-sm">
                                 ${item.className}
                                 <input type="hidden" name="class_${index}" value="${item.className}">
                                 <input type="hidden" name="teacher_${index}" value="${item.teacherName}">
                             </td>
-                            <td class="p-3 font-medium text-slate-700">${item.teacherName}</td>
-                            <td class="p-3">
-                                <div class="flex items-center gap-4 justify-center">
-                                    <label class="flex items-center gap-1.5 cursor-pointer text-emerald-700 font-medium">
-                                        <input type="radio" name="status_${index}" value="ปฏิบัติหน้าที่" ${!isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, false)"> ปฏิบัติหน้าที่
+                            <td class="p-2.5 font-semibold text-slate-700 text-xs sm:text-sm whitespace-normal leading-tight">${item.teacherName}</td>
+                            <td class="p-2.5">
+                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-4 justify-center">
+                                    <label class="flex items-center gap-1.5 cursor-pointer text-emerald-700 font-bold text-[11px] sm:text-xs bg-emerald-50/50 sm:bg-transparent px-2 py-1 rounded-md sm:p-0 w-full sm:w-auto">
+                                        <input type="radio" name="status_${index}" value="ปฏิบัติหน้าที่" ${!isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, false)" class="accent-emerald-600"> ทำหน้าที่
                                     </label>
-                                    <label class="flex items-center gap-1.5 cursor-pointer text-rose-700 font-medium">
-                                        <input type="radio" name="status_${index}" value="ไม่ลงแถว" ${isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, true)"> ไม่ลงแถว
+                                    <label class="flex items-center gap-1.5 cursor-pointer text-rose-700 font-bold text-[11px] sm:text-xs bg-rose-50/50 sm:bg-transparent px-2 py-1 rounded-md sm:p-0 w-full sm:w-auto">
+                                        <input type="radio" name="status_${index}" value="ไม่ลงแถว" ${isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, true)" class="accent-rose-600"> ไม่ลงแถว
                                     </label>
                                 </div>
                             </td>
-                            <td class="p-3">
-                                <select id="reason_${index}" ${!isAbsent ? 'disabled' : ''} class="w-full ${!isAbsent ? 'bg-slate-100 opacity-50' : 'bg-white'} border border-slate-300 rounded-md px-2 py-1 text-xs focus:bg-white outline-hidden">
+                            <td class="p-2.5">
+                                <select id="reason_${index}" ${!isAbsent ? 'disabled' : ''} class="w-full ${!isAbsent ? 'bg-slate-100 opacity-40' : 'bg-white border-rose-300 text-rose-900'} border border-slate-300 rounded-lg px-1.5 py-1 text-[11px] sm:text-xs transition-all outline-hidden focus:border-indigo-500">
                                     <option value="ลาป่วย" ${item.existingReason === 'ลาป่วย' ? 'selected' : ''}>ลาป่วย</option>
                                     <option value="ลากิจ" ${item.existingReason === 'ลากิจ' ? 'selected' : ''}>ลากิจ</option>
                                     <option value="สาย" ${item.existingReason === 'สาย' ? 'selected' : ''}>มาสาย</option>
@@ -876,10 +878,10 @@
             if (select) {
                 if (show) {
                     select.removeAttribute('disabled');
-                    select.className = "w-full bg-white border border-slate-300 rounded-md px-2 py-1 text-xs outline-hidden";
+                    select.className = "w-full bg-white border border-rose-300 text-rose-900 rounded-lg px-1.5 py-1 text-[11px] sm:text-xs outline-hidden transition-all";
                 } else {
                     select.setAttribute('disabled', 'true');
-                    select.className = "w-full bg-slate-100 border border-slate-300 rounded-md px-2 py-1 text-xs opacity-50 outline-hidden";
+                    select.className = "w-full bg-slate-100 border border-slate-300 text-slate-400 rounded-lg px-1.5 py-1 text-[11px] sm:text-xs opacity-40 outline-hidden transition-all";
                 }
             }
         }
@@ -893,7 +895,7 @@
             if (submitBtn) {
                 originalBtnHtml = submitBtn.innerHTML;
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> กำลังบันทึกข้อมูล...`;
+                submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> บันทึกข้อมูล...`;
             }
 
             const tbody = document.getElementById('attendanceTableBody');
@@ -952,7 +954,7 @@
 
                     const checkSelect = document.getElementById('checkClassSelect');
                     if (checkSelect) checkSelect.value = "";
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400"><i class="fa-solid fa-layer-group block text-2xl mb-2"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 text-xs sm:text-sm"><i class="fa-solid fa-layer-group block text-xl mb-1.5"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
                     const submitArea = document.getElementById('submitBtnArea');
                     if (submitArea) submitArea.classList.add('hidden');
                     
@@ -995,44 +997,45 @@
             const monthlyBtn = document.getElementById('rangeMonthlyBtn');
 
             if (rangeType === 'weekly') {
-                if (weeklyBtn) weeklyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition cursor-pointer";
-                if (monthlyBtn) monthlyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer";
+                if (weeklyBtn) weeklyBtn.className = "px-3 py-1 text-xs font-bold rounded-md bg-white text-indigo-900 shadow-sm transition cursor-pointer";
+                if (monthlyBtn) monthlyBtn.className = "px-3 py-1 text-xs font-medium rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer";
             } else {
-                if (monthlyBtn) monthlyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md bg-white text-indigo-900 shadow-sm transition cursor-pointer";
-                if (weeklyBtn) weeklyBtn.className = "px-3 py-1 text-xs font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer";
+                if (monthlyBtn) monthlyBtn.className = "px-3 py-1 text-xs font-bold rounded-md bg-white text-indigo-900 shadow-sm transition cursor-pointer";
+                if (weeklyBtn) weeklyBtn.className = "px-3 py-1 text-xs font-medium rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer";
             }
             loadAttendanceStats(); 
         }
 
+        // 3. ส่วนสถิติสะสม (ปรับ Layout ของแถวตารางให้อ่านง่ายขึ้น ไม่ดันความกว้างหลุดหน้าจอมือถือ)
         function loadAttendanceStats() {
             const statsSelect = document.getElementById('statsClassSelect');
             const levelFilter = statsSelect ? statsSelect.value : '';
             const tbody = document.getElementById('statsTableBody');
             if (!tbody) return;
-            tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500"><i class="fa-solid fa-spinner animate-spin mr-2"></i>กำลังสรุปสถิติ...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500 text-xs sm:text-sm"><i class="fa-solid fa-spinner animate-spin mr-1.5"></i>กำลังสรุปสถิติ...</td></tr>`;
 
             fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}&rangeType=${currentStatsRangeType}`)
                 .then(res => res.json())
                 .then(data => {
                     tbody.innerHTML = '';
                     if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">ยังไม่มีข้อมูลในระบบสะสมค่ะ</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 text-xs sm:text-sm">ยังไม่มีข้อมูลในระบบสะสมค่ะ</td></tr>`;
                         return;
                     }
                     data.forEach(item => {
                         const tr = document.createElement('tr');
-                        tr.className = "hover:bg-slate-50 text-center";
+                        tr.className = "hover:bg-slate-50 text-center border-b border-slate-100";
                         tr.innerHTML = `
-                            <td class="p-3 font-bold text-slate-900">${item.className}</td>
-                            <td class="p-3 text-left font-medium text-slate-700">${item.teacherName}</td>
-                            <td class="p-3 bg-slate-100/80 font-mono font-bold text-slate-800">${item.total}</td>
-                            <td class="p-3 text-emerald-700 bg-emerald-50/20 font-semibold">${item.present}</td>
-                            <td class="p-3 text-rose-700 bg-rose-50/20 font-semibold">${item.absent}</td>
+                            <td class="p-2.5 font-bold text-slate-900 text-xs sm:text-sm">${item.className}</td>
+                            <td class="p-2.5 text-left font-semibold text-slate-700 text-xs sm:text-sm max-w-[130px] truncate">${item.teacherName}</td>
+                            <td class="p-2.5 bg-slate-50 font-mono font-bold text-slate-800 text-xs sm:text-sm">${item.total}</td>
+                            <td class="p-2.5 text-emerald-700 bg-emerald-50/30 font-bold text-xs sm:text-sm">${item.present}</td>
+                            <td class="p-2.5 text-rose-700 bg-rose-50/30 font-bold text-xs sm:text-sm">${item.absent}</td>
                         `;
                         tbody.appendChild(tr);
                     });
                 })
-                .catch(err => tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-500">ผิดพลาด: ${err}</td></tr>`);
+                .catch(err => tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-500 text-xs sm:text-sm">ผิดพลาด: ${err}</td></tr>`);
         }
 
         function loadMonthlyStats() {
