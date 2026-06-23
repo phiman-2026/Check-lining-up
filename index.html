@@ -408,6 +408,90 @@ td[colspan]{
 }
 
 }
+
+/* ==========================================================================
+   📱 MOBILE APP STYLE OPTIMIZATION BY AFFAN (PS-SARABUN)
+   ========================================================================== */
+
+/* 1. จัดการขนาดแบนเนอร์ให้กะทัดรัดขึ้นในหน้าจอมือถือ ไม่กินพื้นที่ */
+@media (max-width: 768px) {
+    /* สมมติว่าแบนเนอร์ใช้คลาสหรือแท็กหัวข้อหลัก */
+    .banner-container, 
+    header, 
+    div[class*="bg-indigo-950"] .max-w-7xl {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+    
+    .banner-title,
+    h1 {
+        font-size: 1.35rem !important;
+        line-height: 1.75rem !important;
+    }
+    
+    /* 2. เปลี่ยนโครงสร้างตาราง (Table) ให้กลายร่างเป็นระบบการ์ดอิสระบนมือถือ */
+    #attendanceTableBody {
+        display: block !important;
+        background: transparent !important;
+    }
+
+    #attendanceTableBody tr {
+        display: block !important;
+        margin-bottom: 1.25rem !important;
+        background-color: #ffffff !important;
+        border: 2px solid #e2e8f0 !important;
+        border-radius: 1.25rem !important;
+        padding: 1.25rem !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05) !important;
+        transition: all 0.2s ease-in-out;
+    }
+
+    /* ปรับแต่งเมื่อมีการกดยกเว้นการลงแถว (ให้การ์ดเปลี่ยนสีขอบเด่นชัดขึ้น) */
+    #attendanceTableBody tr:has(input[value="ไม่ลงแถว"]:checked) {
+        border-color: #fca5a5 !important;
+        background-color: #ffff8f32 !important;
+    }
+
+    /* สั่งซ่อนหัวตาราง (Thead) เดิมในโหมดมือถือ เพราะใช้ระบบการ์ดระบุหัวข้อชัดเจนอยู่แล้ว */
+    #attendanceTableBody:parent table thead,
+    table:has(#attendanceTableBody) thead {
+        display: none !important;
+    }
+
+    /* ทำลายคุณสมบัติเซลล์ของตาราง ให้แสดงผลบล็อกแบบอิสระ */
+    #attendanceTableBody td {
+        display: block !important;
+        padding: 0 !important;
+        width: 100% !important;
+        border: none !important;
+        text-align: left !important;
+    }
+
+    /* เพิ่มขนาดตัวหนังสือและสีสไตล์แอปพลิเคชันให้ครูที่ปรึกษา */
+    #attendanceTableBody td:nth-child(2) {
+        font-size: 1.1rem !important;
+        color: #0f172a !important; /* สีกระดานชนวนเข้ม ชัดเจนมาก */
+        font-weight: 800 !important;
+        margin-bottom: 0.75rem !important;
+    }
+}
+
+/* 3. สไตล์เพิ่มเติมสำหรับการควบคุมปุ่มวิทยุ (Radio) และ Dropdown กล่องข้อความให้กดง่ายในมือถือ */
+input[type="radio"] {
+    cursor: pointer;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.25rem;
+}
 </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased bg-slate-100">
@@ -597,26 +681,26 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
 
                     <form id="attendanceForm" onsubmit="submitAttendance(event)" class="space-y-5">
                         <div class="overflow-hidden rounded-xl border border-blue-50 shadow-2xs">
-                            <table class="w-full text-left border-collapse text-xs sm:text-sm whitespace-nowrap">
-                                <thead>
-                                    <tr class="bg-blue-50/40 border-b border-blue-100 text-blue-900 font-semibold">
-                                        <th class="p-3.5 text-center w-24">ห้องเรียน</th>
-                                        <th class="p-3.5">ชื่อครูที่ปรึกษา (ร่วม)</th>
-                                        <th class="p-3.5 text-center w-64">สถานะการลงแถว</th>
-                                        <th class="p-3.5 w-60">ระบุสาเหตุ (กรณีไม่ลงแถว)</th>
-                                    </tr>
-                                </thead>
-                               <tbody id="attendanceTableBody">
-                                    <tr>
-                                        <td colspan="4" class="p-10 text-center text-slate-400 bg-slate-50/40">
-                                            <div class="max-w-xs mx-auto">
-                                                <i class="fa-solid fa-layer-group block text-2xl text-blue-300 mb-2"></i> 
-                                                <span class="text-xs font-medium text-slate-500">กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                          <table class="w-full text-left border-collapse text-xs sm:text-sm md:whitespace-nowrap">
+    <thead>
+        <tr class="bg-blue-50/40 border-b border-blue-100 text-blue-900 font-semibold">
+            <th class="p-3.5 text-center w-24">ห้องเรียน</th>
+            <th class="p-3.5">ชื่อครูที่ปรึกษา (ร่วม)</th>
+            <th class="p-3.5 text-center w-64">สถานะการลงแถว</th>
+            <th class="p-3.5 w-60">ระบุสาเหตุ (กรณีไม่ลงแถว)</th>
+        </tr>
+    </thead>
+    <tbody id="attendanceTableBody">
+        <tr>
+            <td colspan="4" class="p-10 text-center text-slate-400 bg-slate-50/40">
+                <div class="max-w-xs mx-auto">
+                    <i class="fa-solid fa-layer-group block text-2xl text-blue-300 mb-2"></i> 
+                    <span class="text-xs font-medium text-slate-500">กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</span>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
                         </div>
                       <div id="submitBtnArea" class="flex justify-end pt-1 hidden">
                             <button type="submit" id="submitAttendanceBtn" class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-medium px-6 py-2.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
@@ -720,8 +804,8 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
 
     <!-- CONTROL JAVASCRIPT EXECUTIONS -->
  <script>
-        // ⚠️ ลิงก์ Web App URL ตัวเดิมของคุณอัฟฟาน (คงเดิมไม่เปลี่ยนแปลง)
-      // URL ของ Web App ตัวเดิมที่คุณอัฟฟานใช้งาน (คงเดิม 100%)
+       // ⚠️ ลิงก์ Web App URL ตัวเดิมของคุณอัฟฟาน (คงเดิมไม่เปลี่ยนแปลง)
+        // URL ของ Web App ตัวเดิมที่คุณอัฟฟานใช้งาน (คงเดิม 100%)
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzy3H3uljjyxiC1GSKM7PIYCs8sOR27LjaNdQiSKW3PvUTcxS5ptFsArMpjwHgNP9v7/exec";
         
         let classList = [];
@@ -775,7 +859,6 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
         }
 
         function fetchInitialConfig() {
-            // เอา showLoading(true) ออก เพื่อให้เปิดเว็บครั้งแรกแสดงหน้าจอระบบทันที ไม่ติดหน้าจอหมุนค้าง
             fetch(`${WEB_APP_URL}?action=getInitialData`)
                 .then(res => res.json())
                 .then(data => {
@@ -806,7 +889,6 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
                 return; 
             }
             
-            // เริ่มแสดงหน้าจอหมุนโหลด (Loading) เฉพาะหลังจากกดปุ่มล็อกอินแล้วเท่านั้นเพื่อความรวดเร็ว
             showLoading(true); 
             fetch(WEB_APP_URL, {
                 method: 'POST',
@@ -833,7 +915,6 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
                             const checkSelect = document.getElementById('checkClassSelect');
                             if (checkSelect) checkSelect.value = "";
                             const tbody = document.getElementById('attendanceTableBody');
-                            // ปรับแต่งข้อความแจ้งเตือนเมื่อเช็คชื่อแล้วให้กระชับและแสดงผลสวยงามบนสมาร์ตโฟน
                             if (tbody) tbody.innerHTML = `<tr><td colspan="4" class="p-4 sm:p-8 text-center text-amber-600 font-medium bg-amber-50/50 border border-dashed border-amber-200 rounded-xl text-xs sm:text-sm"><i class="fa-solid fa-circle-check block text-2xl sm:text-3xl mb-1.5 text-amber-500"></i> ระดับชั้นเรียนนี้ได้รับการเช็คชื่อเรียบร้อยแล้วค่ะ<br><span class="text-[10px] sm:text-xs text-slate-500 font-normal block mt-1">หากต้องการแก้ไข กรุณาเปิด "โหมดแก้ไขข้อมูลเดิม" ด้านบนนะคะ</span></td></tr>`;
                             const submitArea = document.getElementById('submitBtnArea');
                             if (submitArea) submitArea.classList.add('hidden');
@@ -1005,313 +1086,228 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
             renderDropdowns();
         }
 
-      // 1. ส่วนควบคุมตารางหน้าแดชบอร์ด (ปรับสไตล์ตารางและขนาด Badge เพื่อมือถือโดยเฉพาะ)
-function loadDailySummary() {
-    const dbSelect = document.getElementById('dbClassSelect');
-    const selectedClass = dbSelect
-        ? dbSelect.value
-        : (userAssignedClass !== 'ALL' ? userAssignedClass : '');
+        // 1. ส่วนควบคุมตารางหน้าแดชบอร์ด (ปรับสไตล์ตารางและขนาด Badge เพื่อมือถือโดยเฉพาะ)
+        function loadDailySummary() {
+            const dbSelect = document.getElementById('dbClassSelect');
+            const selectedClass = dbSelect
+                ? dbSelect.value
+                : (userAssignedClass !== 'ALL' ? userAssignedClass : '');
 
-    const tbody = document.getElementById('dashboardTableBody');
+            const tbody = document.getElementById('dashboardTableBody');
+            if (!tbody) return;
 
-    if (!tbody) return;
+            if (!selectedClass) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="py-6 text-center">
+                                <i class="fa-solid fa-arrow-pointer block text-2xl text-blue-300 mb-2"></i>
+                                <span class="text-xs font-medium text-slate-500">
+                                    กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
 
-    if (!selectedClass) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6">
-                    <div class="py-6">
-                        <i class="fa-solid fa-arrow-pointer block text-2xl text-blue-300 mb-2"></i>
-                        <span class="text-xs font-medium text-slate-500">
-                            กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล
-                        </span>
-                    </div>
-                </td>
-            </tr>
-        `;
-        return;
-    }
+            showLoading(true);
 
-    showLoading(true);
+            fetch(`${WEB_APP_URL}?action=getDailySummaryByClass&className=${encodeURIComponent(selectedClass)}`)
+            .then(res => res.json())
+            .then(data => {
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="py-6 text-center text-slate-400 text-xs sm:text-sm">
+                                ไม่พบตารางรายห้องเรียน
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
 
-    fetch(
-        `${WEB_APP_URL}?action=getDailySummaryByClass&className=${encodeURIComponent(selectedClass)}`
-    )
-    .then(res => res.json())
-    .then(data => {
+                data.forEach(item => {
+                    let statusColor = "text-slate-600 bg-slate-100";
+                    if (item.status === "ปฏิบัติหน้าที่") {
+                        statusColor = "text-emerald-700 bg-emerald-50 border border-emerald-200";
+                    } else if (item.status === "ไม่ลงแถว") {
+                        statusColor = "text-rose-700 bg-rose-50 border border-rose-200";
+                    }
 
-        tbody.innerHTML = '';
-
-        if (data.length === 0) {
-
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="py-6 text-slate-400 text-xs sm:text-sm">
-                        ไม่พบตารางรายห้องเรียน
-                    </td>
-                </tr>
-            `;
-
-            return;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><span class="font-bold text-blue-900">${item.className}</span></td>
+                        <td>${item.teacherName}</td>
+                        <td><span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold ${statusColor}">${item.status}</span></td>
+                        <td>${item.reason || '-'}</td>
+                        <td><span class="font-mono text-xs text-slate-500">${item.time}</span></td>
+                        <td>${item.recorder || '-'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(err => {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-6 text-center text-rose-500 text-xs sm:text-sm">
+                            ผิดพลาด: ${err}
+                        </td>
+                    </tr>
+                `;
+            })
+            .finally(() => showLoading(false));
         }
 
-        data.forEach(item => {
+        // ปรับปรุงการโหลดฟอร์มเช็คชื่อให้เป็นการ์ดแอปพลิเคชันสวยงามบนมือถือ และตารางสวยงามบนคอมพิวเตอร์
+        function loadAttendanceForm() {
+            const checkSelect = document.getElementById('checkClassSelect');
+            const selectedClass = checkSelect ? checkSelect.value : '';
+            const tbody = document.getElementById('attendanceTableBody');
+            const submitArea = document.getElementById('submitBtnArea');
 
-            let statusColor =
-                "text-slate-600 bg-slate-100";
+            if (!tbody) return;
 
-            if (item.status === "ปฏิบัติหน้าที่") {
-                statusColor =
-                    "text-emerald-700 bg-emerald-50 border border-emerald-200";
+            const editDateInp = document.getElementById('editDateInput');
+            const targetDate = editDateInp ? editDateInp.value : '';
+
+            if (!selectedClass) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="p-6 text-center text-slate-400 text-xs sm:text-sm">
+                            <i class="fa-solid fa-layer-group block text-xl mb-2"></i>
+                            กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ
+                        </td>
+                    </tr>
+                `;
+                if (submitArea) submitArea.classList.add('hidden');
+                return;
             }
 
-            else if (item.status === "ไม่ลงแถว") {
-                statusColor =
-                    "text-rose-700 bg-rose-50 border border-rose-200";
+            showLoading(true);
+
+            fetch(`${WEB_APP_URL}?action=getTeachersByClass&className=${encodeURIComponent(selectedClass)}&targetDate=${targetDate}&isEditMode=${isEditMode}`)
+            .then(res => res.json())
+            .then(data => {
+                tbody.innerHTML = '';
+
+                if (data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="p-5 text-center text-slate-400 text-xs sm:text-sm">
+                                ไม่พบข้อมูลรายชื่อค่ะ
+                            </td>
+                        </tr>
+                    `;
+                    if (submitArea) submitArea.classList.add('hidden');
+                    return;
+                }
+
+                // สไตล์แอปพลิเคชันมือถือ: ตรวจสอบและซ่อนสไตล์ตารางแบบเก่าสำหรับมือถือด้วย CSS Utility ของ Tailwind
+                // โดยการห่อหุ้มโครงสร้างแบบ Responsive รองรับทั้ง Card (Mobile) และ Row (Desktop)
+                data.forEach((item, index) => {
+                    const isAbsent = item.existingStatus === "ไม่ลงแถว";
+                    
+                    // สร้าง Element tr ที่ภายในประยุกต์ใช้ Grid/Flexbox ควบคุมให้เป็นการ์ดแอปบนหน้าจอมือถือ
+                    const tr = document.createElement('tr');
+                    tr.className = "block md:table-row bg-white rounded-2xl shadow-md md:shadow-none border border-slate-100 md:border-b md:border-slate-200 mb-4 p-4 md:p-0";
+                    
+                    tr.innerHTML = `
+                        <td class="block md:table-cell pb-2 md:py-4 font-bold text-lg md:text-sm text-indigo-900 border-b border-dashed border-slate-100 md:border-none mb-3 md:mb-0">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-xl text-sm font-extrabold md:bg-transparent md:text-blue-900 md:p-0">
+                                    ${item.className}
+                                </span>
+                            </div>
+                            <input type="hidden" name="class_${index}" value="${item.className}">
+                            <input type="hidden" name="teacher_${index}" value="${item.teacherName}">
+                        </td>
+
+                        <td class="block md:table-cell py-2 md:py-4 font-bold text-slate-800 text-base md:text-sm">
+                            <div class="flex items-center gap-2 text-slate-900">
+                                <i class="fa-solid fa-user text-indigo-400 md:hidden text-sm"></i>
+                                <span>${item.teacherName}</span>
+                            </div>
+                        </td>
+
+                        <td class="block md:table-cell py-3 md:py-4">
+                            <div class="grid grid-cols-2 gap-2.5 w-full md:flex md:flex-col md:gap-2">
+                                <label class="flex items-center justify-center md:justify-start gap-2 cursor-pointer text-emerald-700 font-bold bg-emerald-50/60 p-2.5 rounded-xl md:p-0 md:bg-transparent border border-emerald-100 md:border-none active:scale-95 transition-all text-sm">
+                                    <input
+                                        type="radio"
+                                        name="status_${index}"
+                                        value="ปฏิบัติหน้าที่"
+                                        ${!isAbsent ? 'checked' : ''}
+                                        onchange="toggleReasonField(${index}, false)"
+                                        class="w-4 h-4 accent-emerald-600">
+                                    <span>ทำหน้าที่</span>
+                                </label>
+
+                                <label class="flex items-center justify-center md:justify-start gap-2 cursor-pointer text-rose-700 font-bold bg-rose-50/60 p-2.5 rounded-xl md:p-0 md:bg-transparent border border-rose-100 md:border-none active:scale-95 transition-all text-sm">
+                                    <input
+                                        type="radio"
+                                        name="status_${index}"
+                                        value="ไม่ลงแถว"
+                                        ${isAbsent ? 'checked' : ''}
+                                        onchange="toggleReasonField(${index}, true)"
+                                        class="w-4 h-4 accent-rose-600">
+                                    <span>ไม่ลงแถว</span>
+                                </label>
+                            </div>
+                        </td>
+
+                        <td class="block md:table-cell pt-2 pb-1 md:py-4">
+                            <div class="flex flex-col w-full">
+                                <span class="text-slate-400 text-[11px] font-bold mb-1 md:hidden"><i class="fa-solid fa-comment-dots"></i> ระบุเหตุผล (ถ้าไม่ลงแถว)</span>
+                                <select
+                                    id="reason_${index}"
+                                    ${!isAbsent ? 'disabled' : ''}
+                                    class="w-full min-h-[44px] md:min-h-0 border rounded-xl px-3 py-2 text-sm font-bold transition-all
+                                    ${!isAbsent
+                                        ? 'bg-slate-100 opacity-40 border-slate-200 text-slate-400 cursor-not-allowed'
+                                        : 'bg-white border-rose-300 text-rose-900 focus:ring-2 focus:ring-rose-100'}">
+                                    <option value="ลาป่วย" ${item.existingReason === 'ลาป่วย' ? 'selected' : ''}>ลาป่วย</option>
+                                    <option value="ลากิจ" ${item.existingReason === 'ลากิจ' ? 'selected' : ''}>ลากิจ</option>
+                                    <option value="สาย" ${item.existingReason === 'สาย' ? 'selected' : ''}>มาสาย</option>
+                                    <option value="ไปราชการ" ${item.existingReason === 'ไปราชการ' ? 'selected' : ''}>ไปราชการ</option>
+                                </select>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                if (submitArea) submitArea.classList.remove('hidden');
+            })
+            .catch(err => {
+                Swal.fire({
+                    title:'เกิดข้อผิดพลาด',
+                    text:'ไม่สามารถโหลดฟอร์มลงเวลาได้: ' + err,
+                    icon:'error',
+                    confirmButtonColor:'#1e1b4b'
+                });
+            })
+            .finally(()=>showLoading(false));
+        }
+
+        function toggleReasonField(index, show) {
+            const select = document.getElementById(`reason_${index}`);
+            if (!select) return;
+
+            if (show) {
+                select.removeAttribute('disabled');
+                select.className = "w-full min-h-[44px] bg-white border-2 border-rose-400 text-rose-900 rounded-xl px-3 py-2 text-sm font-bold outline-hidden transition-all focus:border-rose-500 focus:ring-2 focus:ring-rose-100 shadow-xs animate-pulse";
+                setTimeout(() => select.classList.remove('animate-pulse'), 600);
+            } else {
+                select.setAttribute('disabled', 'true');
+                select.className = "w-full min-h-[44px] bg-slate-100 border border-slate-200 text-slate-400 rounded-xl px-3 py-2 text-sm opacity-40 cursor-not-allowed outline-hidden transition-all";
             }
-
-            const tr = document.createElement('tr');
-
-            tr.innerHTML = `
-                <td>
-                    <span class="font-bold text-blue-900">
-                        ${item.className}
-                    </span>
-                </td>
-
-                <td>
-                    ${item.teacherName}
-                </td>
-
-                <td>
-                    <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold ${statusColor}">
-                        ${item.status}
-                    </span>
-                </td>
-
-                <td>
-                    ${item.reason || '-'}
-                </td>
-
-                <td>
-                    <span class="font-mono text-xs text-slate-500">
-                        ${item.time}
-                    </span>
-                </td>
-
-                <td>
-                    ${item.recorder || '-'}
-                </td>
-            `;
-
-            tbody.appendChild(tr);
-
-        });
-
-    })
-    .catch(err => {
-
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6" class="py-6 text-center text-rose-500 text-xs sm:text-sm">
-                    ผิดพลาด: ${err}
-                </td>
-            </tr>
-        `;
-
-    })
-    .finally(() => showLoading(false));
-}
-
-      function loadAttendanceForm() {
-const checkSelect = document.getElementById('checkClassSelect');
-const selectedClass = checkSelect ? checkSelect.value : '';
-const tbody = document.getElementById('attendanceTableBody');
-const submitArea = document.getElementById('submitBtnArea');
-
-if (!tbody) return;
-
-const editDateInp = document.getElementById('editDateInput');
-const targetDate = editDateInp ? editDateInp.value : '';
-
-if (!selectedClass) {
-    tbody.innerHTML = `
-        <tr>
-            <td colspan="4" class="p-6 text-center text-slate-400 text-xs sm:text-sm">
-                <i class="fa-solid fa-layer-group block text-xl mb-2"></i>
-                กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ
-            </td>
-        </tr>
-    `;
-
-    if (submitArea) submitArea.classList.add('hidden');
-    return;
-}
-
-showLoading(true);
-
-fetch(
-    `${WEB_APP_URL}?action=getTeachersByClass&className=${encodeURIComponent(selectedClass)}&targetDate=${targetDate}&isEditMode=${isEditMode}`
-)
-.then(res => res.json())
-.then(data => {
-
-    tbody.innerHTML = '';
-
-    if (data.length === 0) {
-
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="4" class="p-5 text-center text-slate-400 text-xs sm:text-sm">
-                    ไม่พบข้อมูลรายชื่อค่ะ
-                </td>
-            </tr>
-        `;
-
-        if (submitArea) submitArea.classList.add('hidden');
-        return;
-    }
-
-    data.forEach((item,index)=>{
-
-        const isAbsent =
-            item.existingStatus === "ไม่ลงแถว";
-
-        const tr = document.createElement('tr');
-
-        tr.innerHTML = `
-            <td>
-                <span class="font-bold text-blue-900">
-                    ${item.className}
-                </span>
-
-                <input type="hidden"
-                    name="class_${index}"
-                    value="${item.className}">
-
-                <input type="hidden"
-                    name="teacher_${index}"
-                    value="${item.teacherName}">
-            </td>
-
-            <td>
-                <span class="font-medium text-slate-700">
-                    ${item.teacherName}
-                </span>
-            </td>
-
-            <td>
-                <div class="flex flex-col gap-2 w-full">
-
-                    <label class="flex items-center gap-2 cursor-pointer text-emerald-700 font-semibold">
-                        <input
-                            type="radio"
-                            name="status_${index}"
-                            value="ปฏิบัติหน้าที่"
-                            ${!isAbsent ? 'checked' : ''}
-                            onchange="toggleReasonField(${index}, false)"
-                            class="accent-emerald-600">
-
-                        <span>ทำหน้าที่</span>
-                    </label>
-
-                    <label class="flex items-center gap-2 cursor-pointer text-rose-700 font-semibold">
-                        <input
-                            type="radio"
-                            name="status_${index}"
-                            value="ไม่ลงแถว"
-                            ${isAbsent ? 'checked' : ''}
-                            onchange="toggleReasonField(${index}, true)"
-                            class="accent-rose-600">
-
-                        <span>ไม่ลงแถว</span>
-                    </label>
-
-                </div>
-            </td>
-
-            <td>
-                <select
-                    id="reason_${index}"
-                    ${!isAbsent ? 'disabled' : ''}
-                    class="w-full border rounded-xl px-3 py-2 text-sm transition-all
-                    ${!isAbsent
-                        ? 'bg-slate-100 opacity-50 border-slate-200'
-                        : 'bg-white border-rose-300 text-rose-900'}">
-
-                    <option value="ลาป่วย"
-                        ${item.existingReason === 'ลาป่วย' ? 'selected' : ''}>
-                        ลาป่วย
-                    </option>
-
-                    <option value="ลากิจ"
-                        ${item.existingReason === 'ลากิจ' ? 'selected' : ''}>
-                        ลากิจ
-                    </option>
-
-                    <option value="สาย"
-                        ${item.existingReason === 'สาย' ? 'selected' : ''}>
-                        มาสาย
-                    </option>
-
-                    <option value="ไปราชการ"
-                        ${item.existingReason === 'ไปราชการ' ? 'selected' : ''}>
-                        ไปราชการ
-                    </option>
-
-                </select>
-            </td>
-        `;
-
-        tbody.appendChild(tr);
-
-    });
-
-    if (submitArea) {
-        submitArea.classList.remove('hidden');
-    }
-
-})
-.catch(err => {
-
-    Swal.fire({
-        title:'เกิดข้อผิดพลาด',
-        text:'ไม่สามารถโหลดฟอร์มลงเวลาได้: ' + err,
-        icon:'error',
-        confirmButtonColor:'#1e1b4b'
-    });
-
-})
-.finally(()=>showLoading(false));
-
-}
-
-function toggleReasonField(index, show) {
-    const select = document.getElementById(`reason_${index}`);
-
-    if (!select) return;
-
-    if (show) {
-
-        select.removeAttribute('disabled');
-
-        select.className =
-            "w-full min-h-[50px] bg-white border border-rose-300 text-rose-900 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium outline-hidden transition-all focus:border-rose-500 focus:ring-2 focus:ring-rose-100";
-
-    } else {
-
-        select.setAttribute('disabled', 'true');
-
-        select.className =
-            "w-full min-h-[50px] bg-slate-100 border border-slate-200 text-slate-400 rounded-xl px-3 py-2 text-xs sm:text-sm opacity-70 cursor-not-allowed outline-hidden transition-all";
-
-    }
-
-}
+        }
 
         function submitAttendance(e) {
             e.preventDefault();
-            
             const submitBtn = document.getElementById('submitAttendanceBtn');
             let originalBtnHtml = "";
             
@@ -1377,18 +1373,17 @@ function toggleReasonField(index, show) {
 
                     const checkSelect = document.getElementById('checkClassSelect');
                     if (checkSelect) checkSelect.value = "";
-                   tbody.innerHTML = `
-<tr>
-    <td colspan="4"
-        class="p-8 text-center text-slate-400 text-xs sm:text-sm">
-        <div class="max-w-xs mx-auto">
-            <i class="fa-solid fa-layer-group block text-2xl text-blue-300 mb-2"></i>
-            <span class="font-medium text-slate-500">
-                กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ
-            </span>
-        </div>
-    </td>
-</tr>`;
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="p-8 text-center text-slate-400 text-xs sm:text-sm">
+                                <div class="max-w-xs mx-auto">
+                                    <i class="fa-solid fa-layer-group block text-2xl text-blue-300 mb-2"></i>
+                                    <span class="font-medium text-slate-500">
+                                        กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>`;
                     const submitArea = document.getElementById('submitBtnArea');
                     if (submitArea) submitArea.classList.add('hidden');
                     
@@ -1440,84 +1435,59 @@ function toggleReasonField(index, show) {
             loadAttendanceStats(); 
         }
 
-        // 3. ส่วนสถิติสะสม (ปรับ Layout ของแถวตารางให้อ่านง่ายขึ้น ไม่ดันความกว้างหลุดหน้าจอมือถือ)
-       function loadAttendanceStats() {
-    const statsSelect = document.getElementById('statsClassSelect');
-    const levelFilter = statsSelect ? statsSelect.value : '';
-    const tbody = document.getElementById('statsTableBody');
-
-    if (!tbody) return;
-
-    tbody.innerHTML = `
-        <tr>
-            <td colspan="5" class="p-6 text-center text-slate-500 text-xs sm:text-sm">
-                <i class="fa-solid fa-spinner animate-spin mr-1.5"></i>
-                กำลังสรุปสถิติ...
-            </td>
-        </tr>
-    `;
-
-    fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}&rangeType=${currentStatsRangeType}`)
-        .then(res => res.json())
-        .then(data => {
-
-            tbody.innerHTML = '';
-
-            if (data.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="p-6 text-center text-slate-400 text-xs sm:text-sm">
-                            ยังไม่มีข้อมูลในระบบสะสมค่ะ
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            data.forEach(item => {
-
-                const tr = document.createElement('tr');
-
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-slate-900 text-xs sm:text-sm">
-                        ${item.className}
-                    </td>
-
-                    <td class="p-3 font-semibold text-slate-700 text-xs sm:text-sm whitespace-normal break-words">
-                        ${item.teacherName}
-                    </td>
-
-                    <td class="p-3 font-mono font-bold text-slate-800 text-xs sm:text-sm">
-                        ${item.total}
-                    </td>
-
-                    <td class="p-3 font-bold text-emerald-700 text-xs sm:text-sm">
-                        ${item.present}
-                    </td>
-
-                    <td class="p-3 font-bold text-rose-700 text-xs sm:text-sm">
-                        ${item.absent}
-                    </td>
-                `;
-
-                tbody.appendChild(tr);
-
-            });
-
-        })
-        .catch(err => {
+        function loadAttendanceStats() {
+            const statsSelect = document.getElementById('statsClassSelect');
+            const levelFilter = statsSelect ? statsSelect.value : '';
+            const tbody = document.getElementById('statsTableBody');
+            if (!tbody) return;
 
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="5" class="p-4 text-center text-rose-500 text-xs sm:text-sm">
-                        ผิดพลาด: ${err}
+                    <td colspan="5" class="p-6 text-center text-slate-500 text-xs sm:text-sm">
+                        <i class="fa-solid fa-spinner animate-spin mr-1.5"></i>
+                        กำลังสรุปสถิติ...
                     </td>
                 </tr>
             `;
 
-        });
-}
-            
+            fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}&rangeType=${currentStatsRangeType}`)
+                .then(res => res.json())
+                .then(data => {
+                    tbody.innerHTML = '';
+                    if (data.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="p-6 text-center text-slate-400 text-xs sm:text-sm">
+                                    ยังไม่มีข้อมูลในระบบสะสมค่ะ
+                                </td>
+                            </tr>
+                        `;
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="p-3 font-bold text-slate-900 text-xs sm:text-sm">${item.className}</td>
+                            <td class="p-3 font-semibold text-slate-700 text-xs sm:text-sm whitespace-normal break-words">${item.teacherName}</td>
+                            <td class="p-3 font-mono font-bold text-slate-800 text-xs sm:text-sm">${item.total}</td>
+                            <td class="p-3 font-bold text-emerald-700 text-xs sm:text-sm">${item.present}</td>
+                            <td class="p-3 font-bold text-rose-700 text-xs sm:text-sm">${item.absent}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(err => {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="p-4 text-center text-rose-500 text-xs sm:text-sm">
+                                ผิดพลาด: ${err}
+                            </td>
+                        </tr>
+                    `;
+                });
+        }
+                
         function loadMonthlyStats() {
             loadAttendanceStats();
         }
