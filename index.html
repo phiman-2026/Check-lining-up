@@ -10,157 +10,334 @@
     <link href="https://fonts.googleapis.com/css2?family=K2D:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        body { 
-            font-family: 'K2D', sans-serif; 
-            background-color: #0f172a; 
-        }
-        /* ปรับดีไซน์ Scrollbar ของแถบเมนูและตารางในมือถือ */
-        .overflow-x-auto::-webkit-scrollbar {
-            height: 4px;
-        }
-        .overflow-x-auto::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 10px;
-        }
-        /* 🌟 เอฟเฟกต์พิเศษสำหรับชื่อระบบที่ต้องการให้อ่านง่ายและคมชัดทะลุจอ */
-        .system-title-glow {
-            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.95), 0 2px 4px rgba(0, 0, 0, 0.8);
-            -webkit-text-stroke: 1px rgba(0, 0, 0, 0.5);
-        }
-        .system-sub-glow {
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
-            -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.3);
-        }
+ <style>
+body{
+    font-family:'K2D',sans-serif;
+    background:#f1f5f9;
+    -webkit-tap-highlight-color:transparent;
+    overflow-x:hidden;
+}
 
-        /* 📱📱 ส่วนปรับดีไซน์ Mobile App Style (ปรับปรุงให้เต็มจอและสวยงามยิ่งขึ้น) 📱📱 */
-        @media (max-width: 768px) {
-            body {
-                background-color: #0f172a;
-            }
-            header, main, footer {
-                width: 100%;
-                max-width: 100%; /* เปลี่ยนจาก 480px ให้เต็มขอบจอมือถือ */
-                margin-left: auto;
-                margin-right: auto;
-            }
-            header {
-                position: sticky;
-                top: 0;
-                z-index: 40;
-            }
-            /* เมนูแท็บด้านล่างสไตล์แอป */
-            header > .bg-blue-950 {
-                position: fixed !important;
-                bottom: 0 !important;
-                top: auto !important;
-                left: 50% !important;
-                transform: translateX(-50%) !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                border-top: 1px solid rgba(255,255,255,0.1) !important;
-                background-color: #0b1329 !important;
-                box-shadow: 0 -4px 15px rgba(0,0,0,0.3) !important;
-                padding-bottom: env(safe-area-inset-bottom);
-            }
-            header > .bg-blue-950 > div {
-                justify-content: space-around !important;
-                padding: 0 !important;
-            }
-            .tab-btn {
-                flex-direction: column !important;
-                align-items: center !important;
-                justify-content: center !important;
-                gap: 4px !important;
-                padding: 10px 4px !important;
-                font-size: 10px !important;
-                border-bottom: none !important;
-                color: #94a3b8 !important;
-                flex: 1;
-            }
-            .tab-btn.bg-blue-900\/60, .tab-btn[style*="background"] {
-                color: #38bdf8 !important;
-                background-color: transparent !important;
-                font-weight: bold !important;
-            }
-            
-            main {
-                padding: 12px !important; /* ปรับ Padding ให้นวลตาขึ้น ไม่ชิดขอบจนเกินไป */
-                padding-bottom: 100px !important; /* เพิ่มระยะหลบแท็บด้านล่าง */
-            }
+.overflow-x-auto::-webkit-scrollbar{
+    height:4px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb{
+    background:#cbd5e1;
+    border-radius:999px;
+}
 
-            /* 🗂️ การปรับเปลี่ยนตารางให้เป็นการ์ด */
-            #attendanceTableBody tr:not(:has(td[colspan])), 
-            #dashboardTableBody tr:not(:has(td[colspan])), 
-            #statsTableBody tr {
-                display: block !important;
-                background: #ffffff !important;
-                border: 1px solid #e2e8f0 !important;
-                border-radius: 16px !important;
-                margin-bottom: 16px !important;
-                padding: 14px !important;
-                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05) !important;
-                width: 100% !important; /* สั่งให้ตัวการ์ดยืดเต็มหน้าจอ */
-                box-sizing: border-box !important;
-            }
-            
-            /* จัดช่องในตารางเมื่อแปลงร่างเป็นการ์ด */
-            #attendanceTableBody tr:not(:has(td[colspan])) td, 
-            #dashboardTableBody tr:not(:has(td[colspan])) td, 
-            #statsTableBody tr td {
-                display: flex !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                padding: 8px 0 !important; /* ปรับลดพื้นที่ Padding ภายในการ์ดให้อ่านง่ายและประหยัดพื้นที่บนจอสัมผัส */
-                border-bottom: 1px dashed #f1f5f9 !important;
-                width: 100% !important;
-                white-space: normal !important;
-                text-align: right !important;
-                gap: 12px; /* กันส่วนหัวและส่วนท้ายการ์ดชนกัน */
-            }
-            
-            #attendanceTableBody tr td:last-child, 
-            #dashboardTableBody tr td:last-child, 
-            #statsTableBody tr td:last-child {
-                border-bottom: none !important;
-            }
+.system-title-glow{
+    text-shadow:
+    0 4px 12px rgba(0,0,0,.95),
+    0 2px 4px rgba(0,0,0,.8);
+    -webkit-text-stroke:1px rgba(0,0,0,.5);
+}
 
-            /* หัวข้อของการ์ดแต่ละหน้าจอ */
-            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(1)::before { content: "ห้องเรียน:"; font-weight: bold; color: #1e3a8a; shrink-0; }
-            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(2)::before { content: "ครูที่ปรึกษา:"; font-weight: bold; color: #64748b; shrink-0; }
-            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(3)::before { content: "status วันนี้:"; font-weight: bold; color: #64748b; shrink-0; }
-            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(4)::before { content: "เหตุผล:"; font-weight: bold; color: #64748b; shrink-0; }
-            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(5)::before { content: "เวลาบันทึก:"; font-weight: bold; color: #64748b; shrink-0; }
-            #dashboardTableBody tr:not(:has(td[colspan])) td:nth-child(6)::before { content: "ผู้ตรวจ:"; font-weight: bold; color: #64748b; shrink-0; }
+.system-sub-glow{
+    text-shadow:0 2px 6px rgba(0,0,0,.9);
+    -webkit-text-stroke:.5px rgba(0,0,0,.3);
+}
 
-            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(1)::before { content: "ห้องเรียน:"; font-weight: bold; color: #1e3a8a; shrink-0; }
-            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(2)::before { content: "ครูที่ปรึกษา:"; font-weight: bold; color: #64748b; shrink-0; }
-            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(3)::before { content: "เช็คสถานะ:"; font-weight: bold; color: #64748b; shrink-0; }
-            #attendanceTableBody tr:not(:has(td[colspan])) td:nth-child(4)::before { content: "ระบุสาเหตุ:"; font-weight: bold; color: #64748b; shrink-0; }
-            
-            #statsTableBody tr td:nth-child(1)::before { content: "ระดับชั้น:"; font-weight: bold; color: #1e3a8a; shrink-0; }
-            #statsTableBody tr td:nth-child(2)::before { content: "ชื่อ-สกุล:"; font-weight: bold; color: #64748b; shrink-0; }
-            #statsTableBody tr td:nth-child(3)::before { content: "ลงแถวทั้งหมด:"; font-weight: bold; color: #64748b; shrink-0; }
-            #statsTableBody tr td:nth-child(4)::before { content: "รวมลงแถว:"; font-weight: bold; color: #64748b; shrink-0; }
-            #statsTableBody tr td:nth-child(5)::before { content: "รวมไม่ลงแถว:"; font-weight: bold; color: #64748b; shrink-0; }
+/* =====================================
+   MOBILE
+===================================== */
 
-            /* ขยายความกว้างตัวเลือกให้พอดี ไม่บีบตัวหนังสือแน่น */
-            table tbody tr td select, 
-            table tbody tr td input,
-            table tbody tr td .flex {
-                width: 55% !important;
-                max-width: 55% !important;
-                text-align: left !important;
-            }
-            
-            /* หน้าต่างแสดงข้อความ "กรุณาเลือกระดับชั้น" ให้คงความกว้างเต็มตารางแบบเดิม */
-            td[colspan] {
-                display: table-cell !important;
-                text-align: center !important;
-                width: 100% !important;
-            }
-        }
-    </style>
+@media(max-width:768px){
+
+body{
+    background:#f1f5f9;
+    padding-bottom:90px;
+}
+
+header{
+    position:sticky;
+    top:0;
+    z-index:50;
+}
+
+header .max-w-7xl{
+    padding-top:12px!important;
+    padding-bottom:12px!important;
+}
+
+header img{
+    width:50px!important;
+    height:50px!important;
+}
+
+.system-title-glow{
+    font-size:1rem!important;
+    line-height:1.3!important;
+}
+
+.system-sub-glow{
+    font-size:.7rem!important;
+}
+
+main{
+    padding:12px!important;
+    padding-bottom:120px!important;
+}
+
+/* =====================================
+   Bottom Navigation
+===================================== */
+
+header > .bg-blue-950{
+    position:fixed!important;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index:999;
+    background:#0b1329!important;
+    border-top:1px solid rgba(255,255,255,.08);
+    box-shadow:0 -8px 25px rgba(0,0,0,.18);
+    padding-bottom:env(safe-area-inset-bottom);
+}
+
+header > .bg-blue-950 > div{
+    display:flex;
+    justify-content:space-around;
+    padding:0!important;
+}
+
+.tab-btn{
+    flex:1;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    align-items:center!important;
+    gap:4px;
+    min-height:64px;
+    font-size:10px!important;
+    border:none!important;
+    padding:6px 2px!important;
+}
+
+.tab-btn i{
+    font-size:18px!important;
+}
+
+.tab-btn:active{
+    transform:scale(.95);
+}
+
+#btn-dashboard-tab.border-blue-400,
+#btn-check-tab.border-blue-400,
+#btn-stats-tab.border-blue-400,
+#btn-report-tab.border-blue-400{
+    color:#38bdf8!important;
+}
+
+/* =====================================
+   FORM
+===================================== */
+
+input,
+select,
+button{
+    font-size:16px!important;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="month"],
+select{
+    min-height:50px!important;
+    border-radius:14px!important;
+}
+
+button{
+    min-height:48px;
+}
+
+/* =====================================
+   Hide Table Header
+===================================== */
+
+table thead{
+    display:none!important;
+}
+
+/* =====================================
+   Dashboard Card
+===================================== */
+
+#dashboardTableBody tr:not(:has(td[colspan])){
+    display:block!important;
+    background:#fff!important;
+    border-radius:18px!important;
+    padding:14px!important;
+    margin-bottom:12px!important;
+    border:1px solid #e2e8f0!important;
+    box-shadow:0 2px 8px rgba(0,0,0,.05)!important;
+}
+
+#dashboardTableBody tr td{
+    display:flex!important;
+    justify-content:space-between!important;
+    align-items:flex-start!important;
+    gap:12px!important;
+    padding:8px 0!important;
+    border-bottom:1px dashed #e2e8f0!important;
+    white-space:normal!important;
+}
+
+#dashboardTableBody tr td:last-child{
+    border-bottom:none!important;
+}
+
+#dashboardTableBody tr td:nth-child(1)::before{
+    content:"ห้องเรียน";
+    font-weight:700;
+}
+
+#dashboardTableBody tr td:nth-child(2)::before{
+    content:"ครูที่ปรึกษา";
+    font-weight:700;
+}
+
+#dashboardTableBody tr td:nth-child(3)::before{
+    content:"สถานะ";
+    font-weight:700;
+}
+
+#dashboardTableBody tr td:nth-child(4)::before{
+    content:"เหตุผล";
+    font-weight:700;
+}
+
+#dashboardTableBody tr td:nth-child(5)::before{
+    content:"เวลา";
+    font-weight:700;
+}
+
+#dashboardTableBody tr td:nth-child(6)::before{
+    content:"ผู้ตรวจ";
+    font-weight:700;
+}
+
+/* =====================================
+   Attendance Card
+===================================== */
+
+#attendanceTableBody tr:not(:has(td[colspan])){
+    display:block!important;
+    background:#fff!important;
+    border-radius:18px!important;
+    padding:14px!important;
+    margin-bottom:12px!important;
+    border:1px solid #e2e8f0!important;
+}
+
+#attendanceTableBody tr td{
+    display:flex!important;
+    justify-content:space-between!important;
+    align-items:flex-start!important;
+    gap:12px!important;
+    padding:8px 0!important;
+    border-bottom:1px dashed #e2e8f0!important;
+    white-space:normal!important;
+}
+
+#attendanceTableBody tr td:last-child{
+    border-bottom:none!important;
+}
+
+#attendanceTableBody tr td:nth-child(1)::before{
+    content:"ห้องเรียน";
+    font-weight:700;
+}
+
+#attendanceTableBody tr td:nth-child(2)::before{
+    content:"ครูที่ปรึกษา";
+    font-weight:700;
+}
+
+#attendanceTableBody tr td:nth-child(3)::before{
+    content:"สถานะ";
+    font-weight:700;
+}
+
+#attendanceTableBody tr td:nth-child(4)::before{
+    content:"เหตุผล";
+    font-weight:700;
+}
+
+#attendanceTableBody td .flex{
+    width:60%;
+}
+
+/* =====================================
+   Statistics Card
+===================================== */
+
+#statsTableBody tr{
+    display:block!important;
+    background:#fff!important;
+    border-radius:18px!important;
+    padding:14px!important;
+    margin-bottom:12px!important;
+    border:1px solid #e2e8f0!important;
+}
+
+#statsTableBody tr td{
+    display:flex!important;
+    justify-content:space-between!important;
+    padding:8px 0!important;
+    border-bottom:1px dashed #e2e8f0!important;
+}
+
+#statsTableBody tr td:last-child{
+    border-bottom:none!important;
+}
+
+#statsTableBody tr td:nth-child(1)::before{
+    content:"ระดับชั้น";
+    font-weight:700;
+}
+
+#statsTableBody tr td:nth-child(2)::before{
+    content:"ชื่อ-สกุล";
+    font-weight:700;
+}
+
+#statsTableBody tr td:nth-child(3)::before{
+    content:"ทั้งหมด";
+    font-weight:700;
+}
+
+#statsTableBody tr td:nth-child(4)::before{
+    content:"ลงแถว";
+    font-weight:700;
+}
+
+#statsTableBody tr td:nth-child(5)::before{
+    content:"ไม่ลงแถว";
+    font-weight:700;
+}
+
+/* =====================================
+   Message Row
+===================================== */
+
+td[colspan]{
+    display:table-cell!important;
+    text-align:center!important;
+}
+
+/* =====================================
+   Modal
+===================================== */
+
+#successModal .bg-white{
+    width:95%;
+    max-width:420px;
+}
+
+}
+</style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased bg-slate-100">
 
