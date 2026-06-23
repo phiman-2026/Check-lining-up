@@ -1162,7 +1162,7 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
         }
 
         // ปรับปรุงการโหลดฟอร์มเช็คชื่อให้เป็นการ์ดแอปพลิเคชันสวยงามบนมือถือ และตารางสวยงามบนคอมพิวเตอร์
-        function loadAttendanceForm() {
+       function loadAttendanceForm() {
             const checkSelect = document.getElementById('checkClassSelect');
             const selectedClass = checkSelect ? checkSelect.value : '';
             const tbody = document.getElementById('attendanceTableBody');
@@ -1205,74 +1205,103 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
                     return;
                 }
 
-                // สไตล์แอปพลิเคชันมือถือ: ตรวจสอบและซ่อนสไตล์ตารางแบบเก่าสำหรับมือถือด้วย CSS Utility ของ Tailwind
-                // โดยการห่อหุ้มโครงสร้างแบบ Responsive รองรับทั้ง Card (Mobile) และ Row (Desktop)
+                // 🔥 🛠️ ปรับปรุง: กลุ่มข้อมูล (Group By) ตามชื่อห้องเรียน เพื่อดึงครูมาจับคู่กันใน 1 การ์ด
+                const groupedByClass = {};
                 data.forEach((item, index) => {
-                    const isAbsent = item.existingStatus === "ไม่ลงแถว";
+                    if (!groupedByClass[item.className]) {
+                        groupedByClass[item.className] = [];
+                    }
+                    // บันทึก index เดิมไว้ด้วยเพื่อให้ name="status_${index}" ส่งค่าไปหลังบ้านได้ถูกต้อง ไม่ผิดเพี้ยน
+                    groupedByClass[item.className].push({ ...item, originalIndex: index });
+                });
+
+                // วนลูปสร้าง UI รายห้อง (1 การ์ด / 1 แถวคอมพิวเตอร์)
+                Object.keys(groupedByClass).forEach(className => {
+                    const teachers = groupedByClass[className];
                     
-                    // สร้าง Element tr ที่ภายในประยุกต์ใช้ Grid/Flexbox ควบคุมให้เป็นการ์ดแอปบนหน้าจอมือถือ
+                    // สร้างแถวหลักของการ์ดห้องนี้ (บนมือถือจะเป็น 1 บล็อกใหญ่ บนคอมจะเป็น 1 แถวปกติ)
                     const tr = document.createElement('tr');
-                    tr.className = "block md:table-row bg-white rounded-2xl shadow-md md:shadow-none border border-slate-100 md:border-b md:border-slate-200 mb-4 p-4 md:p-0";
+                    tr.className = "block md:table-row bg-white rounded-2xl shadow-md md:shadow-none border-2 border-slate-200 md:border-none md:border-b md:border-slate-200 mb-5 p-4 md:p-0";
                     
+                    // โครงสร้างภายในแบ่งตามสไตล์ คอมพิวเตอร์/มือถือ
                     tr.innerHTML = `
+                        <!-- ส่วนแสดงชื่อห้อง (เด่นชัดสไตล์แอปมือถือ) -->
                         <td class="block md:table-cell pb-2 md:py-4 font-bold text-lg md:text-sm text-indigo-900 border-b border-dashed border-slate-100 md:border-none mb-3 md:mb-0">
-                            <div class="flex items-center gap-2">
-                                <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-xl text-sm font-extrabold md:bg-transparent md:text-blue-900 md:p-0">
-                                    ${item.className}
-                                </span>
-                            </div>
-                            <input type="hidden" name="class_${index}" value="${item.className}">
-                            <input type="hidden" name="teacher_${index}" value="${item.teacherName}">
+                            <span class="bg-indigo-600 text-white md:bg-indigo-50 md:text-indigo-700 px-3.5 py-1.5 rounded-xl text-base md:text-sm font-extrabold shadow-xs md:shadow-none">
+                                ห้อง ${className}
+                            </span>
                         </td>
 
-                        <td class="block md:table-cell py-2 md:py-4 font-bold text-slate-800 text-base md:text-sm">
-                            <div class="flex items-center gap-2 text-slate-900">
-                                <i class="fa-solid fa-user text-indigo-400 md:hidden text-sm"></i>
-                                <span>${item.teacherName}</span>
-                            </div>
-                        </td>
+                        <!-- มัดรวมครูที่ปรึกษา (สูงสุด 2 คน หรือ 1 คนตามจริง) อยู่ในบล็อกย่อยภายใน -->
+                        <td colspan="3" class="block md:table-cell p-0 md:p-0">
+                            <div class="flex flex-col gap-4 md:gap-0">
+                                ${teachers.map(teacher => {
+                                    const idx = teacher.originalIndex;
+                                    const isAbsent = teacher.existingStatus === "ไม่ลงแถว";
+                                    
+                                    return `
+                                    <div class="block md:grid md:grid-cols-3 md:items-center border-b border-slate-100 last:border-0 pb-3 last:pb-0 md:pb-0 md:border-0 w-full">
+                                        
+                                        <!-- ชื่อครู (ตัวหนา ชัดเจน) -->
+                                        <div class="py-1.5 md:py-4 font-bold text-slate-800 text-base md:text-sm md:px-3">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fa-solid fa-user text-indigo-400 md:hidden text-sm"></i>
+                                                <span>${teacher.teacherName}</span>
+                                            </div>
+                                            <!-- ซ่อน Input ลับสำหรับส่งค่าไป Apps Script เหมือนเดิม -->
+                                            <input type="hidden" name="class_${idx}" value="${teacher.className}">
+                                            <input type="hidden" name="teacher_${idx}" value="${teacher.teacherName}">
+                                        </div>
 
-                        <td class="block md:table-cell py-3 md:py-4">
-                            <div class="grid grid-cols-2 gap-2.5 w-full md:flex md:flex-col md:gap-2">
-                                <label class="flex items-center justify-center md:justify-start gap-2 cursor-pointer text-emerald-700 font-bold bg-emerald-50/60 p-2.5 rounded-xl md:p-0 md:bg-transparent border border-emerald-100 md:border-none active:scale-95 transition-all text-sm">
-                                    <input
-                                        type="radio"
-                                        name="status_${index}"
-                                        value="ปฏิบัติหน้าที่"
-                                        ${!isAbsent ? 'checked' : ''}
-                                        onchange="toggleReasonField(${index}, false)"
-                                        class="w-4 h-4 accent-emerald-600">
-                                    <span>ทำหน้าที่</span>
-                                </label>
+                                        <!-- ตัวเลือกสถานะ -->
+                                        <div class="py-2 md:py-4 md:px-3">
+                                            <div class="grid grid-cols-2 gap-2.5 w-full md:flex md:gap-3">
+                                                <label class="flex items-center justify-center md:justify-start gap-2 cursor-pointer text-emerald-700 font-bold bg-emerald-50/60 p-2.5 rounded-xl md:p-0 md:bg-transparent border border-emerald-100 md:border-none active:scale-95 transition-all text-sm">
+                                                    <input
+                                                        type="radio"
+                                                        name="status_${idx}"
+                                                        value="ปฏิบัติหน้าที่"
+                                                        ${!isAbsent ? 'checked' : ''}
+                                                        onchange="toggleReasonField(${idx}, false)"
+                                                        class="w-4 h-4 accent-emerald-600">
+                                                    <span>ทำหน้าที่</span>
+                                                </label>
 
-                                <label class="flex items-center justify-center md:justify-start gap-2 cursor-pointer text-rose-700 font-bold bg-rose-50/60 p-2.5 rounded-xl md:p-0 md:bg-transparent border border-rose-100 md:border-none active:scale-95 transition-all text-sm">
-                                    <input
-                                        type="radio"
-                                        name="status_${index}"
-                                        value="ไม่ลงแถว"
-                                        ${isAbsent ? 'checked' : ''}
-                                        onchange="toggleReasonField(${index}, true)"
-                                        class="w-4 h-4 accent-rose-600">
-                                    <span>ไม่ลงแถว</span>
-                                </label>
-                            </div>
-                        </td>
+                                                <label class="flex items-center justify-center md:justify-start gap-2 cursor-pointer text-rose-700 font-bold bg-rose-50/60 p-2.5 rounded-xl md:p-0 md:bg-transparent border border-rose-100 md:border-none active:scale-95 transition-all text-sm">
+                                                    <input
+                                                        type="radio"
+                                                        name="status_${idx}"
+                                                        value="ไม่ลงแถว"
+                                                        ${isAbsent ? 'checked' : ''}
+                                                        onchange="toggleReasonField(${idx}, true)"
+                                                        class="w-4 h-4 accent-rose-600">
+                                                    <span>ไม่ลงแถว</span>
+                                                </label>
+                                            </div>
+                                        </div>
 
-                        <td class="block md:table-cell pt-2 pb-1 md:py-4">
-                            <div class="flex flex-col w-full">
-                                <span class="text-slate-400 text-[11px] font-bold mb-1 md:hidden"><i class="fa-solid fa-comment-dots"></i> ระบุเหตุผล (ถ้าไม่ลงแถว)</span>
-                                <select
-                                    id="reason_${index}"
-                                    ${!isAbsent ? 'disabled' : ''}
-                                    class="w-full min-h-[44px] md:min-h-0 border rounded-xl px-3 py-2 text-sm font-bold transition-all
-                                    ${!isAbsent
-                                        ? 'bg-slate-100 opacity-40 border-slate-200 text-slate-400 cursor-not-allowed'
-                                        : 'bg-white border-rose-300 text-rose-900 focus:ring-2 focus:ring-rose-100'}">
-                                    <option value="ลาป่วย" ${item.existingReason === 'ลาป่วย' ? 'selected' : ''}>ลาป่วย</option>
-                                    <option value="ลากิจ" ${item.existingReason === 'ลากิจ' ? 'selected' : ''}>ลากิจ</option>
-                                    <option value="สาย" ${item.existingReason === 'สาย' ? 'selected' : ''}>มาสาย</option>
-                                    <option value="ไปราชการ" ${item.existingReason === 'ไปราชการ' ? 'selected' : ''}>ไปราชการ</option>
-                                </select>
+                                        <!-- สาเหตุ (ถ้าไม่ลงแถว) -->
+                                        <div class="py-1 md:py-4 md:px-3">
+                                            <div class="flex flex-col w-full">
+                                                <span class="text-slate-400 text-[11px] font-bold mb-1 md:hidden"><i class="fa-solid fa-comment-dots"></i> ระบุเหตุผล</span>
+                                                <select
+                                                    id="reason_${idx}"
+                                                    ${!isAbsent ? 'disabled' : ''}
+                                                    class="w-full min-h-[44px] md:min-h-0 border rounded-xl px-3 py-2 text-sm font-bold transition-all
+                                                    ${!isAbsent
+                                                        ? 'bg-slate-100 opacity-40 border-slate-200 text-slate-400 cursor-not-allowed'
+                                                        : 'bg-white border-rose-300 text-rose-900 focus:ring-2 focus:ring-rose-100'}">
+                                                    <option value="ลาป่วย" ${teacher.existingReason === 'ลาป่วย' ? 'selected' : ''}>ลาป่วย</option>
+                                                    <option value="ลากิจ" ${teacher.existingReason === 'ลากิจ' ? 'selected' : ''}>ลากิจ</option>
+                                                    <option value="สาย" ${teacher.existingReason === 'สาย' ? 'selected' : ''}>มาสาย</option>
+                                                    <option value="ไปราชการ" ${teacher.existingReason === 'ไปราชการ' ? 'selected' : ''}>ไปราชการ</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    `;
+                                }).join('')}
                             </div>
                         </td>
                     `;
