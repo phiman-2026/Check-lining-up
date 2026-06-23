@@ -495,7 +495,8 @@ td[colspan]{
             </div>
         </div>
 
-        <section id="loginSection" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xs border border-blue-100 p-6 space-y-5">
+        <section id="loginSection"
+class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border border-blue-100 p-6 space-y-5">
             <div class="text-center space-y-1">
                 <div class="bg-blue-50 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner">
                     <i class="fa-solid fa-lock"></i>
@@ -517,7 +518,7 @@ td[colspan]{
         <div id="protectedContent" class="hidden space-y-6">
 
             <section id="dashboard-tab" class="tab-content hidden space-y-6">
-                <div class="bg-white rounded-2xl shadow-xs border border-blue-50 p-4 sm:p-6">
+                <div class="bg-white rounded-3xl shadow-lg border border-blue-50 p-4 sm:p-6">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
                         <div class="flex items-center gap-3">
                             <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-calendar-day"></i></div>
@@ -534,7 +535,7 @@ td[colspan]{
                         </div>
                     </div>
 
-                   <div class="w-full">
+                  <div class="w-full overflow-hidden">
     <table class="w-full text-left border-collapse text-xs sm:text-sm">
         <thead class="hidden sm:table-header-group">
             <tr class="bg-blue-50/40 border-b border-blue-100 text-blue-900 font-semibold">
@@ -547,7 +548,7 @@ td[colspan]{
             </tr>
         </thead>
         
-        <tbody id="dashboardTableBody" class="space-y-3 sm:space-y-0 divide-y-0 sm:divide-y sm:divide-slate-100">
+        <tbody id="dashboardTableBody">
             <tr class="flex flex-col sm:table-row bg-white rounded-2xl sm:rounded-none p-6 sm:p-0 border border-slate-100 sm:border-none shadow-2xs sm:shadow-none">
                 <td colspan="6" class="p-4 sm:p-10 text-center text-slate-400 bg-slate-50/40 sm:bg-transparent rounded-2xl sm:rounded-none">
                     <div class="max-w-xs mx-auto py-4 sm:py-0">
@@ -563,7 +564,7 @@ td[colspan]{
             </section>
 
             <section id="check-tab" class="tab-content hidden space-y-6">
-                <div id="attendanceFormSection" class="bg-white rounded-2xl shadow-xs border border-blue-50 p-4 sm:p-6 space-y-5">
+                <div id="attendanceFormSection" class="bg-white rounded-3xl shadow-lg border border-blue-50 p-4 sm:p-6 space-y-5">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                         <div class="flex items-center gap-3">
                             <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-clipboard-user"></i></div>
@@ -595,7 +596,7 @@ td[colspan]{
                     </div>
 
                     <form id="attendanceForm" onsubmit="submitAttendance(event)" class="space-y-5">
-                        <div class="overflow-x-auto rounded-xl border border-blue-50 shadow-2xs">
+                        <div class="overflow-hidden rounded-xl border border-blue-50 shadow-2xs">
                             <table class="w-full text-left border-collapse text-xs sm:text-sm whitespace-nowrap">
                                 <thead>
                                     <tr class="bg-blue-50/40 border-b border-blue-100 text-blue-900 font-semibold">
@@ -605,7 +606,7 @@ td[colspan]{
                                         <th class="p-3.5 w-60">ระบุสาเหตุ (กรณีไม่ลงแถว)</th>
                                     </tr>
                                 </thead>
-                                <tbody id="attendanceTableBody" class="divide-y divide-slate-100">
+                               <tbody id="attendanceTableBody">
                                     <tr>
                                         <td colspan="4" class="p-10 text-center text-slate-400 bg-slate-50/40">
                                             <div class="max-w-xs mx-auto">
@@ -627,7 +628,7 @@ td[colspan]{
             </section>
 
             <section id="stats-tab" class="tab-content hidden space-y-6">
-                <div class="bg-white rounded-2xl shadow-xs border border-blue-50 p-4 sm:p-6">
+                <div class="bg-white rounded-3xl shadow-lg border border-blue-50 p-4 sm:p-6">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
                         <div class="flex items-center gap-3">
                             <div class="bg-blue-50 text-blue-600 w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-chart-column"></i></div>
@@ -652,7 +653,7 @@ td[colspan]{
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto rounded-xl border border-blue-50 shadow-2xs">
+                   <div class="overflow-hidden rounded-xl border border-blue-50 shadow-2xs">
                         <table class="w-full text-left border-collapse text-xs sm:text-sm whitespace-nowrap">
                             <thead>
                                 <tr class="bg-blue-50/40 border-b border-blue-100 text-blue-900 font-semibold text-center">
@@ -663,7 +664,7 @@ td[colspan]{
                                     <th class="p-3.5 text-rose-600">รวมไม่ลงแถว (ครั้ง)</th>
                                 </tr>
                             </thead>
-                            <tbody id="statsTableBody" class="divide-y divide-slate-100"></tbody>
+                           <tbody id="statsTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -711,7 +712,7 @@ td[colspan]{
 
     </main>
 
-    <footer class="bg-blue-950 text-blue-300/60 border-t border-blue-900/40 py-4.5 mt-8 md:block hidden">
+    <footer class="bg-blue-950 text-blue-300/60 border-t border-blue-900/40 py-4.5 mt-8 hidden lg:block">
         <div class="max-w-7xl mx-auto px-4 text-center text-xs space-y-1">
             <p class="font-light">© 2026 งานสารบรรณ โรงเรียนพิมานพิทยาสรรค์</p>
         </div>
@@ -1007,178 +1008,306 @@ td[colspan]{
       // 1. ส่วนควบคุมตารางหน้าแดชบอร์ด (ปรับสไตล์ตารางและขนาด Badge เพื่อมือถือโดยเฉพาะ)
 function loadDailySummary() {
     const dbSelect = document.getElementById('dbClassSelect');
-    const selectedClass = dbSelect ? dbSelect.value : (userAssignedClass !== 'ALL' ? userAssignedClass : '');
+    const selectedClass = dbSelect
+        ? dbSelect.value
+        : (userAssignedClass !== 'ALL' ? userAssignedClass : '');
+
     const tbody = document.getElementById('dashboardTableBody');
+
     if (!tbody) return;
 
     if (!selectedClass) {
         tbody.innerHTML = `
-            <tr class="flex flex-col sm:table-row bg-white rounded-2xl sm:rounded-none p-6 sm:p-0 border border-slate-100 sm:border-none shadow-2xs sm:shadow-none">
-                <td colspan="6" class="p-4 sm:p-10 text-center text-slate-400 bg-slate-50/40 sm:bg-transparent rounded-2xl sm:rounded-none">
-                    <div class="max-w-xs mx-auto py-4 sm:py-0">
-                        <i class="fa-solid fa-arrow-pointer block text-2xl text-blue-300 mb-2"></i> 
-                        <span class="text-xs font-medium text-slate-500">กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</span>
+            <tr>
+                <td colspan="6">
+                    <div class="py-6">
+                        <i class="fa-solid fa-arrow-pointer block text-2xl text-blue-300 mb-2"></i>
+                        <span class="text-xs font-medium text-slate-500">
+                            กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล
+                        </span>
                     </div>
                 </td>
-            </tr>`;
+            </tr>
+        `;
         return;
     }
 
     showLoading(true);
-    fetch(`${WEB_APP_URL}?action=getDailySummaryByClass&className=${encodeURIComponent(selectedClass)}`)
-        .then(res => res.json())
-        .then(data => {
-            tbody.innerHTML = '';
-            if (data.length === 0) {
-                tbody.innerHTML = `
-                    <tr class="flex flex-col sm:table-row bg-white rounded-2xl sm:rounded-none p-6 sm:p-0 border border-slate-100 sm:border-none shadow-2xs sm:shadow-none">
-                        <td colspan="6" class="p-6 sm:p-10 text-center text-slate-400 bg-slate-50/40 sm:bg-transparent rounded-2xl sm:rounded-none text-xs sm:text-sm">
-                            ไม่พบตารางรายห้องเรียน
-                        </td>
-                    </tr>`;
-                return;
-            }
-            
-            data.forEach(item => {
-                let statusColor = "text-slate-500 bg-slate-100";
-                if (item.status === "ปฏิบัติหน้าที่") statusColor = "text-emerald-700 bg-emerald-50 border border-emerald-200";
-                else if (item.status === "ไม่ลงแถว") statusColor = "text-rose-700 bg-rose-50 border border-rose-200";
 
-                const tr = document.createElement('tr');
-                // ปรับคลาสที่ตัว <tr> ให้แปลงร่างจากแถวเป็นกล่องการ์ดเมื่ออยู่บนมือถือ
-                tr.className = "flex flex-col sm:table-row bg-white rounded-2xl sm:rounded-none p-4 sm:p-0 mb-3 sm:mb-0 border border-slate-100 sm:border-none shadow-2xs sm:shadow-none transition-all";
-                tr.innerHTML = `
-                    <td class="flex justify-between sm:table-cell p-2 sm:p-3.5 border-b border-slate-50 sm:border-none items-center">
-                        <span class="text-xs font-bold text-slate-400 sm:hidden">ห้องเรียน:</span>
-                        <span class="font-bold text-blue-900 text-center sm:w-full block text-xs sm:text-sm">${item.className}</span>
-                    </td>
-                    
-                    <td class="flex flex-col sm:table-cell p-2 pt-3 sm:p-3.5 text-left border-b border-slate-50 sm:border-none">
-                        <span class="text-xs font-bold text-slate-400 mb-1 sm:hidden">ชื่อครูที่ปรึกษา (ร่วม):</span>
-                        <span class="font-medium text-slate-700 text-xs sm:text-sm">${item.teacherName}</span>
-                    </td>
-                    
-                    <td class="flex justify-between sm:table-cell p-2 pt-3 sm:p-3.5 items-center sm:text-center border-b border-slate-50 sm:border-none">
-                        <span class="text-xs font-bold text-slate-400 sm:hidden">status วันนี้:</span>
-                        <div class="flex justify-end sm:justify-center w-full">
-                            <span class="px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-bold ${statusColor}">${item.status}</span>
-                        </div>
-                    </td>
-                    
-                    <td class="flex flex-col sm:table-cell p-2 pt-3 sm:p-3.5 text-left border-b border-slate-50 sm:border-none">
-                        <span class="text-xs font-bold text-slate-400 mb-1 sm:hidden">เหตุผลกรณีไม่ลงแถว:</span>
-                        <span class="text-slate-600 text-xs sm:text-sm whitespace-normal break-words">${item.reason || '-'}</span>
-                    </td>
-                    
-                    <td class="flex justify-between sm:table-cell p-2 pt-3 sm:p-3.5 items-center sm:text-center border-b border-slate-50 sm:border-none">
-                        <span class="text-xs font-bold text-slate-400 sm:hidden">เวลาบันทึก:</span>
-                        <span class="text-slate-500 font-mono text-[10px] sm:text-xs sm:w-full block">${item.time}</span>
-                    </td>
-                    
-                    <td class="flex flex-col sm:table-cell p-2 pt-3 sm:p-3.5 text-left">
-                        <span class="text-xs font-bold text-slate-400 mb-1 sm:hidden">ผู้บันทึกตรวจ:</span>
-                        <span class="text-slate-500 text-[10px] sm:text-xs font-medium">${item.recorder || '-'}</span>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        })
-        .catch(err => {
+    fetch(
+        `${WEB_APP_URL}?action=getDailySummaryByClass&className=${encodeURIComponent(selectedClass)}`
+    )
+    .then(res => res.json())
+    .then(data => {
+
+        tbody.innerHTML = '';
+
+        if (data.length === 0) {
+
             tbody.innerHTML = `
-                <tr class="flex flex-col sm:table-row bg-white rounded-2xl sm:rounded-none p-6 sm:p-0 border border-slate-100 sm:border-none shadow-2xs sm:shadow-none">
-                    <td colspan="6" class="p-6 text-center text-rose-500 text-xs sm:text-sm rounded-2xl sm:rounded-none">
-                        ผิดพลาด: ${err}
+                <tr>
+                    <td colspan="6" class="py-6 text-slate-400 text-xs sm:text-sm">
+                        ไม่พบตารางรายห้องเรียน
                     </td>
-                </tr>`;
-        })
-        .finally(() => showLoading(false));
+                </tr>
+            `;
+
+            return;
+        }
+
+        data.forEach(item => {
+
+            let statusColor =
+                "text-slate-600 bg-slate-100";
+
+            if (item.status === "ปฏิบัติหน้าที่") {
+                statusColor =
+                    "text-emerald-700 bg-emerald-50 border border-emerald-200";
+            }
+
+            else if (item.status === "ไม่ลงแถว") {
+                statusColor =
+                    "text-rose-700 bg-rose-50 border border-rose-200";
+            }
+
+            const tr = document.createElement('tr');
+
+            tr.innerHTML = `
+                <td>
+                    <span class="font-bold text-blue-900">
+                        ${item.className}
+                    </span>
+                </td>
+
+                <td>
+                    ${item.teacherName}
+                </td>
+
+                <td>
+                    <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold ${statusColor}">
+                        ${item.status}
+                    </span>
+                </td>
+
+                <td>
+                    ${item.reason || '-'}
+                </td>
+
+                <td>
+                    <span class="font-mono text-xs text-slate-500">
+                        ${item.time}
+                    </span>
+                </td>
+
+                <td>
+                    ${item.recorder || '-'}
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+
+        });
+
+    })
+    .catch(err => {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="py-6 text-center text-rose-500 text-xs sm:text-sm">
+                    ผิดพลาด: ${err}
+                </td>
+            </tr>
+        `;
+
+    })
+    .finally(() => showLoading(false));
 }
 
-        // 2. ส่วนฟอร์มเช็คเวลาแถว (ปรับปุ่ม Radio และกล่องเลือกเหตุผลให้กดง่ายขึ้นในจอสัมผัส)
-        function loadAttendanceForm() {
-            const checkSelect = document.getElementById('checkClassSelect');
-            const selectedClass = checkSelect ? checkSelect.value : '';
-            const tbody = document.getElementById('attendanceTableBody');
-            const submitArea = document.getElementById('submitBtnArea');
-            if (!tbody) return;
-            
-            const editDateInp = document.getElementById('editDateInput');
-            const targetDate = editDateInp ? editDateInp.value : '';
+      function loadAttendanceForm() {
+const checkSelect = document.getElementById('checkClassSelect');
+const selectedClass = checkSelect ? checkSelect.value : '';
+const tbody = document.getElementById('attendanceTableBody');
+const submitArea = document.getElementById('submitBtnArea');
 
-            if (!selectedClass) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 text-xs sm:text-sm"><i class="fa-solid fa-layer-group block text-xl mb-1.5"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
-                if (submitArea) submitArea.classList.add('hidden');
-                return;
-            }
+if (!tbody) return;
 
-            showLoading(true);
-            fetch(`${WEB_APP_URL}?action=getTeachersByClass&className=${encodeURIComponent(selectedClass)}&targetDate=${targetDate}&isEditMode=${isEditMode}`)
-                .then(res => res.json())
-                .then(data => {
-                    tbody.innerHTML = '';
-                    if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="4" class="p-5 text-center text-slate-400 text-xs sm:text-sm">ไม่พบข้อมูลรายชื่อค่ะ</td></tr>`;
-                        if (submitArea) submitArea.classList.add('hidden');
-                        return;
-                    }
+const editDateInp = document.getElementById('editDateInput');
+const targetDate = editDateInp ? editDateInp.value : '';
 
-                    data.forEach((item, index) => {
-                        const isAbsent = item.existingStatus === "ไม่ลงแถว";
-                        const tr = document.createElement('tr');
-                        tr.className = "hover:bg-slate-50/60 border-b border-slate-100";
-                        tr.innerHTML = `
-                            <td class="p-2.5 text-center font-bold text-slate-900 text-xs sm:text-sm">
-                                ${item.className}
-                                <input type="hidden" name="class_${index}" value="${item.className}">
-                                <input type="hidden" name="teacher_${index}" value="${item.teacherName}">
-                            </td>
-                            <td class="p-2.5 font-semibold text-slate-700 text-xs sm:text-sm whitespace-normal leading-tight">${item.teacherName}</td>
-                            <td class="p-2.5">
-                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1.5 sm:gap-4 justify-center">
-                                    <label class="flex items-center gap-1.5 cursor-pointer text-emerald-700 font-bold text-[11px] sm:text-xs bg-emerald-50/50 sm:bg-transparent px-2 py-1 rounded-md sm:p-0 w-full sm:w-auto">
-                                        <input type="radio" name="status_${index}" value="ปฏิบัติหน้าที่" ${!isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, false)" class="accent-emerald-600"> ทำหน้าที่
-                                    </label>
-                                    <label class="flex items-center gap-1.5 cursor-pointer text-rose-700 font-bold text-[11px] sm:text-xs bg-rose-50/50 sm:bg-transparent px-2 py-1 rounded-md sm:p-0 w-full sm:w-auto">
-                                        <input type="radio" name="status_${index}" value="ไม่ลงแถว" ${isAbsent ? 'checked' : ''} onchange="toggleReasonField(${index}, true)" class="accent-rose-600"> ไม่ลงแถว
-                                    </label>
-                                </div>
-                            </td>
-                            <td class="p-2.5">
-                                <select id="reason_${index}" ${!isAbsent ? 'disabled' : ''} class="w-full ${!isAbsent ? 'bg-slate-100 opacity-40' : 'bg-white border-rose-300 text-rose-900'} border border-slate-300 rounded-lg px-1.5 py-1 text-[11px] sm:text-xs transition-all outline-hidden focus:border-indigo-500">
-                                    <option value="ลาป่วย" ${item.existingReason === 'ลาป่วย' ? 'selected' : ''}>ลาป่วย</option>
-                                    <option value="ลากิจ" ${item.existingReason === 'ลากิจ' ? 'selected' : ''}>ลากิจ</option>
-                                    <option value="สาย" ${item.existingReason === 'สาย' ? 'selected' : ''}>มาสาย</option>
-                                    <option value="ไปราชการ" ${item.existingReason === 'ไปราชการ' ? 'selected' : ''}>ไปราชการ</option>
-                                </select>
-                            </td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                    if (submitArea) submitArea.classList.remove('hidden');
-                })
-                .catch(err => {
-                    Swal.fire({
-                        title: 'เกิดข้อผิดพลาด',
-                        text: 'ไม่สามารถโหลดฟอร์มลงเวลาได้: ' + err,
-                        icon: 'error',
-                        confirmButtonColor: '#1e1b4b'
-                    });
-                })
-                .finally(() => showLoading(false));
-        }
+if (!selectedClass) {
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="4" class="p-6 text-center text-slate-400 text-xs sm:text-sm">
+                <i class="fa-solid fa-layer-group block text-xl mb-2"></i>
+                กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ
+            </td>
+        </tr>
+    `;
 
-        function toggleReasonField(index, show) {
-            const select = document.getElementById(`reason_${index}`);
-            if (select) {
-                if (show) {
-                    select.removeAttribute('disabled');
-                    select.className = "w-full bg-white border border-rose-300 text-rose-900 rounded-lg px-1.5 py-1 text-[11px] sm:text-xs outline-hidden transition-all";
-                } else {
-                    select.setAttribute('disabled', 'true');
-                    select.className = "w-full bg-slate-100 border border-slate-300 text-slate-400 rounded-lg px-1.5 py-1 text-[11px] sm:text-xs opacity-40 outline-hidden transition-all";
-                }
-            }
-        }
+    if (submitArea) submitArea.classList.add('hidden');
+    return;
+}
+
+showLoading(true);
+
+fetch(
+    `${WEB_APP_URL}?action=getTeachersByClass&className=${encodeURIComponent(selectedClass)}&targetDate=${targetDate}&isEditMode=${isEditMode}`
+)
+.then(res => res.json())
+.then(data => {
+
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" class="p-5 text-center text-slate-400 text-xs sm:text-sm">
+                    ไม่พบข้อมูลรายชื่อค่ะ
+                </td>
+            </tr>
+        `;
+
+        if (submitArea) submitArea.classList.add('hidden');
+        return;
+    }
+
+    data.forEach((item,index)=>{
+
+        const isAbsent =
+            item.existingStatus === "ไม่ลงแถว";
+
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+            <td>
+                <span class="font-bold text-blue-900">
+                    ${item.className}
+                </span>
+
+                <input type="hidden"
+                    name="class_${index}"
+                    value="${item.className}">
+
+                <input type="hidden"
+                    name="teacher_${index}"
+                    value="${item.teacherName}">
+            </td>
+
+            <td>
+                <span class="font-medium text-slate-700">
+                    ${item.teacherName}
+                </span>
+            </td>
+
+            <td>
+                <div class="flex flex-col gap-2 w-full">
+
+                    <label class="flex items-center gap-2 cursor-pointer text-emerald-700 font-semibold">
+                        <input
+                            type="radio"
+                            name="status_${index}"
+                            value="ปฏิบัติหน้าที่"
+                            ${!isAbsent ? 'checked' : ''}
+                            onchange="toggleReasonField(${index}, false)"
+                            class="accent-emerald-600">
+
+                        <span>ทำหน้าที่</span>
+                    </label>
+
+                    <label class="flex items-center gap-2 cursor-pointer text-rose-700 font-semibold">
+                        <input
+                            type="radio"
+                            name="status_${index}"
+                            value="ไม่ลงแถว"
+                            ${isAbsent ? 'checked' : ''}
+                            onchange="toggleReasonField(${index}, true)"
+                            class="accent-rose-600">
+
+                        <span>ไม่ลงแถว</span>
+                    </label>
+
+                </div>
+            </td>
+
+            <td>
+                <select
+                    id="reason_${index}"
+                    ${!isAbsent ? 'disabled' : ''}
+                    class="w-full border rounded-xl px-3 py-2 text-sm transition-all
+                    ${!isAbsent
+                        ? 'bg-slate-100 opacity-50 border-slate-200'
+                        : 'bg-white border-rose-300 text-rose-900'}">
+
+                    <option value="ลาป่วย"
+                        ${item.existingReason === 'ลาป่วย' ? 'selected' : ''}>
+                        ลาป่วย
+                    </option>
+
+                    <option value="ลากิจ"
+                        ${item.existingReason === 'ลากิจ' ? 'selected' : ''}>
+                        ลากิจ
+                    </option>
+
+                    <option value="สาย"
+                        ${item.existingReason === 'สาย' ? 'selected' : ''}>
+                        มาสาย
+                    </option>
+
+                    <option value="ไปราชการ"
+                        ${item.existingReason === 'ไปราชการ' ? 'selected' : ''}>
+                        ไปราชการ
+                    </option>
+
+                </select>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+
+    });
+
+    if (submitArea) {
+        submitArea.classList.remove('hidden');
+    }
+
+})
+.catch(err => {
+
+    Swal.fire({
+        title:'เกิดข้อผิดพลาด',
+        text:'ไม่สามารถโหลดฟอร์มลงเวลาได้: ' + err,
+        icon:'error',
+        confirmButtonColor:'#1e1b4b'
+    });
+
+})
+.finally(()=>showLoading(false));
+
+}
+
+function toggleReasonField(index, show) {
+    const select = document.getElementById(`reason_${index}`);
+
+    if (!select) return;
+
+    if (show) {
+
+        select.removeAttribute('disabled');
+
+        select.className =
+            "w-full min-h-[50px] bg-white border border-rose-300 text-rose-900 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium outline-hidden transition-all focus:border-rose-500 focus:ring-2 focus:ring-rose-100";
+
+    } else {
+
+        select.setAttribute('disabled', 'true');
+
+        select.className =
+            "w-full min-h-[50px] bg-slate-100 border border-slate-200 text-slate-400 rounded-xl px-3 py-2 text-xs sm:text-sm opacity-70 cursor-not-allowed outline-hidden transition-all";
+
+    }
+
+}
 
         function submitAttendance(e) {
             e.preventDefault();
@@ -1238,7 +1367,7 @@ function loadDailySummary() {
                     
                     isEditMode = false;
                     const toggleBtn = document.getElementById('toggleModeBtn');
-                    if (toggleBtn) toggleBtn.className = "bg-amber-50 text-amber-700 border border-amber-200 font-medium px-3 py-1.5 rounded-lg text-xs hover:bg-amber-100 transition flex items-center gap-1.5 cursor-pointer";
+                    if (toggleBtn) toggleBtn.className = "bg-amber-50 text-amber-700 border border-amber-200 font-semibold px-3 py-2 rounded-xl text-xs hover:bg-amber-100 transition flex items-center justify-center gap-1.5 cursor-pointer";
                     const modeTxt = document.getElementById('modeText');
                     if (modeTxt) modeTxt.innerText = "เปิดโหมดแก้ไขข้อมูลเดิม";
                     
@@ -1248,7 +1377,18 @@ function loadDailySummary() {
 
                     const checkSelect = document.getElementById('checkClassSelect');
                     if (checkSelect) checkSelect.value = "";
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-slate-400 text-xs sm:text-sm"><i class="fa-solid fa-layer-group block text-xl mb-1.5"></i> กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</td></tr>`;
+                   tbody.innerHTML = `
+<tr>
+    <td colspan="4"
+        class="p-8 text-center text-slate-400 text-xs sm:text-sm">
+        <div class="max-w-xs mx-auto">
+            <i class="fa-solid fa-layer-group block text-2xl text-blue-300 mb-2"></i>
+            <span class="font-medium text-slate-500">
+                กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ
+            </span>
+        </div>
+    </td>
+</tr>`;
                     const submitArea = document.getElementById('submitBtnArea');
                     if (submitArea) submitArea.classList.add('hidden');
                     
@@ -1301,37 +1441,83 @@ function loadDailySummary() {
         }
 
         // 3. ส่วนสถิติสะสม (ปรับ Layout ของแถวตารางให้อ่านง่ายขึ้น ไม่ดันความกว้างหลุดหน้าจอมือถือ)
-        function loadAttendanceStats() {
-            const statsSelect = document.getElementById('statsClassSelect');
-            const levelFilter = statsSelect ? statsSelect.value : '';
-            const tbody = document.getElementById('statsTableBody');
-            if (!tbody) return;
-            tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500 text-xs sm:text-sm"><i class="fa-solid fa-spinner animate-spin mr-1.5"></i>กำลังสรุปสถิติ...</td></tr>`;
+       function loadAttendanceStats() {
+    const statsSelect = document.getElementById('statsClassSelect');
+    const levelFilter = statsSelect ? statsSelect.value : '';
+    const tbody = document.getElementById('statsTableBody');
 
-            fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}&rangeType=${currentStatsRangeType}`)
-                .then(res => res.json())
-                .then(data => {
-                    tbody.innerHTML = '';
-                    if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 text-xs sm:text-sm">ยังไม่มีข้อมูลในระบบสะสมค่ะ</td></tr>`;
-                        return;
-                    }
-                    data.forEach(item => {
-                        const tr = document.createElement('tr');
-                        tr.className = "hover:bg-slate-50 text-center border-b border-slate-100";
-                        tr.innerHTML = `
-                            <td class="p-2.5 font-bold text-slate-900 text-xs sm:text-sm">${item.className}</td>
-                            <td class="p-2.5 text-left font-semibold text-slate-700 text-xs sm:text-sm max-w-[130px] truncate">${item.teacherName}</td>
-                            <td class="p-2.5 bg-slate-50 font-mono font-bold text-slate-800 text-xs sm:text-sm">${item.total}</td>
-                            <td class="p-2.5 text-emerald-700 bg-emerald-50/30 font-bold text-xs sm:text-sm">${item.present}</td>
-                            <td class="p-2.5 text-rose-700 bg-rose-50/30 font-bold text-xs sm:text-sm">${item.absent}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                })
-                .catch(err => tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-500 text-xs sm:text-sm">ผิดพลาด: ${err}</td></tr>`);
-        }
+    if (!tbody) return;
 
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="5" class="p-6 text-center text-slate-500 text-xs sm:text-sm">
+                <i class="fa-solid fa-spinner animate-spin mr-1.5"></i>
+                กำลังสรุปสถิติ...
+            </td>
+        </tr>
+    `;
+
+    fetch(`${WEB_APP_URL}?action=getMonthlyStats&className=${encodeURIComponent(levelFilter)}&rangeType=${currentStatsRangeType}`)
+        .then(res => res.json())
+        .then(data => {
+
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="p-6 text-center text-slate-400 text-xs sm:text-sm">
+                            ยังไม่มีข้อมูลในระบบสะสมค่ะ
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            data.forEach(item => {
+
+                const tr = document.createElement('tr');
+
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-slate-900 text-xs sm:text-sm">
+                        ${item.className}
+                    </td>
+
+                    <td class="p-3 font-semibold text-slate-700 text-xs sm:text-sm whitespace-normal break-words">
+                        ${item.teacherName}
+                    </td>
+
+                    <td class="p-3 font-mono font-bold text-slate-800 text-xs sm:text-sm">
+                        ${item.total}
+                    </td>
+
+                    <td class="p-3 font-bold text-emerald-700 text-xs sm:text-sm">
+                        ${item.present}
+                    </td>
+
+                    <td class="p-3 font-bold text-rose-700 text-xs sm:text-sm">
+                        ${item.absent}
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+
+            });
+
+        })
+        .catch(err => {
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="p-4 text-center text-rose-500 text-xs sm:text-sm">
+                        ผิดพลาด: ${err}
+                    </td>
+                </tr>
+            `;
+
+        });
+}
+            
         function loadMonthlyStats() {
             loadAttendanceStats();
         }
