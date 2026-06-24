@@ -190,22 +190,38 @@ select {
     padding-right: 1.75rem !important;
 }
 
-/* บังคับให้ตารางกางออกตามขนาดจริงของข้อมูล ไม่บีบตัวจนทับกันบนมือถือ */
-#dashboardTableBody text-slate-800, 
-#statsTableBody text-slate-700,
+/* ลบอันเก่าออกแล้ววางชุดนี้แทนที่ได้เลยครับ */
+
+/* 1. บังคับตารางให้กางเต็มหน้าจอพอดี 100% ไม่ทะลุออกไปขวา */
 table {
-    table-layout: auto !important;
+    width: 100% !important;
+    table-layout: fixed !important; /* บังคับแบ่งสัดส่วนคอลัมน์ตามที่เรากำหนด */
 }
 
-/* เพิ่มการเว้นระยะห่างขั้นต่ำให้กับคอลัมน์ชื่อครูและผู้ตรวจ ไม่ให้โดนคอลัมน์อื่นเบียด */
-#dashboardTableBody td:nth-child(2),
-#statsTableBody td:nth-child(2) {
-    min-width: 150px !important; /* ล็อกความกว้างขั้นต่ำของชื่อครู */
-    padding-right: 12px !important;
+/* 2. ปรับขนาดตัวอักษรของตารางทั้งสองให้กะทัดรัด */
+#dashboardTableBody td, 
+#statsTableBody td {
+    font-size: 10px !important;
 }
 
-#dashboardTableBody td:nth-child(5) {
-    min-width: 120px !important; /* ล็อกความกว้างขั้นต่ำของชื่อผู้ตรวจ */
+/* 3. จัดสัดส่วนคอลัมน์ของแท็บ "สรุปวันนี้รายชั้น" บนมือถือ */
+@media (max-width: 768px) {
+    /* สัดส่วน: ห้อง(12%) ชื่อครู(35%) สถานะ(23%) เหตุผล(12%) ผู้ตรวจ(18%) รวมครบ 100% */
+    #dashboardTableBody th:nth-child(1), #dashboardTableBody td:nth-child(1) { width: 12% !important; }
+    #dashboardTableBody th:nth-child(2), #dashboardTableBody td:nth-child(2) { width: 35% !important; white-space: normal !important; word-break: break-word; }
+    #dashboardTableBody th:nth-child(3), #dashboardTableBody td:nth-child(3) { width: 23% !important; }
+    #dashboardTableBody th:nth-child(4), #dashboardTableBody td:nth-child(4) { width: 12% !important; }
+    #dashboardTableBody th:nth-child(5), #dashboardTableBody td:nth-child(5) { width: 18% !important; white-space: normal !important; word-break: break-word; }
+}
+
+/* 4. จัดสัดส่วนคอลัมน์ของแท็บ "หน้าสถิติรายงาน" บนมือถือ */
+@media (max-width: 768px) {
+    /* สัดส่วน: ห้อง(15%) ชื่อครู(43%) รวม(14%) ปฏิบัติหน้าที่(14%) ไม่ลงแถว(14%) รวมครบ 100% */
+    #statsTableBody th:nth-child(1), #statsTableBody td:nth-child(1) { width: 15% !important; }
+    #statsTableBody th:nth-child(2), #statsTableBody td:nth-child(2) { width: 43% !important; white-space: normal !important; word-break: break-word; }
+    #statsTableBody th:nth-child(3), #statsTableBody td:nth-child(3) { width: 14% !important; }
+    #statsTableBody th:nth-child(4), #statsTableBody td:nth-child(4) { width: 14% !important; }
+    #statsTableBody th:nth-child(5), #statsTableBody td:nth-child(5) { width: 14% !important; }
 }
 </style>
 </head>
