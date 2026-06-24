@@ -190,38 +190,58 @@ select {
     padding-right: 1.75rem !important;
 }
 
-/* ลบอันเก่าออกแล้ววางชุดนี้แทนที่ได้เลยครับ */
-
-/* 1. บังคับตารางให้กางเต็มหน้าจอพอดี 100% ไม่ทะลุออกไปขวา */
+/* บังคับตารางให้กางเต็มหน้าจอพอดี 100% ไม่ทะลุออกไปขวา */
 table {
     width: 100% !important;
-    table-layout: fixed !important; /* บังคับแบ่งสัดส่วนคอลัมน์ตามที่เรากำหนด */
+    table-layout: fixed !important;
 }
 
-/* 2. ปรับขนาดตัวอักษรของตารางทั้งสองให้กะทัดรัด */
+/* 1. ย่อขนาดตัวอักษรของตารางลงอีกระดับเพื่อให้ชื่อยาวๆ แสดงผลได้ง่ายขึ้น */
 #dashboardTableBody td, 
 #statsTableBody td {
-    font-size: 10px !important;
+    font-size: 9px !important;
 }
 
-/* 3. จัดสัดส่วนคอลัมน์ของแท็บ "สรุปวันนี้รายชั้น" บนมือถือ */
+/* 2. จัดสัดส่วนคอลัมน์ของแท็บ "สรุปวันนี้รายชั้น" บนมือถือ */
 @media (max-width: 768px) {
-    /* สัดส่วน: ห้อง(12%) ชื่อครู(35%) สถานะ(23%) เหตุผล(12%) ผู้ตรวจ(18%) รวมครบ 100% */
-    #dashboardTableBody th:nth-child(1), #dashboardTableBody td:nth-child(1) { width: 12% !important; }
-    #dashboardTableBody th:nth-child(2), #dashboardTableBody td:nth-child(2) { width: 35% !important; white-space: normal !important; word-break: break-word; }
-    #dashboardTableBody th:nth-child(3), #dashboardTableBody td:nth-child(3) { width: 23% !important; }
-    #dashboardTableBody th:nth-child(4), #dashboardTableBody td:nth-child(4) { width: 12% !important; }
-    #dashboardTableBody th:nth-child(5), #dashboardTableBody td:nth-child(5) { width: 18% !important; white-space: normal !important; word-break: break-word; }
+    /* ปรับใหม่: บีบห้องเหลือ 8% | ขยายชื่อครูเป็น 42% | สถานะ 22% | เหตุผล 10% | ผู้ตรวจ 18% */
+    #dashboardTableBody th:nth-child(1), #dashboardTableBody td:nth-child(1) { width: 8% !important; }
+    
+    /* คอลัมน์ชื่อครู: ขยายกว้างขึ้น และเพิ่ม padding-right เพื่อดันคอลัมน์สถานะไม่ให้ชิดกันเกินไป */
+    #dashboardTableBody th:nth-child(2), #dashboardTableBody td:nth-child(2) { 
+        width: 42% !important; 
+        white-space: normal !important; 
+        word-break: break-word;
+        padding-right: 8px !important; 
+    }
+    
+    #dashboardTableBody th:nth-child(3), #dashboardTableBody td:nth-child(3) { width: 22% !important; }
+    #dashboardTableBody th:nth-child(4), #dashboardTableBody td:nth-child(4) { width: 10% !important; }
+    
+    /* คอลัมน์ผู้ตรวจ: ขยายเพิ่มพื้นที่ให้อ่านง่าย */
+    #dashboardTableBody th:nth-child(5), #dashboardTableBody td:nth-child(5) { 
+        width: 18% !important; 
+        white-space: normal !important; 
+        word-break: break-word; 
+    }
 }
 
-/* 4. จัดสัดส่วนคอลัมน์ของแท็บ "หน้าสถิติรายงาน" บนมือถือ */
+/* 3. จัดสัดส่วนคอลัมน์ของแท็บ "หน้าสถิติรายงาน" บนมือถือ */
 @media (max-width: 768px) {
-    /* สัดส่วน: ห้อง(15%) ชื่อครู(43%) รวม(14%) ปฏิบัติหน้าที่(14%) ไม่ลงแถว(14%) รวมครบ 100% */
-    #statsTableBody th:nth-child(1), #statsTableBody td:nth-child(1) { width: 15% !important; }
-    #statsTableBody th:nth-child(2), #statsTableBody td:nth-child(2) { width: 43% !important; white-space: normal !important; word-break: break-word; }
-    #statsTableBody th:nth-child(3), #statsTableBody td:nth-child(3) { width: 14% !important; }
-    #statsTableBody th:nth-child(4), #statsTableBody td:nth-child(4) { width: 14% !important; }
-    #statsTableBody th:nth-child(5), #statsTableBody td:nth-child(5) { width: 14% !important; }
+    /* ปรับใหม่: บีบห้องเหลือ 10% | ขยายชื่อครูเป็น 51% | สถิติอื่นๆ ช่องละ 13% */
+    #statsTableBody th:nth-child(1), #statsTableBody td:nth-child(1) { width: 10% !important; }
+    
+    /* คอลัมน์ชื่อครูที่ปรึกษาหน้าสถิติ: ขยายให้จุใจ และเว้นระยะห่างก่อนถึงคอลัมน์ถัดไป */
+    #statsTableBody th:nth-child(2), #statsTableBody td:nth-child(2) { 
+        width: 51% !important; 
+        white-space: normal !important; 
+        word-break: break-word;
+        padding-right: 8px !important;
+    }
+    
+    #statsTableBody th:nth-child(3), #statsTableBody td:nth-child(3) { width: 13% !important; }
+    #statsTableBody th:nth-child(4), #statsTableBody td:nth-child(4) { width: 13% !important; }
+    #statsTableBody th:nth-child(5), #statsTableBody td:nth-child(5) { width: 13% !important; }
 }
 </style>
 </head>
