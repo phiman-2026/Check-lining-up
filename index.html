@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>ระบบเช็คการปฏิบัติงานลงแถวครู - โรงเรียนพิมานพิทยาสรรค์</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -799,10 +799,10 @@ select {
             if (!selectedClass) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6">
+                        <td colspan="5">
                             <div class="py-6 text-center">
                                 <i class="fa-solid fa-arrow-pointer block text-2xl text-blue-300 mb-2"></i>
-                                <span class="text-xs font-medium text-slate-500">
+                                <span class="text-[11px] font-medium text-slate-500">
                                     กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล
                                 </span>
                             </div>
@@ -821,7 +821,7 @@ select {
                 if (data.length === 0) {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="6" class="py-6 text-center text-slate-400 text-xs sm:text-sm">
+                            <td colspan="5" class="py-6 text-center text-slate-400 text-[11px] whitespace-nowrap">
                                 ไม่พบตารางรายห้องเรียน
                             </td>
                         </tr>
@@ -838,13 +838,13 @@ select {
                     }
 
                     const tr = document.createElement('tr');
+                    // จัดตำแหน่ง: ระดับชั้น(กลาง), ชื่อครู(ซ้าย), สถานะ(กลาง), หมายเหตุ(กลาง), ผู้ตรวจ(ซ้าย)
                     tr.innerHTML = `
-                        <td><span class="font-bold text-blue-900">${item.className}</span></td>
-                        <td>${item.teacherName}</td>
-                        <td><span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold ${statusColor}">${item.status}</span></td>
-                        <td>${item.reason || '-'}</td>
-                        <td><span class="font-mono text-xs text-slate-500">${item.time}</span></td>
-                        <td>${item.recorder || '-'}</td>
+                        <td class="p-2 text-center text-[11px] font-bold text-blue-900 border-b border-slate-200 whitespace-nowrap">${item.className}</td>
+                        <td class="p-2 text-left text-[11px] font-medium text-slate-800 border-b border-slate-200 whitespace-nowrap">${item.teacherName}</td>
+                        <td class="p-2 text-center text-[11px] border-b border-slate-200 whitespace-nowrap"><span class="inline-flex items-center px-2 py-0.5 rounded-md font-bold ${statusColor}">${item.status}</span></td>
+                        <td class="p-2 text-center text-[11px] text-slate-600 border-b border-slate-200 whitespace-nowrap">${item.reason || '-'}</td>
+                        <td class="p-2 text-left text-[11px] text-slate-600 border-b border-slate-200 whitespace-nowrap">${item.recorder || '-'}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -852,7 +852,7 @@ select {
             .catch(err => {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="py-6 text-center text-rose-500 text-xs sm:text-sm">
+                        <td colspan="5" class="py-6 text-center text-rose-500 text-[11px] whitespace-nowrap">
                             ผิดพลาด: ${err}
                         </td>
                     </tr>
@@ -1122,7 +1122,7 @@ select {
             loadAttendanceStats(); 
         }
 
-        function loadAttendanceStats() {
+      function loadAttendanceStats() {
             const statsSelect = document.getElementById('statsClassSelect');
             const levelFilter = statsSelect ? statsSelect.value : '';
             const tbody = document.getElementById('statsTableBody');
@@ -1130,7 +1130,7 @@ select {
 
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="5" class="p-6 text-center text-slate-500 text-xs sm:text-sm">
+                    <td colspan="5" class="p-6 text-center text-slate-500 text-[11px] whitespace-nowrap">
                         <i class="fa-solid fa-spinner animate-spin mr-1.5"></i>
                         กำลังสรุปสถิติ...
                     </td>
@@ -1144,7 +1144,7 @@ select {
                     if (data.length === 0) {
                         tbody.innerHTML = `
                             <tr>
-                                <td colspan="5" class="p-6 text-center text-slate-400 text-xs sm:text-sm">
+                                <td colspan="5" class="p-6 text-center text-slate-400 text-[11px] whitespace-nowrap">
                                     ยังไม่มีข้อมูลในระบบสะสมค่ะ
                                 </td>
                             </tr>
@@ -1154,12 +1154,13 @@ select {
 
                     data.forEach(item => {
                         const tr = document.createElement('tr');
+                        // จัดตำแหน่ง: ระดับชั้น(กลาง), ชื่อครู(ซ้าย), รวม(กลาง), ทำหน้าที่(กลาง), ไม่ลงแถว(กลาง)
                         tr.innerHTML = `
-                            <td class="p-3 font-bold text-slate-900 text-xs sm:text-sm">${item.className}</td>
-                            <td class="p-3 font-semibold text-slate-700 text-xs sm:text-sm whitespace-normal break-words">${item.teacherName}</td>
-                            <td class="p-3 font-mono font-bold text-slate-800 text-xs sm:text-sm">${item.total}</td>
-                            <td class="p-3 font-bold text-emerald-700 text-xs sm:text-sm">${item.present}</td>
-                            <td class="p-3 font-bold text-rose-700 text-xs sm:text-sm">${item.absent}</td>
+                            <td class="p-2 text-center text-[11px] font-bold text-slate-900 border-b border-slate-200 whitespace-nowrap">${item.className}</td>
+                            <td class="p-2 text-left text-[11px] font-semibold text-slate-700 border-b border-slate-200 whitespace-nowrap">${item.teacherName}</td>
+                            <td class="p-2 text-center text-[11px] font-mono font-bold text-slate-800 border-b border-slate-200 whitespace-nowrap">${item.total}</td>
+                            <td class="p-2 text-center text-[11px] font-bold text-emerald-700 border-b border-slate-200 whitespace-nowrap">${item.present}</td>
+                            <td class="p-2 text-center text-[11px] font-bold text-rose-700 border-b border-slate-200 whitespace-nowrap">${item.absent}</td>
                         `;
                         tbody.appendChild(tr);
                     });
@@ -1167,7 +1168,7 @@ select {
                 .catch(err => {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="5" class="p-4 text-center text-rose-500 text-xs sm:text-sm">
+                            <td colspan="5" class="p-4 text-center text-rose-500 text-[11px] whitespace-nowrap">
                                 ผิดพลาด: ${err}
                             </td>
                         </tr>
