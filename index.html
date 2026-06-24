@@ -194,31 +194,40 @@ select {
 table {
     width: 100% !important;
     table-layout: fixed !important;
+    border-collapse: collapse !important;
 }
 
-/* 1. ย่อขนาดตัวอักษรของตารางลงอีกระดับเพื่อให้ชื่อยาวๆ แสดงผลได้ง่ายขึ้น */
+/* 1. ย่อขนาดตัวอักษรของหัวตาราง (th) ให้เล็กจิ๋วลง เพื่อไม่ให้คำซ้อนกันบนมือถือ */
+thead th {
+    font-size: 9px !important;
+    padding: 6px 2px !important; /* ลด padding แนวนอนไม่ให้ดันกัน */
+    line-height: 1.2 !important;
+}
+
+/* 2. ขนาดตัวอักษรของเนื้อหาในตาราง (td) */
 #dashboardTableBody td, 
 #statsTableBody td {
     font-size: 9px !important;
+    padding: 8px 4px !important; /* เว้นช่องไฟให้ดูสบายตาขึ้น */
 }
 
-/* 2. จัดสัดส่วนคอลัมน์ของแท็บ "สรุปวันนี้รายชั้น" บนมือถือ */
+/* 3. จัดสัดส่วนคอลัมน์ของแท็บ "สรุปวันนี้รายชั้น" บนมือถือ */
 @media (max-width: 768px) {
-    /* ปรับใหม่: บีบห้องเหลือ 8% | ขยายชื่อครูเป็น 42% | สถานะ 22% | เหตุผล 10% | ผู้ตรวจ 18% */
-    #dashboardTableBody th:nth-child(1), #dashboardTableBody td:nth-child(1) { width: 8% !important; }
+    /* ห้อง 10% | ชื่อครู 40% | สถานะ 22% | เหตุผล 10% | ผู้ตรวจ 18% */
+    #dashboardTableBody th:nth-child(1), #dashboardTableBody td:nth-child(1) { width: 10% !important; }
     
-    /* คอลัมน์ชื่อครู: ขยายกว้างขึ้น และเพิ่ม padding-right เพื่อดันคอลัมน์สถานะไม่ให้ชิดกันเกินไป */
+    /* คอลัมน์ชื่อครู: เพิ่มพื้นที่ และเว้นระยะห่างด้านขวา (padding-right) กันสถานะวิ่งมาชน */
     #dashboardTableBody th:nth-child(2), #dashboardTableBody td:nth-child(2) { 
-        width: 42% !important; 
+        width: 40% !important; 
         white-space: normal !important; 
         word-break: break-word;
-        padding-right: 8px !important; 
+        padding-right: 6px !important; 
     }
     
     #dashboardTableBody th:nth-child(3), #dashboardTableBody td:nth-child(3) { width: 22% !important; }
     #dashboardTableBody th:nth-child(4), #dashboardTableBody td:nth-child(4) { width: 10% !important; }
     
-    /* คอลัมน์ผู้ตรวจ: ขยายเพิ่มพื้นที่ให้อ่านง่าย */
+    /* คอลัมน์ผู้ตรวจ */
     #dashboardTableBody th:nth-child(5), #dashboardTableBody td:nth-child(5) { 
         width: 18% !important; 
         white-space: normal !important; 
@@ -226,19 +235,15 @@ table {
     }
 }
 
-/* 3. จัดสัดส่วนคอลัมน์ของแท็บ "หน้าสถิติรายงาน" บนมือถือ */
+/* 4. จัดสัดส่วนคอลัมน์ของแท็บ "หน้าสถิติรายงาน" บนมือถือ */
 @media (max-width: 768px) {
-    /* ปรับใหม่: บีบห้องเหลือ 10% | ขยายชื่อครูเป็น 51% | สถิติอื่นๆ ช่องละ 13% */
     #statsTableBody th:nth-child(1), #statsTableBody td:nth-child(1) { width: 10% !important; }
-    
-    /* คอลัมน์ชื่อครูที่ปรึกษาหน้าสถิติ: ขยายให้จุใจ และเว้นระยะห่างก่อนถึงคอลัมน์ถัดไป */
     #statsTableBody th:nth-child(2), #statsTableBody td:nth-child(2) { 
         width: 51% !important; 
         white-space: normal !important; 
         word-break: break-word;
-        padding-right: 8px !important;
+        padding-right: 6px !important;
     }
-    
     #statsTableBody th:nth-child(3), #statsTableBody td:nth-child(3) { width: 13% !important; }
     #statsTableBody th:nth-child(4), #statsTableBody td:nth-child(4) { width: 13% !important; }
     #statsTableBody th:nth-child(5), #statsTableBody td:nth-child(5) { width: 13% !important; }
@@ -376,13 +381,13 @@ table {
 
                     <div class="w-full overflow-hidden">
                         <table class="w-full text-left border-collapse table-fixed sm:table-auto text-[10px] sm:text-sm">
-                            <thead>
-    <tr class="bg-slate-100 text-[10px] sm:text-xs text-slate-700 uppercase tracking-wider">
-        <th class="p-2 text-center font-bold whitespace-nowrap">ห้อง</th>
-        <th class="p-2 text-left font-bold whitespace-nowrap">ชื่อครูที่ปรึกษา</th>
-        <th class="p-2 text-center font-bold whitespace-nowrap">สถานะวันนี้</th>
-        <th class="p-2 text-center font-bold whitespace-nowrap">เหตุผล</th>
-        <th class="p-2 text-left font-bold whitespace-nowrap">ผู้ตรวจ</th>
+                          <thead>
+    <tr class="bg-slate-100 text-slate-700">
+        <th class="p-2 text-center font-bold">ห้อง</th>
+        <th class="p-2 text-left font-bold">ชื่อครูที่ปรึกษา</th>
+        <th class="p-2 text-center font-bold">สถานะวันนี้</th>
+        <th class="p-2 text-center font-bold">เหตุผล</th>
+        <th class="p-2 text-left font-bold">ผู้ตรวจ</th>
     </tr>
 </thead>
                             <tbody id="dashboardTableBody">
