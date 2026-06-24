@@ -10,12 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=K2D:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
- <style>
+<style>
 body{
     font-family:'K2D',sans-serif;
     background:#f1f5f9;
     -webkit-tap-highlight-color:transparent;
-    overflow-x:hidden;
+    overflow-x:auto; /* ⚙️ ปรับเปิดพื้นที่ให้หน้าจอมือถือซูมและขยายความกว้างแนวราบได้ */
 }
 
 .overflow-x-auto::-webkit-scrollbar{
@@ -39,7 +39,7 @@ body{
 }
 
 /* =====================================
-   MOBILE
+   MOBILE OPTIMIZATION (KEEP TRADITIONAL TABLE VIEW)
 ===================================== */
 
 @media(max-width:768px){
@@ -144,249 +144,12 @@ input[type="password"],
 input[type="date"],
 input[type="month"],
 select{
-    min-height:50px!important;
-    border-radius:14px!important;
+    min-height:40px!important;
+    border-radius:8px!important;
 }
 
 button{
-    min-height:48px;
-}
-
-/* =====================================
-   Hide Table Header
-===================================== */
-
-table thead{
-    display:none!important;
-}
-
-/* =====================================
-   DASHBOARD CARD
-===================================== */
-
-#dashboardTableBody tr:not(:has(td[colspan])),
-#attendanceTableBody tr:not(:has(td[colspan])),
-#statsTableBody tr{
-
-    display:block!important;
-    background:#ffffff!important;
-
-    border-radius:22px!important;
-
-    padding:0!important;
-
-    margin-bottom:16px!important;
-
-    overflow:hidden!important;
-
-    border:1px solid #dbeafe!important;
-
-    box-shadow:
-    0 4px 14px rgba(15,23,42,.05),
-    0 1px 2px rgba(15,23,42,.08)!important;
-}
-
-/* แถวแรกเป็นหัวการ์ด */
-
-#dashboardTableBody tr td:first-child,
-#attendanceTableBody tr td:first-child,
-#statsTableBody tr td:first-child{
-
-    background:linear-gradient(
-    135deg,
-    #1e40af,
-    #2563eb);
-
-    color:white!important;
-
-    font-weight:800!important;
-
-    padding:14px 16px!important;
-
-    border:none!important;
-
-    justify-content:center!important;
-
-    text-align:center!important;
-
-    font-size:15px!important;
-}
-
-/* รายการข้อมูล */
-
-#dashboardTableBody tr td:not(:first-child),
-#attendanceTableBody tr td:not(:first-child),
-#statsTableBody tr td:not(:first-child){
-
-    display:flex!important;
-
-    flex-direction:column!important;
-
-    align-items:flex-start!important;
-
-    gap:4px!important;
-
-    padding:12px 16px!important;
-
-    border-bottom:1px dashed #e2e8f0!important;
-
-    text-align:left!important;
-
-    white-space:normal!important;
-}
-
-#dashboardTableBody tr td:last-child,
-#attendanceTableBody tr td:last-child,
-#statsTableBody tr td:last-child{
-    border-bottom:none!important;
-}
-
-/* Label */
-
-#dashboardTableBody tr td:not(:first-child)::before,
-#attendanceTableBody tr td:not(:first-child)::before,
-#statsTableBody tr td:not(:first-child)::before{
-
-    display:block!important;
-
-    font-size:11px!important;
-
-    font-weight:700!important;
-
-    letter-spacing:.3px;
-
-    color:#64748b!important;
-
-    margin-bottom:2px!important;
-}
-
-/* Dashboard */
-
-#dashboardTableBody tr td:nth-child(2)::before{
-    content:"ครูที่ปรึกษา";
-}
-
-#dashboardTableBody tr td:nth-child(3)::before{
-    content:"สถานะการปฏิบัติงาน";
-}
-
-#dashboardTableBody tr td:nth-child(4)::before{
-    content:"เหตุผล";
-}
-
-#dashboardTableBody tr td:nth-child(5)::before{
-    content:"เวลาบันทึก";
-}
-
-#dashboardTableBody tr td:nth-child(6)::before{
-    content:"ผู้ตรวจ";
-}
-
-/* Attendance */
-
-#attendanceTableBody tr td:nth-child(2)::before{
-    content:"ครูที่ปรึกษา";
-}
-
-#attendanceTableBody tr td:nth-child(3)::before{
-    content:"สถานะ";
-}
-
-#attendanceTableBody tr td:nth-child(4)::before{
-    content:"สาเหตุ";
-}
-
-/* Statistics */
-
-#statsTableBody tr td:nth-child(2)::before{
-    content:"ชื่อ-สกุล";
-}
-
-#statsTableBody tr td:nth-child(3)::before{
-    content:"จำนวนทั้งหมด";
-}
-
-#statsTableBody tr td:nth-child(4)::before{
-    content:"ปฏิบัติหน้าที่";
-}
-
-#statsTableBody tr td:nth-child(5)::before{
-    content:"ไม่ปฏิบัติหน้าที่";
-}
-
-/* =====================================
-   STATUS BADGE
-===================================== */
-
-#dashboardTableBody .bg-emerald-50{
-    background:#dcfce7!important;
-    border:1px solid #22c55e!important;
-    color:#166534!important;
-    border-radius:999px!important;
-    padding:6px 12px!important;
-    font-size:12px!important;
-}
-
-#dashboardTableBody .bg-rose-50{
-    background:#fee2e2!important;
-    border:1px solid #ef4444!important;
-    color:#991b1b!important;
-    border-radius:999px!important;
-    padding:6px 12px!important;
-    font-size:12px!important;
-}
-
-/* =====================================
-   FORM CARD
-===================================== */
-
-#attendanceTableBody td .flex{
-    width:100%!important;
-    max-width:100%!important;
-}
-
-#attendanceTableBody select{
-    width:100%!important;
-}
-
-#attendanceTableBody label{
-    width:100%!important;
-}
-
-/* =====================================
-   STATS
-===================================== */
-
-#statsTableBody tr td:nth-child(4){
-    background:#f0fdf4;
-}
-
-#statsTableBody tr td:nth-child(5){
-    background:#fef2f2;
-}
-
-/* =====================================
-   CARD ANIMATION
-===================================== */
-
-#dashboardTableBody tr,
-#attendanceTableBody tr,
-#statsTableBody tr{
-
-    animation:fadeCard .25s ease;
-}
-
-@keyframes fadeCard{
-
-    from{
-        opacity:0;
-        transform:translateY(8px);
-    }
-
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
+    min-height:44px;
 }
 
 /* =====================================
@@ -409,78 +172,11 @@ td[colspan]{
 
 }
 
-/* ==========================================================================
-   📱 MOBILE APP STYLE OPTIMIZATION BY AFFAN (PS-SARABUN)
-   ========================================================================== */
-
-/* 1. จัดการขนาดแบนเนอร์ให้กะทัดรัดขึ้นในหน้าจอมือถือ ไม่กินพื้นที่ */
-@media (max-width: 768px) {
-    /* สมมติว่าแบนเนอร์ใช้คลาสหรือแท็กหัวข้อหลัก */
-    .banner-container, 
-    header, 
-    div[class*="bg-indigo-950"] .max-w-7xl {
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
-    }
-    
-    .banner-title,
-    h1 {
-        font-size: 1.35rem !important;
-        line-height: 1.75rem !important;
-    }
-    
-    /* 2. เปลี่ยนโครงสร้างตาราง (Table) ให้กลายร่างเป็นระบบการ์ดอิสระบนมือถือ */
-    #attendanceTableBody {
-        display: block !important;
-        background: transparent !important;
-    }
-
-    #attendanceTableBody tr {
-        display: block !important;
-        margin-bottom: 1.25rem !important;
-        background-color: #ffffff !important;
-        border: 2px solid #e2e8f0 !important;
-        border-radius: 1.25rem !important;
-        padding: 1.25rem !important;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05) !important;
-        transition: all 0.2s ease-in-out;
-    }
-
-    /* ปรับแต่งเมื่อมีการกดยกเว้นการลงแถว (ให้การ์ดเปลี่ยนสีขอบเด่นชัดขึ้น) */
-    #attendanceTableBody tr:has(input[value="ไม่ลงแถว"]:checked) {
-        border-color: #fca5a5 !important;
-        background-color: #ffff8f32 !important;
-    }
-
-    /* สั่งซ่อนหัวตาราง (Thead) เดิมในโหมดมือถือ เพราะใช้ระบบการ์ดระบุหัวข้อชัดเจนอยู่แล้ว */
-    #attendanceTableBody:parent table thead,
-    table:has(#attendanceTableBody) thead {
-        display: none !important;
-    }
-
-    /* ทำลายคุณสมบัติเซลล์ของตาราง ให้แสดงผลบล็อกแบบอิสระ */
-    #attendanceTableBody td {
-        display: block !important;
-        padding: 0 !important;
-        width: 100% !important;
-        border: none !important;
-        text-align: left !important;
-    }
-
-    /* เพิ่มขนาดตัวหนังสือและสีสไตล์แอปพลิเคชันให้ครูที่ปรึกษา */
-    #attendanceTableBody td:nth-child(2) {
-        font-size: 1.1rem !important;
-        color: #0f172a !important; /* สีกระดานชนวนเข้ม ชัดเจนมาก */
-        font-weight: 800 !important;
-        margin-bottom: 0.75rem !important;
-    }
-}
-
-/* 3. สไตล์เพิ่มเติมสำหรับการควบคุมปุ่มวิทยุ (Radio) และ Dropdown กล่องข้อความให้กดง่ายในมือถือ */
+/* 🛠️ ปรับปุ่มวิทยุ (Radio) และกล่องเลือกเหตุผลให้สเกลสวยงาม ไม่เบียดกัน */
 input[type="radio"] {
     cursor: pointer;
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.15rem;
+    height: 1.15rem;
 }
 
 select {
@@ -489,8 +185,9 @@ select {
     appearance: none;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
     background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 1.25rem;
+    background-position: right 0.5rem center;
+    background-size: 1rem;
+    padding-right: 1.75rem !important;
 }
 </style>
 </head>
@@ -579,8 +276,7 @@ select {
             </div>
         </div>
 
-        <section id="loginSection"
-class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border border-blue-100 p-6 space-y-5">
+        <section id="loginSection" class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border border-blue-100 p-6 space-y-5">
             <div class="text-center space-y-1">
                 <div class="bg-blue-50 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center text-xl mx-auto mb-2 shadow-inner">
                     <i class="fa-solid fa-lock"></i>
@@ -619,31 +315,31 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
                         </div>
                     </div>
 
-                  <div class="w-full overflow-hidden">
-    <table class="w-full text-left border-collapse text-xs sm:text-sm">
-        <thead class="hidden sm:table-header-group">
-            <tr class="bg-blue-50/40 border-b border-blue-100 text-blue-900 font-semibold">
-                <th class="p-3.5 text-center w-24">ห้องเรียน</th>
-                <th class="p-3.5">ชื่อครูที่ปรึกษา (ร่วม)</th>
-                <th class="p-3.5 text-center w-36">status วันนี้</th>
-                <th class="p-3.5">เหตุผลกรณีไม่ลงแถว</th>
-                <th class="p-3.5 text-center w-24">เวลาบันทึก</th>
-                <th class="p-3.5">ผู้บันทึกตรวจ</th>
-            </tr>
-        </thead>
-        
-        <tbody id="dashboardTableBody">
-            <tr class="flex flex-col sm:table-row bg-white rounded-2xl sm:rounded-none p-6 sm:p-0 border border-slate-100 sm:border-none shadow-2xs sm:shadow-none">
-                <td colspan="6" class="p-4 sm:p-10 text-center text-slate-400 bg-slate-50/40 sm:bg-transparent rounded-2xl sm:rounded-none">
-                    <div class="max-w-xs mx-auto py-4 sm:py-0">
-                        <i class="fa-solid fa-arrow-pointer block text-2xl text-blue-300 mb-2"></i> 
-                        <span class="text-xs font-medium text-slate-500">กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</span>
+                    <div class="w-full overflow-x-auto select-none" style="-webkit-overflow-scrolling: touch;">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm min-w-[700px]">
+                            <thead>
+                                <tr class="bg-blue-50/40 border-b border-blue-100 text-blue-900 font-semibold">
+                                    <th class="p-3.5 text-center w-24">ห้องเรียน</th>
+                                    <th class="p-3.5">ชื่อครูที่ปรึกษา (ร่วม)</th>
+                                    <th class="p-3.5 text-center w-36">status วันนี้</th>
+                                    <th class="p-3.5">เหตุผลกรณีไม่ลงแถว</th>
+                                    <th class="p-3.5 text-center w-24">เวลาบันทึก</th>
+                                    <th class="p-3.5">ผู้บันทึกตรวจ</th>
+                                </tr>
+                            </thead>
+                            
+                            <tbody id="dashboardTableBody">
+                                <tr>
+                                    <td colspan="6" class="p-10 text-center text-slate-400 bg-slate-50/40 rounded-2xl sm:rounded-none">
+                                        <div class="max-w-xs mx-auto py-4 sm:py-0">
+                                            <i class="fa-solid fa-arrow-pointer block text-2xl text-blue-300 mb-2"></i> 
+                                            <span class="text-xs font-medium text-slate-500">กรุณาเลือกระดับชั้นด้านบนเพื่อแสดงข้อมูล</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
                 </div>
             </section>
 
@@ -680,29 +376,29 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
                     </div>
 
                     <form id="attendanceForm" onsubmit="submitAttendance(event)" class="space-y-5">
-                        <div class="overflow-hidden rounded-xl border border-blue-50 shadow-2xs">
-                          <table class="w-full text-left border-collapse text-xs sm:text-sm md:whitespace-nowrap">
-    <thead>
-        <tr class="bg-blue-50/40 border-b border-blue-100 text-blue-900 font-semibold">
-            <th class="p-3.5 text-center w-24">ห้องเรียน</th>
-            <th class="p-3.5">ชื่อครูที่ปรึกษา (ร่วม)</th>
-            <th class="p-3.5 text-center w-64">สถานะการลงแถว</th>
-            <th class="p-3.5 w-60">ระบุสาเหตุ (กรณีไม่ลงแถว)</th>
-        </tr>
-    </thead>
-    <tbody id="attendanceTableBody">
-        <tr>
-            <td colspan="4" class="p-10 text-center text-slate-400 bg-slate-50/40">
-                <div class="max-w-xs mx-auto">
-                    <i class="fa-solid fa-layer-group block text-2xl text-blue-300 mb-2"></i> 
-                    <span class="text-xs font-medium text-slate-500">กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</span>
-                </div>
-            </td>
-        </tr>
-    </tbody>
-</table>
+                        <div class="w-full overflow-x-auto select-none rounded-xl border border-blue-50 shadow-2xs" style="-webkit-overflow-scrolling: touch;">
+                            <table class="w-full text-left border-collapse text-xs sm:text-sm whitespace-nowrap min-w-[700px]">
+                                <thead>
+                                    <tr class="bg-blue-50/40 border-b border-blue-100 text-blue-900 font-semibold">
+                                        <th class="p-3.5 text-center w-24">ห้องเรียน</th>
+                                        <th class="p-3.5">ชื่อครูที่ปรึกษา (ร่วม)</th>
+                                        <th class="p-3.5 text-center w-64">สถานะการลงแถว</th>
+                                        <th class="p-3.5 w-60">ระบุสาเหตุ (กรณีไม่ลงแถว)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendanceTableBody">
+                                    <tr>
+                                        <td colspan="4" class="p-10 text-center text-slate-400 bg-slate-50/40">
+                                            <div class="max-w-xs mx-auto">
+                                                <i class="fa-solid fa-layer-group block text-2xl text-blue-300 mb-2"></i> 
+                                                <span class="text-xs font-medium text-slate-500">กรุณาเลือกระดับชั้นเพื่อเปิดหน้าเช็คเวลาค่ะ</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                      <div id="submitBtnArea" class="flex justify-end pt-1 hidden">
+                        <div id="submitBtnArea" class="flex justify-end pt-1 hidden">
                             <button type="submit" id="submitAttendanceBtn" class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-medium px-6 py-2.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98">
                                 <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล
                             </button>
@@ -737,8 +433,8 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
                         </div>
                     </div>
 
-                   <div class="overflow-hidden rounded-xl border border-blue-50 shadow-2xs">
-                        <table class="w-full text-left border-collapse text-xs sm:text-sm whitespace-nowrap">
+                    <div class="w-full overflow-x-auto select-none rounded-xl border border-blue-50 shadow-2xs" style="-webkit-overflow-scrolling: touch;">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm whitespace-nowrap min-w-[700px]">
                             <thead>
                                 <tr class="bg-blue-50/40 border-b border-blue-100 text-blue-900 font-semibold text-center">
                                     <th class="p-3.5">ระดับชั้น</th>
@@ -748,7 +444,7 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
                                     <th class="p-3.5 text-rose-600">รวมไม่ลงแถว (ครั้ง)</th>
                                 </tr>
                             </thead>
-                           <tbody id="statsTableBody"></tbody>
+                            <tbody id="statsTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -1162,7 +858,7 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
         }
 
         // ปรับปรุงการโหลดฟอร์มเช็คชื่อให้เป็นการ์ดแอปพลิเคชันสวยงามบนมือถือ และตารางสวยงามบนคอมพิวเตอร์
-       function loadAttendanceForm() {
+     function loadAttendanceForm() {
             const checkSelect = document.getElementById('checkClassSelect');
             const selectedClass = checkSelect ? checkSelect.value : '';
             const tbody = document.getElementById('attendanceTableBody');
@@ -1197,7 +893,7 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
                     tbody.innerHTML = `
                         <tr>
                             <td colspan="4" class="p-5 text-center text-slate-400 text-xs sm:text-sm">
-                                ไม่พบข้อมูลรายชื่อค่ะ
+                                不พบข้อมูลรายชื่อค่ะ
                             </td>
                         </tr>
                     `;
@@ -1205,104 +901,62 @@ class="max-w-md mx-auto my-6 sm:my-12 bg-white rounded-3xl shadow-lg border bord
                     return;
                 }
 
-                // 🔥 🛠️ ปรับปรุง: กลุ่มข้อมูล (Group By) ตามชื่อห้องเรียน เพื่อดึงครูมาจับคู่กันใน 1 การ์ด
-                const groupedByClass = {};
                 data.forEach((item, index) => {
-                    if (!groupedByClass[item.className]) {
-                        groupedByClass[item.className] = [];
-                    }
-                    // บันทึก index เดิมไว้ด้วยเพื่อให้ name="status_${index}" ส่งค่าไปหลังบ้านได้ถูกต้อง ไม่ผิดเพี้ยน
-                    groupedByClass[item.className].push({ ...item, originalIndex: index });
-                });
-
-                // วนลูปสร้าง UI รายห้อง (1 การ์ด / 1 แถวคอมพิวเตอร์)
-                Object.keys(groupedByClass).forEach(className => {
-                    const teachers = groupedByClass[className];
+                    const isAbsent = item.existingStatus === "ไม่ลงแถว";
                     
-                    // สร้างแถวหลักของการ์ดห้องนี้ (บนมือถือจะเป็น 1 บล็อกใหญ่ บนคอมจะเป็น 1 แถวปกติ)
                     const tr = document.createElement('tr');
-                    tr.className = "block md:table-row bg-white rounded-2xl shadow-md md:shadow-none border-2 border-slate-200 md:border-none md:border-b md:border-slate-200 mb-5 p-4 md:p-0";
+                    tr.className = "border-b border-slate-200 hover:bg-slate-50/50 transition-colors";
                     
-                    // โครงสร้างภายในแบ่งตามสไตล์ คอมพิวเตอร์/มือถือ
                     tr.innerHTML = `
-                        <!-- ส่วนแสดงชื่อห้อง (เด่นชัดสไตล์แอปมือถือ) -->
-                        <td class="block md:table-cell pb-2 md:py-4 font-bold text-lg md:text-sm text-indigo-900 border-b border-dashed border-slate-100 md:border-none mb-3 md:mb-0">
-                            <span class="bg-indigo-600 text-white md:bg-indigo-50 md:text-indigo-700 px-3.5 py-1.5 rounded-xl text-base md:text-sm font-extrabold shadow-xs md:shadow-none">
-                                ห้อง ${className}
-                            </span>
+                        <td class="p-3 text-center font-bold text-blue-900 bg-slate-50/30">
+                            <span>${item.className}</span>
+                            <input type="hidden" name="class_${index}" value="${item.className}">
+                            <input type="hidden" name="teacher_${index}" value="${item.teacherName}">
                         </td>
 
-                        <!-- มัดรวมครูที่ปรึกษา (สูงสุด 2 คน หรือ 1 คนตามจริง) อยู่ในบล็อกย่อยภายใน -->
-                        <td colspan="3" class="block md:table-cell p-0 md:p-0">
-                            <div class="flex flex-col gap-4 md:gap-0">
-                                ${teachers.map(teacher => {
-                                    const idx = teacher.originalIndex;
-                                    const isAbsent = teacher.existingStatus === "ไม่ลงแถว";
-                                    
-                                    return `
-                                    <div class="block md:grid md:grid-cols-3 md:items-center border-b border-slate-100 last:border-0 pb-3 last:pb-0 md:pb-0 md:border-0 w-full">
-                                        
-                                        <!-- ชื่อครู (ตัวหนา ชัดเจน) -->
-                                        <div class="py-1.5 md:py-4 font-bold text-slate-800 text-base md:text-sm md:px-3">
-                                            <div class="flex items-center gap-2">
-                                                <i class="fa-solid fa-user text-indigo-400 md:hidden text-sm"></i>
-                                                <span>${teacher.teacherName}</span>
-                                            </div>
-                                            <!-- ซ่อน Input ลับสำหรับส่งค่าไป Apps Script เหมือนเดิม -->
-                                            <input type="hidden" name="class_${idx}" value="${teacher.className}">
-                                            <input type="hidden" name="teacher_${idx}" value="${teacher.teacherName}">
-                                        </div>
+                        <td class="p-3 font-semibold text-slate-800">
+                            <span>${item.teacherName}</span>
+                        </td>
 
-                                        <!-- ตัวเลือกสถานะ -->
-                                        <div class="py-2 md:py-4 md:px-3">
-                                            <div class="grid grid-cols-2 gap-2.5 w-full md:flex md:gap-3">
-                                                <label class="flex items-center justify-center md:justify-start gap-2 cursor-pointer text-emerald-700 font-bold bg-emerald-50/60 p-2.5 rounded-xl md:p-0 md:bg-transparent border border-emerald-100 md:border-none active:scale-95 transition-all text-sm">
-                                                    <input
-                                                        type="radio"
-                                                        name="status_${idx}"
-                                                        value="ปฏิบัติหน้าที่"
-                                                        ${!isAbsent ? 'checked' : ''}
-                                                        onchange="toggleReasonField(${idx}, false)"
-                                                        class="w-4 h-4 accent-emerald-600">
-                                                    <span>ทำหน้าที่</span>
-                                                </label>
+                        <td class="p-3 text-center">
+                            <div class="flex items-center justify-center gap-4">
+                                <label class="flex items-center gap-1.5 cursor-pointer text-emerald-700 font-medium text-xs sm:text-sm">
+                                    <input
+                                        type="radio"
+                                        name="status_${index}"
+                                        value="ปฏิบัติหน้าที่"
+                                        ${!isAbsent ? 'checked' : ''}
+                                        onchange="toggleReasonField(${index}, false)"
+                                        class="w-4 h-4 accent-emerald-600">
+                                    <span>ทำหน้าที่</span>
+                                </label>
 
-                                                <label class="flex items-center justify-center md:justify-start gap-2 cursor-pointer text-rose-700 font-bold bg-rose-50/60 p-2.5 rounded-xl md:p-0 md:bg-transparent border border-rose-100 md:border-none active:scale-95 transition-all text-sm">
-                                                    <input
-                                                        type="radio"
-                                                        name="status_${idx}"
-                                                        value="ไม่ลงแถว"
-                                                        ${isAbsent ? 'checked' : ''}
-                                                        onchange="toggleReasonField(${idx}, true)"
-                                                        class="w-4 h-4 accent-rose-600">
-                                                    <span>ไม่ลงแถว</span>
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <!-- สาเหตุ (ถ้าไม่ลงแถว) -->
-                                        <div class="py-1 md:py-4 md:px-3">
-                                            <div class="flex flex-col w-full">
-                                                <span class="text-slate-400 text-[11px] font-bold mb-1 md:hidden"><i class="fa-solid fa-comment-dots"></i> ระบุเหตุผล</span>
-                                                <select
-                                                    id="reason_${idx}"
-                                                    ${!isAbsent ? 'disabled' : ''}
-                                                    class="w-full min-h-[44px] md:min-h-0 border rounded-xl px-3 py-2 text-sm font-bold transition-all
-                                                    ${!isAbsent
-                                                        ? 'bg-slate-100 opacity-40 border-slate-200 text-slate-400 cursor-not-allowed'
-                                                        : 'bg-white border-rose-300 text-rose-900 focus:ring-2 focus:ring-rose-100'}">
-                                                    <option value="ลาป่วย" ${teacher.existingReason === 'ลาป่วย' ? 'selected' : ''}>ลาป่วย</option>
-                                                    <option value="ลากิจ" ${teacher.existingReason === 'ลากิจ' ? 'selected' : ''}>ลากิจ</option>
-                                                    <option value="สาย" ${teacher.existingReason === 'สาย' ? 'selected' : ''}>มาสาย</option>
-                                                    <option value="ไปราชการ" ${teacher.existingReason === 'ไปราชการ' ? 'selected' : ''}>ไปราชการ</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    `;
-                                }).join('')}
+                                <label class="flex items-center gap-1.5 cursor-pointer text-rose-700 font-medium text-xs sm:text-sm">
+                                    <input
+                                        type="radio"
+                                        name="status_${index}"
+                                        value="ไม่ลงแถว"
+                                        ${isAbsent ? 'checked' : ''}
+                                        onchange="toggleReasonField(${index}, true)"
+                                        class="w-4 h-4 accent-rose-600">
+                                    <span>ไม่ลงแถว</span>
+                                </label>
                             </div>
+                        </td>
+
+                        <td class="p-2">
+                            <select
+                                id="reason_${index}"
+                                ${!isAbsent ? 'disabled' : ''}
+                                class="w-full border rounded-lg px-2 py-1.5 text-xs sm:text-sm font-medium transition-all
+                                ${!isAbsent
+                                    ? 'bg-slate-100 opacity-50 border-slate-200 text-slate-400 cursor-not-allowed'
+                                    : 'bg-white border-rose-300 text-rose-900 focus:ring-2 focus:ring-rose-100'}">
+                                <option value="ลาป่วย" ${item.existingReason === 'ลาป่วย' ? 'selected' : ''}>ลาป่วย</option>
+                                <option value="ลากิจ" ${item.existingReason === 'ลากิจ' ? 'selected' : ''}>ลากิจ</option>
+                                <option value="สาย" ${item.existingReason === 'สาย' ? 'selected' : ''}>มาสาย</option>
+                                <option value="ไปราชการ" ${item.existingReason === 'ไปราชการ' ? 'selected' : ''}>ไปราชการ</option>
+                            </select>
                         </td>
                     `;
                     tbody.appendChild(tr);
