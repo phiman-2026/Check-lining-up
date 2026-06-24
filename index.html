@@ -189,6 +189,24 @@ select {
     background-size: 1rem;
     padding-right: 1.75rem !important;
 }
+
+/* บังคับให้ตารางกางออกตามขนาดจริงของข้อมูล ไม่บีบตัวจนทับกันบนมือถือ */
+#dashboardTableBody text-slate-800, 
+#statsTableBody text-slate-700,
+table {
+    table-layout: auto !important;
+}
+
+/* เพิ่มการเว้นระยะห่างขั้นต่ำให้กับคอลัมน์ชื่อครูและผู้ตรวจ ไม่ให้โดนคอลัมน์อื่นเบียด */
+#dashboardTableBody td:nth-child(2),
+#statsTableBody td:nth-child(2) {
+    min-width: 150px !important; /* ล็อกความกว้างขั้นต่ำของชื่อครู */
+    padding-right: 12px !important;
+}
+
+#dashboardTableBody td:nth-child(5) {
+    min-width: 120px !important; /* ล็อกความกว้างขั้นต่ำของชื่อผู้ตรวจ */
+}
 </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased bg-slate-100">
